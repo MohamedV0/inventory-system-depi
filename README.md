@@ -111,11 +111,11 @@ gantt
 
 <div align="center">
 
-| Member | Role | Scholar ID |
-|:------:|:----:|:---------:|
-| **Mohamed Ashraf ElSayed** | Full Stack Developer | ![ID](https://img.shields.io/badge/DEPI_Scholar-2025-blue) |
-| **Lamis Ahmed Ebrahim** | Full Stack Developer | ![ID](https://img.shields.io/badge/DEPI_Scholar-2025-blue) |
-| **Shaimaa Abo Hashem Ibrahim** | Full Stack Developer | ![ID](https://img.shields.io/badge/DEPI_Scholar-2025-blue) |
+| Role | Member | Responsibilities | Scholar ID |
+|:-----|:------:|:----------------|:--------:|
+| **Full Stack Dev** | Mohamed Ashraf ElSayed | Backend & Frontend Development | ![ID](https://img.shields.io/badge/DEPI_Scholar-2025-blue) |
+| **Full Stack Dev** | Lamis Ahmed Ebrahim | Backend & Frontend Development | ![ID](https://img.shields.io/badge/DEPI_Scholar-2025-blue) |
+| **Full Stack Dev** | Shaimaa Abo Hashem Ibrahim | Backend & Frontend Development | ![ID](https://img.shields.io/badge/DEPI_Scholar-2025-blue) |
 
 </div>
 
@@ -123,7 +123,7 @@ gantt
 
 - **Initiative**: Digital Egypt Pioneers Initiative (DEPI)
 - **Track**: Full Stack .NET Developer
-- **Cohort**: 2025-2025
+- **Cohort**: 2024-2025
 - **Mentor**: Eng. Amira Hashim
 - **Project Type**: Graduation Project
 
