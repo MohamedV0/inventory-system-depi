@@ -1,0 +1,16 @@
+﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
+
+<script>
+    // Apply the 'required' class to all form labels for required fields
+    $(document).ready(function() {
+        // Find all input elements with data-val-required attribute
+        $('input[data-val-required], select[data-val-required], textarea[data-val-required]').each(function() {
+            // Get the corresponding label using the 'for' attribute matching the input's 'id'
+            var label = $('label[for="' + $(this).attr('id') + '"]');
+            // Add the 'required' class to the label
+            label.addClass('required');
+        });
+    });
+</script>

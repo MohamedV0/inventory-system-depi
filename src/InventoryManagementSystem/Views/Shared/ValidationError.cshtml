@@ -1,0 +1,43 @@
+@model InventoryManagementSystem.Filters.ErrorViewModel
+@{
+    ViewData["Title"] = "Validation Error";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">Validation Error</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.Message</h5>
+                    
+                    <div class="alert alert-info mt-3">
+                        <p class="mb-0">Please check your input and try again.</p>
+                    </div>
+                    
+                    <p class="text-muted small">
+                        <strong>Request ID:</strong> <code>@Model.RequestId</code><br/>
+                        <strong>Correlation ID:</strong> <code>@Model.CorrelationId</code>
+                    </p>
+                    
+                    @if (Model.ShowStackTrace && !string.IsNullOrEmpty(Model.StackTrace))
+                    {
+                        <div class="mt-4">
+                            <h6>Details</h6>
+                            <div class="bg-light p-3 rounded small">
+                                <pre>@Model.StackTrace</pre>
+                            </div>
+                        </div>
+                    }
+                    
+                    <div class="mt-4">
+                        <button class="btn btn-primary" onclick="window.history.back();">Go Back</button>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary ml-2">Return to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,393 @@
+@model InventoryManagementSystem.Models.ViewModels.CreateProductViewModel
+@using InventoryManagementSystem.Models.ViewComponents
+
+@{
+    ViewData["Title"] = "Create Product";
+    var categories = ViewBag.Categories as IEnumerable<CategoryViewModel>;
+    var hasCategories = categories != null && categories.Any();
+    var suppliers = ViewBag.Suppliers as IEnumerable<SupplierListItemViewModel>;
+    var hasSuppliers = suppliers != null && suppliers.Any();
+}
+
+<!-- Use a more compact container with consistent padding -->
+<div class="container-fluid px-3 py-2">
+    <!-- Use the existing PageHeader partial with fluent API -->
+    @{
+        var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+            .Create("Create Product", "fas fa-plus-circle")
+            .WithPrimaryButton("Back to Products", Url.Action("Index", "Product"), "fas fa-arrow-left");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <div class="row g-3">
+        <!-- Main Form Card -->
+        <div class="col-lg-8">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 p-3 border rounded bg-danger-subtle"></div>
+                
+                @if (!hasCategories)
+                {
+                    <div class="alert alert-warning mb-3 d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-3"></i>
+                        <div>
+                            <strong>Warning:</strong> No categories are available. Please <a asp-controller="Category" asp-action="Create" class="alert-link">create a category</a> first before adding products.
+                        </div>
+                    </div>
+                }
+                
+                <!-- Product Information Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-box-open text-primary"></i>
+                            </span>
+                            Product Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-4 mb-0">
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h6 class="section-title mb-3">
+                                        <i class="fas fa-info-circle text-primary me-2"></i>Basic Details
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="Name" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-tag text-primary me-2"></i>Product Name
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="A clear, descriptive name that customers and staff can easily search for. Good names include key attributes like brand, model, or size."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="Name" class="form-control" placeholder="Enter product name" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="SKU" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-barcode text-primary me-2"></i>SKU
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Stock Keeping Unit - a unique product identifier. Use a consistent format that includes category codes or supplier references for better organization."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="SKU" class="form-control code-format" placeholder="Enter SKU code" />
+                                        <span asp-validation-for="SKU" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="UnitOfMeasurement" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-ruler text-primary me-2"></i>Unit of Measurement
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="How this product is counted, measured, or sold. Examples: Each, Box, Kg, Liter, Pair, Case, Pallet. This affects inventory counts and order quantities."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="UnitOfMeasurement" class="form-control" placeholder="e.g., Each, Box, Kg" />
+                                        <span asp-validation-for="UnitOfMeasurement" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="CategoryId" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-sitemap text-primary me-2"></i>Category
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Group similar products together for better organization, reporting, and searching. Proper categorization improves inventory management efficiency."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <div class="select-container">
+                                            <select asp-for="CategoryId" class="form-select form-select-enhanced" 
+                                                    asp-items="@(new SelectList(ViewBag.Categories, "Id", "Name"))">
+                                                <option value="">Select Category</option>
+                                            </select>
+                                            <div class="select-icon">
+                                                <i class="fas fa-chevron-down text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h6 class="section-title mb-3">
+                                        <i class="fas fa-dollar-sign text-primary me-2"></i>Pricing & Inventory
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="Price" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-tag text-primary me-2"></i>Selling Price
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The price you charge customers for each unit of this product. This determines your revenue and profit margin when items are sold."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text input-group-currency">$</span>
+                                            <input asp-for="Price" class="form-control currency-input" placeholder="0.00" />
+                                        </div>
+                                        <span asp-validation-for="Price" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="Cost" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-dollar-sign text-primary me-2"></i>Cost
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Your direct cost for each unit, excluding supplier costs. This includes manufacturing, handling, and other internal costs affecting profit calculations."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text input-group-currency">$</span>
+                                            <input asp-for="Cost" class="form-control currency-input" placeholder="0.00" />
+                                        </div>
+                                        <span asp-validation-for="Cost" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="CurrentStock" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-cubes text-primary me-2"></i>Initial Stock
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The current quantity you have available in inventory. This sets the starting point for inventory tracking in the system."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="CurrentStock" class="form-control" type="number" min="0" placeholder="Enter quantity" />
+                                        <span asp-validation-for="CurrentStock" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="ReorderLevel" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-level-down-alt text-primary me-2"></i>Reorder Level
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The minimum stock threshold that triggers low stock alerts. The system will notify you when inventory falls below this level so you can reorder in time."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="ReorderLevel" class="form-control" type="number" min="0" placeholder="Minimum stock level" />
+                                        <span asp-validation-for="ReorderLevel" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Description Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-align-left text-primary"></i>
+                            </span>
+                            Product Description
+                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                               title="Detailed information about the product including features, specifications, materials, and benefits. A good description helps staff understand the product and improves searchability."><i class="fas fa-info"></i></span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <textarea asp-for="Description" class="form-control" rows="5" placeholder="Enter detailed product description..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <!-- Supplier Information Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-truck text-primary"></i>
+                            </span>
+                            Supplier Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        @if (!hasSuppliers)
+                        {
+                            <div class="alert alert-info mb-3 d-flex align-items-center">
+                                <i class="fas fa-info-circle me-3"></i>
+                                <div>
+                                    No suppliers are available. You can <a asp-controller="Suppliers" asp-action="Create" class="alert-link">create a supplier</a> first, or add suppliers to this product later.
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row g-4 mb-0">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="PrimarySupplierID" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-building text-primary me-2"></i>Supplier
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The vendor from whom you purchase this product. You can assign a primary supplier now or add multiple suppliers later."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <div class="select-container">
+                                            <select asp-for="PrimarySupplierID" class="form-select form-select-enhanced" 
+                                                    asp-items="@(new SelectList(ViewBag.Suppliers, "Id", "Name"))">
+                                                <option value="">Select Supplier (Optional)</option>
+                                            </select>
+                                            <div class="select-icon">
+                                                <i class="fas fa-chevron-down text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="PrimarySupplierID" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="SupplierUnitPrice" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-dollar-sign text-primary me-2"></i>Unit Price
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The price you pay to the supplier for each unit of this product. This affects your total cost and profit calculations."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text input-group-currency">$</span>
+                                            <input asp-for="SupplierUnitPrice" class="form-control currency-input" placeholder="0.00" />
+                                        </div>
+                                        <span asp-validation-for="SupplierUnitPrice" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="LeadTimeDays" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-clock text-primary me-2"></i>Lead Time (Days)
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The typical number of days between placing an order and receiving the product from this supplier. This helps in planning reorder timing."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="LeadTimeDays" class="form-control" type="number" min="0" placeholder="Enter lead time" />
+                                        <span asp-validation-for="LeadTimeDays" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="MinimumOrderQuantity" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-shopping-cart text-primary me-2"></i>Minimum Order Quantity
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The smallest quantity the supplier will accept in a single order. Important for planning purchases and avoiding order rejections."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="MinimumOrderQuantity" class="form-control" type="number" min="0" placeholder="Enter minimum order quantity" />
+                                        <span asp-validation-for="MinimumOrderQuantity" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label d-flex align-items-center">
+                                            <i class="fas fa-star text-warning me-2"></i>Preferred Supplier
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Indicates this is your preferred vendor for this product. The system will suggest this supplier first when creating purchase orders."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <div class="form-check form-switch">
+                                            <input asp-for="IsPreferredSupplier" class="form-check-input" type="checkbox" role="switch" id="preferredSupplierSwitch">
+                                            <label class="form-check-label" for="preferredSupplierSwitch">Mark as preferred</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 justify-content-end mb-4">
+                    <a asp-action="Index" class="btn btn-outline-light">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-save me-1"></i> Create Product
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Help & Tips Card -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-lightbulb text-primary"></i>
+                        </span>
+                        Tips & Information
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="tip-item mb-3 p-2 rounded bg-primary-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-info-circle me-2"></i> Product Creation Tips
+                        </h6>
+                        <ul class="mb-0 ps-3 small">
+                            <li>Use descriptive, searchable names</li>
+                            <li>Set accurate reorder levels</li>
+                            <li>Include detailed descriptions</li>
+                            <li>Assign the correct category</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tip-item mb-3 p-2 rounded bg-warning-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i> SKU Best Practices
+                        </h6>
+                        <p class="small mb-0">Use a consistent SKU format that is easy to understand and unique. Consider including category codes, supplier identifiers, or variant information.</p>
+                    </div>
+                    
+                    <div class="tip-item p-2 rounded bg-success-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle me-2"></i> What Happens Next?
+                        </h6>
+                        <p class="small mb-0">After creating a product, you can add suppliers, adjust stock levels, track inventory history, and monitor stock status.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Card (Optional) -->
+            <div class="card content-card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-eye text-primary"></i>
+                        </span>
+                        After Creation
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <h6 class="text-primary mb-3">What can you do next?</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-truck text-primary me-2"></i>
+                            <span class="text-light">Add product suppliers</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-boxes text-primary me-2"></i>
+                            <span class="text-light">Adjust stock levels</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-history text-primary me-2"></i>
+                            <span class="text-light">Track inventory history</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-chart-line text-primary me-2"></i>
+                            <span class="text-light">Monitor stock status</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Add custom currency validation method
+            $.validator.addMethod("currency", function(value, element) {
+                return this.optional(element) || /^\$?\d+(\.\d{1,2})?$/.test(value.replace(/[$,]/g, ''));
+            }, "Please enter a valid currency amount");
+
+            // Apply client validation to currency fields
+            $.validator.addClassRules("currency-input", {
+                currency: true,
+                required: true
+            });
+            
+            // When primary supplier selection changes, clear or enable supplier fields
+            $('#PrimarySupplierID').change(function() {
+                const hasSelection = $(this).val() !== '';
+                
+                if (!hasSelection) {
+                    // Clear values if no supplier selected
+                    $('#SupplierUnitPrice').val('');
+                    $('#LeadTimeDays').val('');
+                    $('#MinimumOrderQuantity').val('');
+                }
+            });
+        });
+    </script>
+} 

@@ -1,0 +1,266 @@
+@model InventoryManagementSystem.Models.ViewModels.StockHistoryDetailViewModel
+@using InventoryManagementSystem.Models.ViewComponents
+
+@{
+    ViewData["Title"] = "Stock Movement Details";
+}
+
+<!-- Use a more compact container with less padding -->
+<div class="container-fluid px-3 py-2">
+    @{
+        var headerModel = PageHeaderViewModel
+            .Create("Stock Movement Details", "fas fa-exchange-alt")
+            .WithSecondaryButton("Back to Stock History", Url.Action("Index", "Stock"), "fas fa-arrow-left")
+            .WithPrimaryButton("Product History", Url.Action("ProductHistory", "Stock", new { id = Model.ProductId }), "fas fa-history");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <div class="row g-3">
+        <div class="col-xl-10 col-lg-12 mx-auto">
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-info-circle text-primary"></i>
+                        </span>
+                        Transaction Details
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="card content-card bg-darker shadow-sm h-100">
+                                <div class="card-header d-flex align-items-center py-3 bg-darker border-bottom border-secondary-subtle">
+                                    <span class="icon-circle bg-primary-subtle me-2">
+                                        <i class="fas fa-box text-primary"></i>
+                                    </span>
+                                    <h6 class="m-0">Product Information</h6>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="info-row mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="fw-medium text-secondary">Product:</div>
+                                            <div class="fw-bold">@Model.ProductName</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-row mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="fw-medium text-secondary">SKU:</div>
+                                            <div class="code-format">@Model.SKU</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="fw-medium text-secondary">Category:</div>
+                                            <div>
+                                                <span class="badge category-badge py-2 px-3">
+                                                    <i class="fas fa-tag me-1"></i> @Model.CategoryName
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card content-card bg-darker shadow-sm h-100">
+                                <div class="card-header d-flex align-items-center py-3 bg-darker border-bottom border-secondary-subtle">
+                                    <span class="icon-circle bg-primary-subtle me-2">
+                                        <i class="fas fa-receipt text-primary"></i>
+                                    </span>
+                                    <h6 class="m-0">Transaction Summary</h6>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="info-row mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="fw-medium text-secondary">Date:</div>
+                                            <div class="date-display">
+                                                <span class="date">@Model.Date.ToString("MMM d, yyyy")</span>
+                                                <span class="time">@Model.Date.ToString("h:mm tt")</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="info-row mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="fw-medium text-secondary">User:</div>
+                                            <div>
+                                                <span class="badge bg-dark text-white border border-secondary">
+                                                    <i class="fas fa-user me-1"></i> @(Model.UserName ?? "System")
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="fw-medium text-secondary">Reference:</div>
+                                            <div>
+                                                @if (!string.IsNullOrEmpty(Model.Reference))
+                                                {
+                                                    <span class="code-format">@Model.Reference</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">N/A</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card content-card bg-darker shadow-sm">
+                        <div class="card-header d-flex align-items-center py-3 bg-darker border-bottom border-secondary-subtle">
+                            @{
+                                string changeClass = Model.Type switch
+                                {
+                                    InventoryManagementSystem.Models.Common.TransactionType.StockIn => "text-success",
+                                    InventoryManagementSystem.Models.Common.TransactionType.StockOut => "text-danger",
+                                    InventoryManagementSystem.Models.Common.TransactionType.Adjustment => "text-warning",
+                                    InventoryManagementSystem.Models.Common.TransactionType.Initial => "text-primary",
+                                    InventoryManagementSystem.Models.Common.TransactionType.Transfer => "text-info",
+                                    _ => "text-secondary"
+                                };
+                                
+                                string changeIcon = Model.Type switch
+                                {
+                                    InventoryManagementSystem.Models.Common.TransactionType.StockIn => "fa-arrow-up",
+                                    InventoryManagementSystem.Models.Common.TransactionType.StockOut => "fa-arrow-down",
+                                    InventoryManagementSystem.Models.Common.TransactionType.Adjustment => "fa-exchange-alt",
+                                    InventoryManagementSystem.Models.Common.TransactionType.Initial => "fa-box",
+                                    InventoryManagementSystem.Models.Common.TransactionType.Transfer => "fa-exchange-alt",
+                                    _ => "fa-question"
+                                };
+                            }
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-chart-line text-primary"></i>
+                            </span>
+                            <h6 class="m-0">Stock Change Details</h6>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <div class="card text-center bg-dark border-0 shadow-sm h-100">
+                                        <div class="card-body p-3">
+                                            <h6 class="text-secondary mb-3">Previous Stock</h6>
+                                            <div class="stock-display">
+                                                <i class="fas fa-box text-muted fa-2x mb-2"></i>
+                                                <h2 class="display-4 mb-0">@Model.PreviousStock</h2>
+                                                <div class="text-muted small mt-2">Before Transaction</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    @{
+                                        string cardClass = Model.Type switch
+                                        {
+                                            InventoryManagementSystem.Models.Common.TransactionType.StockIn => "bg-success-subtle border-success",
+                                            InventoryManagementSystem.Models.Common.TransactionType.StockOut => "bg-danger-subtle border-danger",
+                                            InventoryManagementSystem.Models.Common.TransactionType.Adjustment => "bg-warning-subtle border-warning",
+                                            InventoryManagementSystem.Models.Common.TransactionType.Initial => "bg-primary-subtle border-primary",
+                                            InventoryManagementSystem.Models.Common.TransactionType.Transfer => "bg-info-subtle border-info",
+                                            _ => "bg-secondary-subtle border-secondary"
+                                        };
+                                    }
+                                    <div class="card text-center @cardClass shadow-sm border h-100">
+                                        <div class="card-body p-3">
+                                            <div class="transaction-badge mb-3 mx-auto">
+                                                <span class="badge @(changeClass.Replace("text", "bg")) p-2">
+                                                    <i class="fas @changeIcon me-1"></i> @Model.TypeString
+                                                </span>
+                                            </div>
+                                            <div class="stock-display">
+                                                <h2 class="display-4 mb-0 @changeClass">
+                                                    @(Model.QuantityChange > 0 ? "+" : "")@Model.QuantityChange
+                                                </h2>
+                                                <div class="text-muted small mt-2">Stock Change</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card text-center bg-dark border-0 shadow-sm h-100">
+                                        <div class="card-body p-3">
+                                            <h6 class="text-secondary mb-3">New Stock</h6>
+                                            <div class="stock-display">
+                                                <i class="fas fa-boxes text-primary fa-2x mb-2"></i>
+                                                <h2 class="display-4 mb-0">@Model.NewStock</h2>
+                                                <div class="text-muted small mt-2">After Transaction</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-3 border-top border-secondary-subtle">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="info-row mb-3">
+                                            <div class="d-flex flex-column">
+                                                <div class="fw-medium text-secondary mb-2">
+                                                    <i class="fas fa-comment-alt text-primary me-2"></i>Reason:
+                                                </div>
+                                                <div class="p-3 bg-darker rounded">
+                                                    @if (!string.IsNullOrEmpty(Model.Reason))
+                                                    {
+                                                        @Model.Reason
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">No reason provided</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-row mb-3">
+                                            <div class="d-flex flex-column">
+                                                <div class="fw-medium text-secondary mb-2">
+                                                    <i class="fas fa-tag text-primary me-2"></i>Unit Price:
+                                                </div>
+                                                <div class="p-3 bg-darker rounded">
+                                                    @if (Model.UnitPrice.HasValue)
+                                                    {
+                                                        <span class="price-value">@Model.UnitPrice.Value.ToString("C")</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">N/A</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                @if (!string.IsNullOrEmpty(Model.Notes))
+                                {
+                                    <div class="info-row mb-0">
+                                        <div class="d-flex flex-column">
+                                            <div class="fw-medium text-secondary mb-2">
+                                                <i class="fas fa-sticky-note text-primary me-2"></i>Notes:
+                                            </div>
+                                            <div class="p-3 bg-darker rounded">@Model.Notes</div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Back to List
+                        </a>
+                        <a asp-action="ProductHistory" asp-route-id="@Model.ProductId" class="btn btn-primary">
+                            <i class="fas fa-history me-2"></i> View Product History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

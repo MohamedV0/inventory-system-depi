@@ -1,0 +1,144 @@
+@model InventoryManagementSystem.Models.ViewModels.CategoryViewModel
+@using InventoryManagementSystem.Models.ViewComponents
+
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<!-- Use a more compact container with consistent padding -->
+<div class="container-fluid px-3 py-2">
+    <!-- Use the PageHeader partial with fluent API -->
+    @{
+        var headerModel = PageHeaderViewModel
+            .Create("Edit Category", "fas fa-edit")
+            .WithPrimaryButton("Back to Categories", Url.Action("Index", "Category"), "fas fa-arrow-left");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <div class="row g-3">
+        <!-- Main Form Card -->
+        <div class="col-lg-8">
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 p-3 border rounded bg-danger-subtle"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CreatedAt" />
+                <input type="hidden" asp-for="CreatedBy" />
+                
+                <!-- Category Information Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-tag text-primary"></i>
+                            </span>
+                            Category Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-4 mb-0">
+                            <div class="col-md-12">
+                                <div class="info-section">
+                                    <h6 class="section-title mb-3">
+                                        <i class="fas fa-info-circle text-primary me-2"></i>Basic Details
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="Name" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-tag text-primary me-2"></i>Category Name
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="A clear, descriptive name for grouping related products. Good category names help organize your inventory and make products easier to find."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="Name" class="form-control" placeholder="Enter category name" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="Description" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-align-left text-primary me-2"></i>Description
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="A detailed description explaining what types of products belong in this category. A good description helps staff properly categorize inventory items and maintain organization."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <textarea asp-for="Description" class="form-control" rows="4" 
+                                                placeholder="Enter category description (optional)"></textarea>
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                        <div class="form-text text-muted">
+                                            <i class="fas fa-info-circle"></i> Provide a brief description of this category and its products.
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="IsActive" class="form-label d-flex align-items-center">
+                                            Status
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Active categories are visible throughout the system. Inactive categories are hidden from product selection but preserved in the database. Deactivate obsolete categories rather than deleting them."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <div class="form-check form-switch">
+                                            <input asp-for="IsActive" class="form-check-input" role="switch" type="checkbox" />
+                                            <label asp-for="IsActive" class="form-check-label">
+                                                <span id="statusLabel">Active</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-text text-muted">
+                                            Active categories are visible and can be assigned to products. Inactive categories cannot be assigned to new products but remain visible in reports.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 justify-content-end mb-4">
+                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-light">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-save me-1"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Warning Card -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-lightbulb text-primary"></i>
+                        </span>
+                        Tips & Information
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="tip-item mb-3 p-2 rounded bg-warning-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i> Important Note
+                        </h6>
+                        <p class="small mb-0">Changes to this category will affect all associated products.</p>
+                    </div>
+                    
+                    <div class="tip-item mb-3 p-2 rounded bg-info-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-info-circle me-2"></i> Naming Best Practices
+                        </h6>
+                        <p class="small mb-0">Use descriptive names that clearly identify the type of products this category contains.</p>
+                    </div>
+                    
+                    <div class="tip-item p-2 rounded bg-success-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle me-2"></i> Status Management
+                        </h6>
+                        <p class="small mb-0">Historical data will continue to reference this category even if it's made inactive.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

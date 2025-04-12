@@ -1,0 +1,228 @@
+@model X.PagedList.IPagedList<InventoryManagementSystem.Models.ViewModels.SupplierListItemViewModel>
+@using InventoryManagementSystem.Helpers
+@using InventoryManagementSystem.Models.ViewComponents
+
+@{
+    ViewData["Title"] = "Suppliers";
+}
+
+@await Html.PartialAsync("_PageHeader", PageHeaderViewModel.Create("Suppliers", "fas fa-truck")
+    .WithPrimaryButton("Add New Supplier", Url.Action("Create", "Suppliers"), "fas fa-plus"))
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-truck me-2 text-primary"></i>
+                <span class="fw-semibold">All Suppliers</span>
+                <span class="badge bg-primary ms-2">@Model.TotalItemCount</span>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <div class="entries-dropdown">
+                    <span class="me-1 text-sm"><i class="fas fa-list-ul me-1 text-secondary"></i> Show</span>
+                    <div class="select-container">
+                        <select class="form-select form-select-sm form-select-enhanced bg-dark border-dark text-white" id="entriesSelect">
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <div class="select-icon">
+                            <i class="fas fa-chevron-down text-primary"></i>
+                        </div>
+                    </div>
+                    <span class="text-secondary small">entries</span>
+                </div>
+                <form asp-controller="Suppliers" asp-action="Index" method="get" class="d-flex search-form">
+                    <input type="hidden" name="page" value="1" />
+                    <div class="d-flex align-items-center">
+                        <div class="input-group search-group">
+                            <span class="input-group-text bg-dark border-dark text-secondary border-end-0">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" name="searchTerm" id="supplierSearch" class="form-control bg-dark border-dark text-white border-start-0 border-end-0" 
+                                   style="min-width: 200px;" 
+                                   placeholder="Search suppliers..." value="@ViewBag.SearchTerm" />
+                            @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+                            {
+                                <button type="button" id="clearSearch" class="btn bg-dark border-dark border-start-0 border-end-0">
+                                    <i class="fas fa-times text-secondary"></i>
+                                </button>
+                            }
+                            <button type="submit" class="btn btn-primary rounded-end search-button">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Filters -->
+    <div class="card-body py-2 border-bottom border-dark">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <div class="d-flex align-items-center me-3">
+                <i class="fas fa-filter text-primary me-2"></i>
+                <span class="text-secondary small">Status:</span>
+            </div>
+            <div class="d-flex gap-2 supplier-filters">
+                <button type="button" class="btn filter-btn active" data-filter="all">
+                    <i class="fas fa-layer-group me-2"></i> All
+                </button>
+                <button type="button" class="btn filter-btn" data-filter="active">
+                    <i class="fas fa-check-circle text-success me-2"></i> Active
+                </button>
+                <button type="button" class="btn filter-btn" data-filter="inactive">
+                    <i class="fas fa-times-circle text-danger me-2"></i> Inactive
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card-body">
+            <div class="alert alert-info d-flex align-items-center m-0">
+                <i class="fas fa-info-circle me-3 fa-lg"></i>
+                <div>No suppliers found. Add your first supplier to get started.</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table m-0 data-table">
+                <thead>
+                    <tr>
+                        <th width="5%" class="sortable" data-sort="id">
+                            <div class="d-flex align-items-center">
+                                ID <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="20%" class="sortable" data-sort="name">
+                            <div class="d-flex align-items-center">
+                                NAME <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="20%" class="sortable" data-sort="contact">
+                            <div class="d-flex align-items-center">
+                                CONTACT PERSON <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="20%" class="sortable" data-sort="email">
+                            <div class="d-flex align-items-center">
+                                EMAIL <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="15%" class="sortable" data-sort="phone">
+                            <div class="d-flex align-items-center">
+                                PHONE <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="10%" class="text-center sortable" data-sort="products">
+                            <div class="d-flex align-items-center justify-content-center">
+                                PRODUCTS <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="10%" class="text-center">STATUS</th>
+                        <th width="10%" class="text-end">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var supplier in Model)
+                    {
+                        var statusClass = supplier.IsActive ? "badge bg-success" : "badge bg-danger";
+                        var statusText = supplier.IsActive ? "Active" : "Inactive";
+                        var statusIcon = supplier.IsActive ? "fas fa-check-circle" : "fas fa-times-circle";
+                        
+                        <tr class="data-table-row @(supplier.IsActive ? "active" : "inactive")">
+                            <td>@supplier.Id</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-building text-primary me-2"></i>
+                                    <span class="fw-medium">@supplier.Name</span>
+                                </div>
+                            </td>
+                            <td>@supplier.ContactPerson</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-envelope text-primary me-2"></i>
+                                    @supplier.Email
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-phone text-primary me-2"></i>
+                                    @supplier.Phone
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-primary rounded-pill">
+                                    <i class="fas fa-boxes me-1"></i> @supplier.ProductCount
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="@statusClass">
+                                    <i class="@statusIcon me-1"></i> @statusText
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="actions-container d-flex justify-content-end">
+                                    <a asp-controller="Suppliers" asp-action="Details" asp-route-id="@supplier.Id" 
+                                       class="btn btn-action btn-info me-1" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-controller="Suppliers" asp-action="Edit" asp-route-id="@supplier.Id" 
+                                       class="btn btn-action btn-primary me-1" title="Edit Supplier">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-action btn-danger delete-supplier" title="Delete Supplier"
+                                            data-supplier-id="@supplier.Id" data-supplier-name="@supplier.Name">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Hidden form for delete submission -->
+                                <form asp-action="Delete" asp-route-id="@supplier.Id" method="post" id="delete-form-@supplier.Id" class="d-none">
+                                    @Html.AntiForgeryToken()
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card-footer border-dark py-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="text-secondary small">
+                    <i class="fas fa-info-circle me-1"></i> Showing 1 to @Model.Count of @Model.TotalItemCount entries
+                </div>
+                <div>
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchTerm = ViewBag.SearchTerm }),
+                        PagedListAdapter.GetStandardOptions())
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/table-utils.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize table sorting
+            new TableUtils('.data-table');
+
+            // Initialize filters
+            initializeTableFilters('.supplier-filters', '.data-table-row');
+
+            // Initialize entries dropdown
+            initializeEntriesDropdown('#entriesSelect');
+
+            // Initialize search clear
+            initializeSearchClear('#clearSearch');
+        });
+    </script>
+} 

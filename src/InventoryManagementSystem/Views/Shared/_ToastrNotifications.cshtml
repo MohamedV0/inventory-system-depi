@@ -1,0 +1,56 @@
+@using System.Text.Encodings.Web;
+
+@if (TempData != null)
+{
+    <script>
+        // Configure toastr
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": true,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1500",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut",
+            "escapeHtml": false,
+            "closeHtml": '<button><i class="fas fa-times"></i></button>',
+            "tapToDismiss": true
+        };
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                toastr.success('@Html.Raw(JavaScriptEncoder.Default.Encode(TempData["SuccessMessage"].ToString()))', 'Success');
+            </text>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                toastr.error('@Html.Raw(JavaScriptEncoder.Default.Encode(TempData["ErrorMessage"].ToString()))', 'Error');
+            </text>
+        }
+
+        @if (TempData["WarningMessage"] != null)
+        {
+            <text>
+                toastr.warning('@Html.Raw(JavaScriptEncoder.Default.Encode(TempData["WarningMessage"].ToString()))', 'Warning');
+            </text>
+        }
+
+        @if (TempData["InfoMessage"] != null)
+        {
+            <text>
+                toastr.info('@Html.Raw(JavaScriptEncoder.Default.Encode(TempData["InfoMessage"].ToString()))', 'Information');
+            </text>
+        }
+    </script>
+} 

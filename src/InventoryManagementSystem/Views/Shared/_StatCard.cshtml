@@ -1,0 +1,13 @@
+@model InventoryManagementSystem.Models.ViewComponents.StatCardViewModel
+
+<div class="dashboard-card stat-card shadow-sm">
+    <div class="stat-label">@Model.Label</div>
+    <div class="stat-value">@Model.Value</div>
+    @if (!string.IsNullOrEmpty(Model.Subtext))
+    {
+        <div class="stat-subtext">@Model.Subtext</div>
+    }
+    <div class="icon-shape">
+        <i class="@Model.IconClass"></i>
+    </div>
+</div> 

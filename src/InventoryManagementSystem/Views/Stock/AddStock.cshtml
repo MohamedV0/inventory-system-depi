@@ -1,0 +1,273 @@
+@model InventoryManagementSystem.Models.ViewModels.AddStockViewModel
+@using InventoryManagementSystem.Models.ViewComponents
+
+@{
+    ViewData["Title"] = "Add Stock";
+}
+
+<!-- Use a more compact container with consistent padding -->
+<div class="container-fluid px-3 py-2">
+    <!-- Use the existing PageHeader partial with fluent API -->
+    @{
+        var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+            .Create("Add Stock", "fas fa-plus-circle")
+            .WithPrimaryButton("Back to Stock History", Url.Action("Index", "Stock"), "fas fa-arrow-left");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <div class="row g-3">
+        <!-- Main Form Card -->
+        <div class="col-lg-8">
+            <form asp-action="AddStock" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 p-3 border rounded bg-danger-subtle"></div>
+                
+                <!-- Stock Addition Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-success-subtle me-2">
+                                <i class="fas fa-plus text-success"></i>
+                            </span>
+                            Add Stock to Inventory
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-4 mb-0">
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h6 class="section-title mb-3">
+                                        <i class="fas fa-box text-primary me-2"></i>Product Details
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="ProductId" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-box-open text-primary me-2"></i>Product
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Select the product you want to add stock for. This will update the product's inventory count."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <div class="select-container">
+                                            <select asp-for="ProductId" class="form-select form-select-enhanced" 
+                                                    asp-items="ViewBag.Products" required>
+                                                <option value="">Select Product</option>
+                                            </select>
+                                            <div class="select-icon">
+                                                <i class="fas fa-chevron-down text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="ProductId" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="Quantity" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-cubes text-primary me-2"></i>Quantity
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The number of units to add to inventory. This will increase the product's current stock level."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="Quantity" class="form-control" min="1" required placeholder="Enter quantity to add" />
+                                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h6 class="section-title mb-3">
+                                        <i class="fas fa-dollar-sign text-primary me-2"></i>Price Information
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="UnitPrice" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-tag text-primary me-2"></i>Unit Price
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The cost per unit for this stock addition. This helps track inventory value and can be used for cost averaging."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text input-group-currency">$</span>
+                                            <input asp-for="UnitPrice" class="form-control currency-input" min="0" step="0.01" placeholder="0.00" />
+                                        </div>
+                                        <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="Reason" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-question-circle text-primary me-2"></i>Reason
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Why you're adding stock - helps with inventory tracking and reporting."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <div class="select-container">
+                                            <select asp-for="Reason" class="form-select form-select-enhanced" required>
+                                                <option value="">Select Reason</option>
+                                                <option value="Purchase">Purchase</option>
+                                                <option value="Return from Customer">Return from Customer</option>
+                                                <option value="Inventory Count Correction">Inventory Count Correction</option>
+                                                <option value="Initial Stock">Initial Stock</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                            <div class="select-icon">
+                                                <i class="fas fa-chevron-down text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="Reason" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Details Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-info-circle text-primary"></i>
+                            </span>
+                            Additional Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-4 mb-0">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Reference" class="form-label d-flex align-items-center">
+                                        <i class="fas fa-hashtag text-primary me-2"></i>Reference
+                                        <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                           title="Optional reference number for this stock addition, such as PO number, invoice reference, or tracking number."><i class="fas fa-info"></i></span>
+                                    </label>
+                                    <input asp-for="Reference" class="form-control code-format" placeholder="PO number, invoice reference, etc." />
+                                    <span asp-validation-for="Reference" class="text-danger"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Notes" class="form-label d-flex align-items-center">
+                                        <i class="fas fa-sticky-note text-primary me-2"></i>Notes
+                                        <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                           title="Any additional information about this stock addition. Useful for future reference."><i class="fas fa-info"></i></span>
+                                    </label>
+                                    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Enter any additional notes about this stock addition..."></textarea>
+                                    <span asp-validation-for="Notes" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 justify-content-end mb-4">
+                    <a asp-action="Index" class="btn btn-outline-light">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="fas fa-plus-circle me-1"></i> Add Stock
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Help & Tips Card -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-lightbulb text-primary"></i>
+                        </span>
+                        Tips & Information
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="tip-item mb-3 p-2 rounded bg-primary-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-info-circle me-2"></i> Stock Addition Tips
+                        </h6>
+                        <ul class="mb-0 ps-3 small">
+                            <li>Verify product selection before proceeding</li>
+                            <li>Enter accurate quantities to maintain inventory integrity</li>
+                            <li>Always include unit price for proper valuation</li>
+                            <li>Select the correct reason for accurate reporting</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tip-item mb-3 p-2 rounded bg-warning-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i> Important Note
+                        </h6>
+                        <p class="small mb-0">Adding stock will increase the product's available quantity and may affect inventory value calculations. Make sure all information is accurate before submitting.</p>
+                    </div>
+                    
+                    <div class="tip-item p-2 rounded bg-success-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle me-2"></i> What Happens Next?
+                        </h6>
+                        <p class="small mb-0">After adding stock, the system will update the product's inventory level and create a new entry in the stock history. You'll be able to track this addition in the stock movement history.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stock Movement Info -->
+            <div class="card content-card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-success-subtle me-2">
+                            <i class="fas fa-exchange-alt text-success"></i>
+                        </span>
+                        Stock Movement Types
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-arrow-up text-success me-2"></i>
+                            <div>
+                                <span class="text-light fw-medium">Stock In</span>
+                                <p class="mb-0 small text-secondary">Add stock through purchase or returns</p>
+                            </div>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-arrow-down text-danger me-2"></i>
+                            <div>
+                                <span class="text-light fw-medium">Stock Out</span>
+                                <p class="mb-0 small text-secondary">Remove stock through sales or damage</p>
+                            </div>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-exchange-alt text-warning me-2"></i>
+                            <div>
+                                <span class="text-light fw-medium">Adjustment</span>
+                                <p class="mb-0 small text-secondary">Correct inventory discrepancies</p>
+                            </div>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-box text-primary me-2"></i>
+                            <div>
+                                <span class="text-light fw-medium">Initial Stock</span>
+                                <p class="mb-0 small text-secondary">Set the starting inventory level</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Add custom currency validation method
+            $.validator.addMethod("currency", function(value, element) {
+                return this.optional(element) || /^\$?\d+(\.\d{1,2})?$/.test(value.replace(/[$,]/g, ''));
+            }, "Please enter a valid currency amount");
+
+            // Apply client validation to currency fields
+            $.validator.addClassRules("currency-input", {
+                currency: true
+            });
+        });
+    </script>
+} 

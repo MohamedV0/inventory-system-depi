@@ -1,0 +1,285 @@
+@model X.PagedList.IPagedList<InventoryManagementSystem.Models.ViewModels.ProductListItemViewModel>
+@using InventoryManagementSystem.Helpers
+@using InventoryManagementSystem.Models.ViewComponents
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+@await Html.PartialAsync("_PageHeader", PageHeaderViewModel.Create("Products", "fas fa-box")
+    .WithPrimaryButton("Add New Product", Url.Action("Create", "Product"), "fas fa-plus")
+    .WithSecondaryButton("Low Stock Products", Url.Action("LowStock", "Product"), "fas fa-exclamation-triangle"))
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-boxes me-2 text-primary"></i>
+                <span class="fw-semibold">All Products</span>
+                <span class="badge bg-primary ms-2">@Model.TotalItemCount</span>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <div class="entries-dropdown">
+                    <span class="me-1 text-sm"><i class="fas fa-list-ul me-1 text-secondary"></i> Show</span>
+                    <div class="select-container">
+                        <select class="form-select form-select-sm form-select-enhanced bg-dark border-dark text-white" id="entriesSelect">
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <div class="select-icon">
+                            <i class="fas fa-chevron-down text-primary"></i>
+                        </div>
+                    </div>
+                    <span class="text-secondary small">entries</span>
+                </div>
+                <form asp-controller="Product" asp-action="Index" method="get" class="d-flex search-form">
+                    <input type="hidden" name="page" value="1" />
+                    <div class="d-flex align-items-center">
+                        <div class="input-group search-group">
+                            <span class="input-group-text bg-dark border-dark text-secondary border-end-0 ">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" name="searchTerm" id="productSearch" class="form-control bg-dark border-dark text-white border-start-0 border-end-0" 
+                                   style="min-width: 200px;" 
+                                   placeholder="Search products..." value="@ViewBag.SearchTerm" />
+                            @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+                            {
+                                <button type="button" id="clearSearch" class="btn bg-dark border-dark border-start-0 border-end-0">
+                                    <i class="fas fa-times text-secondary"></i>
+                                </button>
+                            }
+                            <button type="submit" class="btn btn-primary rounded-end search-button">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Filters -->
+    <div class="card-body py-2 border-bottom border-dark">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <div class="d-flex align-items-center me-3">
+                <i class="fas fa-filter text-primary me-2"></i>
+                <span class="text-secondary small">Stock Status:</span>
+            </div>
+            <div class="d-flex gap-2 product-filters">
+                <button type="button" class="btn filter-btn @(string.IsNullOrEmpty(ViewBag.StockFilter) ? "active" : "")" data-filter="all">
+                    <i class="fas fa-layer-group me-2"></i> All
+                </button>
+                <button type="button" class="btn filter-btn @(ViewBag.StockFilter == "low" ? "active" : "")" data-filter="low">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i> Low Stock
+                </button>
+                <button type="button" class="btn filter-btn @(ViewBag.StockFilter == "out" ? "active" : "")" data-filter="out">
+                    <i class="fas fa-times-circle text-danger me-2"></i> Out of Stock
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card-body">
+            <div class="alert alert-info d-flex align-items-center m-0">
+                <i class="fas fa-info-circle me-3 fa-lg"></i>
+                <div>No products found. Add your first product to get started.</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table m-0 data-table">
+                <thead>
+                    <tr>
+                        <th width="15%" class="sortable" data-sort="sku">
+                            <div class="d-flex align-items-center">
+                                SKU <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="30%" class="sortable" data-sort="name">
+                            <div class="d-flex align-items-center">
+                                NAME <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="15%" class="sortable" data-sort="category">
+                            <div class="d-flex align-items-center">
+                                CATEGORY <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="15%" class="sortable" data-sort="supplier">
+                            <div class="d-flex align-items-center">
+                                SUPPLIER <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="8%" class="sortable" data-sort="price">
+                            <div class="d-flex align-items-center">
+                                PRICE <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="8%" class="text-center sortable" data-sort="stock">
+                            <div class="d-flex align-items-center justify-content-center">
+                                STOCK <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="7%" class="text-center">STATUS</th>
+                        <th width="7%" class="text-end">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        var statusClass = "badge bg-success";
+                        var statusText = "OK";
+                        var statusIcon = "fas fa-check-circle";
+                        
+                        if (product.CurrentStock <= 0)
+                        {
+                            statusClass = "badge bg-danger";
+                            statusText = "Out of Stock";
+                            statusIcon = "fas fa-times-circle";
+                        }
+                        else if (product.NeedsReorder)
+                        {
+                            statusClass = "badge bg-warning";
+                            statusText = "Low Stock";
+                            statusIcon = "fas fa-exclamation-triangle";
+                        }
+                        
+                        <tr class="data-table-row @(product.CurrentStock <= 0 ? "out-of-stock" : product.NeedsReorder ? "low-stock" : "")">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-box text-primary me-2"></i>
+                                    <span class="code-format">@product.SKU</span>
+                                </div>
+                            </td>
+                            <td class="fw-medium">@product.Name</td>
+                            <td>
+                                <span class="badge rounded-pill category-badge py-2 px-3">
+                                    <i class="fas fa-tag me-1"></i> @product.CategoryName
+                                </span>
+                            </td>
+                            <td>
+                                @if (product.HasSupplier)
+                                {
+                                    <span class="supplier-badge">
+                                        <i class="fas fa-truck me-1 text-primary"></i> @product.PrimarySupplierName
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">
+                                        <i class="fas fa-exclamation-circle me-1"></i> No supplier
+                                    </span>
+                                }
+                            </td>
+                            <td class="fw-medium">@product.Price.ToString("C")</td>
+                            <td class="text-center position-relative">
+                                <span class="@(product.CurrentStock <= 0 ? "text-danger fw-medium" : product.NeedsReorder ? "text-warning fw-medium" : "")">
+                                    @product.CurrentStock
+                                </span>
+                                @if (product.ReorderLevel > 0)
+                                {
+                                    <div class="stock-progress mt-1" title="Stock Level: @product.CurrentStock / Reorder at: @product.ReorderLevel">
+                                        <div class="progress progress-thin">
+                                            <div class="progress-bar @(product.CurrentStock <= 0 ? "bg-danger" : product.NeedsReorder ? "bg-warning" : "bg-success")" 
+                                                 role="progressbar" 
+                                                 style="width: @(Math.Min(100, (int)(product.CurrentStock * 100 / (product.ReorderLevel * 2))))%"
+                                                 aria-valuenow="@product.CurrentStock" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="@(product.ReorderLevel * 2)">
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <span class="@statusClass">
+                                    <i class="@statusIcon me-1"></i> @statusText
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="actions-container d-flex justify-content-end">
+                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" 
+                                       class="btn btn-action btn-info me-1" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-controller="Product" asp-action="Edit" asp-route-id="@product.Id" 
+                                       class="btn btn-action btn-primary me-1" title="Edit Product">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-action btn-danger delete-product" title="Delete Product"
+                                            data-product-id="@product.Id" data-product-name="@product.Name">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Hidden form for delete submission -->
+                                <form asp-action="Delete" asp-route-id="@product.Id" method="post" id="delete-form-@product.Id" class="d-none">
+                                    @Html.AntiForgeryToken()
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card-footer border-dark py-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="text-secondary small">
+                    <i class="fas fa-info-circle me-1"></i> Showing 1 to @Model.Count of @Model.TotalItemCount entries
+                </div>
+                <div>
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchTerm = ViewBag.SearchTerm, category = ViewBag.SelectedCategory, stockFilter = ViewBag.StockFilter }),
+                        PagedListAdapter.GetStandardOptions())
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/table-utils.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize table sorting
+            new TableUtils('.data-table');
+
+            // Initialize filters with server-side filtering
+            initializeTableFilters('.product-filters', '.data-table-row', {
+                serverSide: true,
+                filterParam: 'stockFilter',
+                urlParams: {
+                    searchTerm: '@ViewBag.SearchTerm',
+                    category: '@ViewBag.SelectedCategory'
+                }
+            });
+
+            // Initialize entries dropdown
+            initializeEntriesDropdown('#entriesSelect');
+
+            // Initialize search clear
+            initializeSearchClear('#clearSearch');
+
+            // Handle category filter
+            $('#categoryFilter').change(function() {
+                var category = $(this).val();
+                var currentUrl = new URL(window.location);
+                
+                if (category) {
+                    currentUrl.searchParams.set('category', category);
+                } else {
+                    currentUrl.searchParams.delete('category');
+                }
+                
+                currentUrl.searchParams.set('page', 1);
+                window.location = currentUrl;
+            });
+        });
+    </script>
+} 

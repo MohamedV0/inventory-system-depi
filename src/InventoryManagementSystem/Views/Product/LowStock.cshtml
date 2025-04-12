@@ -1,0 +1,182 @@
+@model X.PagedList.IPagedList<InventoryManagementSystem.Models.ViewModels.ProductListItemViewModel>
+@using InventoryManagementSystem.Helpers
+@using InventoryManagementSystem.Models.ViewComponents
+
+@{
+    ViewData["Title"] = "Low Stock Products";
+}
+
+@await Html.PartialAsync("_PageHeader", PageHeaderViewModel.Create("Low Stock Products", "fas fa-boxes")
+    .WithPrimaryButton("Back to Products", Url.Action("Index", "Product"), "fas fa-arrow-left"))
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+            <span class="fw-semibold">Products Requiring Reorder</span>
+            <span class="badge bg-warning ms-2">@Model.Count</span>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card-body">
+            <div class="alert alert-success d-flex align-items-center m-0">
+                <i class="fas fa-check-circle me-3 fa-lg"></i>
+                <div>All products have adequate stock levels.</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table m-0 data-table">
+                <thead>
+                    <tr>
+                        <th width="15%">
+                            <div class="d-flex align-items-center">
+                                SKU <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="25%">
+                            <div class="d-flex align-items-center">
+                                NAME <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="15%">
+                            <div class="d-flex align-items-center">
+                                CATEGORY <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="15%">
+                            <div class="d-flex align-items-center">
+                                SUPPLIER <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="10%" class="text-center">
+                            <div class="d-flex align-items-center justify-content-center">
+                                STOCK <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="10%" class="text-center">
+                            <div class="d-flex align-items-center justify-content-center">
+                                REORDER LEVEL <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="5%" class="text-center">STATUS</th>
+                        <th width="10%" class="text-end">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        var statusClass = product.CurrentStock == 0 ? "badge bg-danger" : "badge bg-warning";
+                        var statusText = product.CurrentStock == 0 ? "Out of Stock" : "Low Stock";
+                        var statusIcon = product.CurrentStock == 0 ? "fas fa-times-circle" : "fas fa-exclamation-triangle";
+                        
+                        <tr class="data-table-row @(product.CurrentStock <= 0 ? "out-of-stock" : "low-stock")">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-box text-primary me-2"></i>
+                                    <span class="code-format">@product.SKU</span>
+                                </div>
+                            </td>
+                            <td class="fw-medium">@product.Name</td>
+                            <td>
+                                <span class="badge rounded-pill category-badge py-2 px-3">
+                                    <i class="fas fa-tag me-1"></i> @product.CategoryName
+                                </span>
+                            </td>
+                            <td>
+                                @if (product.HasSupplier)
+                                {
+                                    <span class="supplier-badge">
+                                        <i class="fas fa-truck me-1 text-primary"></i> @product.PrimarySupplierName
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">
+                                        <i class="fas fa-exclamation-circle me-1"></i> No supplier
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-center position-relative">
+                                <span class="@(product.CurrentStock <= 0 ? "text-danger fw-medium" : "text-warning fw-medium")">
+                                    @product.CurrentStock
+                                </span>
+                                @if (product.ReorderLevel > 0)
+                                {
+                                    <div class="stock-progress mt-1" title="Stock Level: @product.CurrentStock / Reorder at: @product.ReorderLevel">
+                                        <div class="progress progress-thin">
+                                            <div class="progress-bar @(product.CurrentStock <= 0 ? "bg-danger" : "bg-warning")" 
+                                                 role="progressbar" 
+                                                 style="width: @(Math.Min(100, (int)(product.CurrentStock * 100 / (product.ReorderLevel * 2))))%"
+                                                 aria-valuenow="@product.CurrentStock" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="@(product.ReorderLevel * 2)">
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </td>
+                            <td class="text-center">@product.ReorderLevel</td>
+                            <td class="text-center">
+                                <span class="@statusClass">
+                                    <i class="@statusIcon me-1"></i> @statusText
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="actions-container d-flex justify-content-end">
+                                    <a asp-controller="Stock" asp-action="AddStock" asp-route-productId="@product.Id" 
+                                       class="btn btn-action btn-success me-1" title="Add Stock">
+                                        <i class="fas fa-plus"></i>
+                                    </a>
+                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" 
+                                       class="btn btn-action btn-info me-1" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-controller="Product" asp-action="Edit" asp-route-id="@product.Id" 
+                                       class="btn btn-action btn-primary me-1" title="Edit Product">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <a asp-controller="Stock" asp-action="ProductHistory" asp-route-id="@product.Id" 
+                                       class="btn btn-action btn-secondary" title="Stock History">
+                                        <i class="fas fa-history"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="card-footer border-dark py-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="text-secondary small">
+                    <i class="fas fa-info-circle me-1"></i> Showing low stock products
+                </div>
+                <div>
+                    @Html.PagedListPager(Model, page => Url.Action("LowStock", new { page }),
+                        PagedListAdapter.GetStandardOptions())
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize tooltips for action buttons
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    delay: { show: 500, hide: 100 }
+                });
+            });
+        });
+    </script>
+} 

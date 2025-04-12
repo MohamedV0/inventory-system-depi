@@ -1,0 +1,228 @@
+/* Toastr Custom Styles that match the theme */
+
+/* Container styles */
+#toast-container > div {
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    opacity: 1;
+    padding: 16px 16px 16px 52px;
+    background: var(--bg-card) !important;
+    background-image: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4px solid;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-position: 15px center;
+    min-width: 360px;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#toast-container > div:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+#toast-container > .toast-success {
+    background: linear-gradient(90deg, 
+        rgba(34, 197, 94, 0.15), 
+        rgba(34, 197, 94, 0.05)
+    ) !important;
+    border-left-color: var(--success);
+}
+
+#toast-container > .toast-error {
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05)) !important;
+    border-left-color: var(--danger);
+    color: var(--danger-text);
+}
+
+#toast-container > .toast-warning {
+    background: linear-gradient(90deg, rgba(234, 179, 8, 0.1), rgba(234, 179, 8, 0.05)) !important;
+    border-left-color: var(--warning);
+    color: var(--warning-text);
+}
+
+#toast-container > .toast-info {
+    background: linear-gradient(90deg, rgba(14, 165, 233, 0.1), rgba(14, 165, 233, 0.05)) !important;
+    border-left-color: var(--accent-secondary);
+    color: var(--info-text);
+}
+
+/* Title styles */
+.toast-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-right: 28px; /* Space for close button */
+}
+
+/* Message styles */
+.toast-message {
+    font-size: 0.875rem;
+    word-wrap: break-word;
+    line-height: 1.6;
+    color: var(--text-primary);
+    opacity: 0.9;
+    padding-right: 28px; /* Space for close button */
+}
+
+/* Success specific styles */
+#toast-container > .toast-success .toast-message {
+    color: var(--success-text);
+}
+
+/* Close button */
+.toast-close-button {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    font-weight: 400;
+    text-shadow: none;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+    padding: 0;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.toast-close-button:hover,
+.toast-close-button:focus {
+    color: var(--text-primary);
+    opacity: 1;
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Progress bar */
+.toast-progress {
+    height: 3px;
+    opacity: 1;
+    bottom: 0;
+    border-radius: 0 0 8px 8px;
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.4));
+}
+
+.toast-success .toast-progress {
+    background: linear-gradient(90deg, var(--success), rgba(34, 197, 94, 0.7));
+}
+
+.toast-error .toast-progress {
+    background: linear-gradient(90deg, var(--danger), rgba(239, 68, 68, 0.7));
+}
+
+.toast-warning .toast-progress {
+    background: linear-gradient(90deg, var(--warning), rgba(234, 179, 8, 0.7));
+}
+
+.toast-info .toast-progress {
+    background: linear-gradient(90deg, var(--accent-secondary), rgba(14, 165, 233, 0.7));
+}
+
+/* Animation effects */
+.toast {
+    animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top right;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%) translateY(-8px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Position adjustments */
+#toast-container.toast-top-right {
+    top: 20px;
+    right: 20px;
+}
+
+/* Custom icons with better positioning */
+.toast-success:before,
+.toast-error:before,
+.toast-warning:before,
+.toast-info:before {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    opacity: 0.95;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.toast-success:before {
+    content: "\f058"; /* fa-check-circle */
+    color: var(--success);
+    font-size: 22px; /* Slightly larger for better visibility */
+}
+
+.toast-error:before {
+    content: "\f057"; /* fa-times-circle */
+    color: var(--danger);
+}
+
+.toast-warning:before {
+    content: "\f071"; /* fa-exclamation-triangle */
+    color: var(--warning);
+}
+
+.toast-info:before {
+    content: "\f05a"; /* fa-info-circle */
+    color: var(--accent-secondary);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 576px) {
+    #toast-container > div {
+        width: calc(100vw - 32px);
+        min-width: unset;
+        margin: 0 16px;
+        padding: 14px 14px 14px 48px;
+    }
+    
+    #toast-container.toast-top-right {
+        top: 12px;
+        right: 0;
+        left: 0;
+    }
+
+    .toast-close-button {
+        width: 18px;
+        height: 18px;
+        font-size: 12px;
+        right: 6px;
+        top: 6px;
+    }
+
+    .toast-title {
+        font-size: 0.9rem;
+        padding-right: 24px;
+    }
+
+    .toast-message {
+        font-size: 0.825rem;
+        padding-right: 24px;
+    }
+} 

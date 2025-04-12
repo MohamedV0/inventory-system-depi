@@ -1,0 +1,418 @@
+/* SweetAlert2 Custom Theme
+   Matches the dark theme of our Inventory Management System
+   and provides consistency with toastr notifications */
+
+/* Set z-index higher than toastr (999999) */
+.swal2-container {
+    z-index: 9999 !important;
+}
+
+/* Main modal styling */
+.swal2-popup {
+    background: linear-gradient(145deg, var(--bg-card) 0%, #1a2234 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 12px !important;
+    padding: 2rem !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+/* Header styling */
+.swal2-title {
+    color: var(--text-primary) !important;
+    font-size: 1.5rem !important;
+    margin-bottom: 1rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+}
+
+/* Content styling */
+.swal2-html-container {
+    color: var(--text-secondary) !important;
+    font-size: 1rem !important;
+    margin: 1rem 0 !important;
+    line-height: 1.6 !important;
+    padding: 0.5rem !important;
+}
+
+/* Enhanced content formatting */
+.swal2-html-container .entity-name {
+    color: var(--danger) !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+    padding: 0.75rem 1rem !important;
+    margin: 1rem 0 !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-radius: 8px !important;
+    display: block !important;
+    text-align: center !important;
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+    width: 100% !important;
+    word-break: break-word !important;
+    line-height: 1.4 !important;
+}
+
+.swal2-html-container .delete-message {
+    display: block !important;
+    text-align: center !important;
+    margin-bottom: 1rem !important;
+    color: var(--text-primary) !important;
+    font-size: 1.1rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.01em !important;
+}
+
+.swal2-html-container .warning-text {
+    background: rgba(234, 179, 8, 0.1) !important;
+    border: 1px solid rgba(234, 179, 8, 0.2) !important;
+    color: var(--warning-text) !important;
+    padding: 0.75rem 1rem !important;
+    margin-top: 0.75rem !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+}
+
+.swal2-html-container .warning-text i {
+    color: var(--warning) !important;
+    margin-top: 0.2rem !important;
+}
+
+.swal2-html-container ul {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin: 0.75rem 0 !important;
+}
+
+.swal2-html-container ul li {
+    position: relative !important;
+    padding-left: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+    color: var(--text-secondary) !important;
+}
+
+.swal2-html-container ul li:before {
+    content: "•" !important;
+    color: var(--accent-primary) !important;
+    position: absolute !important;
+    left: 0.5rem !important;
+}
+
+.swal2-html-container .highlight {
+    color: var(--accent-primary) !important;
+    font-weight: 500 !important;
+}
+
+.swal2-html-container .details {
+    background: rgba(59, 130, 246, 0.1) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+    border-radius: 8px !important;
+    padding: 0.75rem 1rem !important;
+    margin: 0.75rem 0 !important;
+    font-size: 0.9rem !important;
+}
+
+/* Icon Colors and Sizes */
+.swal2-icon {
+    border-width: 3px !important;
+    margin: 1.5rem auto !important;
+    position: relative !important;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+.swal2-icon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+    animation: pulse 2s infinite;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.swal2-icon.swal2-error {
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+    background-color: var(--danger) !important;
+    height: 3px !important;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
+}
+
+.swal2-icon.swal2-success {
+    border-color: var(--success) !important;
+    color: var(--success) !important;
+    background: rgba(34, 197, 94, 0.1) !important;
+}
+
+.swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: var(--success) !important;
+    height: 3px !important;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6) !important;
+}
+
+.swal2-icon.swal2-success .swal2-success-ring {
+    border-color: var(--success) !important;
+}
+
+.swal2-icon.swal2-info {
+    border-color: var(--accent-secondary) !important;
+    color: var(--accent-secondary) !important;
+    background: rgba(14, 165, 233, 0.1) !important;
+}
+
+.swal2-icon.swal2-question {
+    border-color: var(--accent-primary) !important;
+    color: var(--accent-primary) !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Buttons */
+.swal2-actions {
+    margin-top: 1.5rem !important;
+    gap: 0.75rem !important;
+}
+
+/* General Button Style */
+.swal2-styled {
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+    padding: 0.625rem 1.5rem !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.swal2-styled::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    transform: scale(0) !important;
+    opacity: 0 !important;
+    border-radius: inherit !important;
+    transition: transform 0.3s ease, opacity 0.2s ease !important;
+}
+
+.swal2-styled:hover::before {
+    transform: scale(1) !important;
+    opacity: 1 !important;
+}
+
+/* Delete button styles */
+.swal2-confirm.btn-danger {
+    background: linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%) !important;
+    color: white !important;
+    border: none !important;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2) !important;
+}
+
+.swal2-confirm.btn-danger:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3) !important;
+}
+
+.swal2-confirm.btn-danger:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* Cancel button styles */
+.swal2-cancel.btn-outline-light {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.swal2-cancel.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.swal2-cancel.btn-outline-light:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Remove Bootstrap focus styles */
+.swal2-confirm.btn-danger:focus,
+.swal2-cancel.btn-outline-light:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.swal2-confirm.btn-danger:focus-visible,
+.swal2-cancel.btn-outline-light:focus-visible {
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4) !important;
+}
+
+/* Delete confirmation specific styles - overrides */
+.swal2-popup.swal2-modal-delete {
+    border-left: 4px solid var(--danger) !important;
+    background: linear-gradient(to right, 
+        rgba(239, 68, 68, 0.15), 
+        rgba(30, 41, 59, 0.9)
+    ) !important;
+}
+
+/* Animation */
+.swal2-show {
+    animation: swal2-show 0.3s cubic-bezier(0.26, 0.86, 0.44, 0.985) !important;
+}
+
+.swal2-hide {
+    animation: swal2-hide 0.2s cubic-bezier(0.26, 0.86, 0.44, 0.985) !important;
+}
+
+@keyframes swal2-show {
+    0% {
+        transform: translateY(-20px) scale(0.95);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes swal2-hide {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.1); }
+    70% { box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+/* Ensure proper stacking context */
+.swal2-container {
+    position: fixed !important;
+}
+
+.swal2-container.swal2-backdrop-show {
+    background: rgba(0, 0, 0, 0.7) !important;
+    backdrop-filter: blur(3px) !important;
+}
+
+/* Prevent body scroll when modal is open */
+body.swal2-shown {
+    overflow: hidden !important;
+}
+
+/* Clean up any lingering backdrops */
+body > .swal2-container {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* Toast-style alerts */
+.swal2-popup.swal2-toast {
+    padding: 0.75rem 1.5rem !important;
+    width: auto !important;
+    border-left: 4px solid var(--accent-primary) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    background: linear-gradient(90deg, 
+        rgba(59, 130, 246, 0.15), 
+        rgba(59, 130, 246, 0.05)
+    ) !important;
+}
+
+.swal2-popup.swal2-toast.swal2-icon-success {
+    border-left-color: var(--success) !important;
+    background: linear-gradient(90deg, 
+        rgba(34, 197, 94, 0.15), 
+        rgba(34, 197, 94, 0.05)
+    ) !important;
+}
+
+.swal2-popup.swal2-toast.swal2-icon-error {
+    border-left-color: var(--danger) !important;
+    background: linear-gradient(90deg, 
+        rgba(239, 68, 68, 0.15), 
+        rgba(239, 68, 68, 0.05)
+    ) !important;
+}
+
+.swal2-popup.swal2-toast.swal2-icon-warning {
+    border-left-color: var(--warning) !important;
+    background: linear-gradient(90deg, 
+        rgba(234, 179, 8, 0.15), 
+        rgba(234, 179, 8, 0.05)
+    ) !important;
+}
+
+.swal2-popup.swal2-toast.swal2-icon-info {
+    border-left-color: var(--accent-secondary) !important;
+    background: linear-gradient(90deg, 
+        rgba(14, 165, 233, 0.15), 
+        rgba(14, 165, 233, 0.05)
+    ) !important;
+}
+
+.swal2-popup.swal2-toast .swal2-title {
+    font-size: 1rem !important;
+    margin: 0 !important;
+}
+
+.swal2-popup.swal2-toast .swal2-html-container {
+    font-size: 0.875rem !important;
+    margin: 0.25rem 0 0 0 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .swal2-popup {
+        padding: 1.5rem !important;
+        width: calc(100% - 2rem) !important;
+        margin: 1rem !important;
+    }
+    
+    .swal2-title {
+        font-size: 1.25rem !important;
+    }
+    
+    .swal2-html-container {
+        font-size: 0.9rem !important;
+    }
+    
+    .swal2-styled {
+        padding: 0.5rem 1.2rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .swal2-icon {
+        transform: scale(0.85) !important;
+        margin: 1rem auto !important;
+    }
+} 

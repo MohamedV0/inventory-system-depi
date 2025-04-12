@@ -1,0 +1,62 @@
+@model InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+
+<div class="page-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1 d-flex align-items-center">
+            @if (!string.IsNullOrEmpty(Model.IconClass))
+            {
+                <i class="@Model.IconClass me-2 text-primary"></i>
+            }
+            @Model.Title
+        </h1>
+        @if (!string.IsNullOrEmpty(Model.Subtitle))
+        {
+            <p class="text-muted mb-0 small">@Model.Subtitle</p>
+        }
+    </div>
+    <div class="d-flex flex-wrap gap-2 action-buttons">
+        @if (Model.ShowRefreshButton)
+        {
+            <button class="btn btn-sm btn-outline-light d-flex align-items-center justify-content-center flex-grow-1 flex-sm-grow-0" onclick="window.location.reload()">
+                <i class="fas fa-sync-alt me-1"></i>
+                Refresh
+            </button>
+        }
+        
+        @if (!string.IsNullOrEmpty(Model.PrimaryButtonText))
+        {
+            <a href="@Model.PrimaryButtonUrl" class="btn btn-sm btn-primary d-flex align-items-center justify-content-center flex-grow-1 flex-sm-grow-0">
+                @if (!string.IsNullOrEmpty(Model.PrimaryButtonIcon))
+                {
+                    <i class="@Model.PrimaryButtonIcon me-1"></i>
+                }
+                @Model.PrimaryButtonText
+            </a>
+        }
+        
+        @if (!string.IsNullOrEmpty(Model.SecondaryButtonText))
+        {
+            @if (Model.IsDeleteButton)
+            {
+                <button type="button" 
+                        class="btn btn-sm btn-danger d-flex align-items-center justify-content-center flex-grow-1 flex-sm-grow-0 delete-@(Model.EntityType.ToLower())"
+                        data-@(Model.EntityType.ToLower())-id="@Model.EntityName"
+                        data-@(Model.EntityType.ToLower())-name="@Model.EntityName"
+                        data-form-id="@Model.DeleteFormId">
+                    <i class="@Model.SecondaryButtonIcon me-1"></i>
+                    @Model.SecondaryButtonText
+                </button>
+            }
+            else
+            {
+                <a href="@Model.SecondaryButtonUrl" class="btn btn-sm @(Model.IsSecondaryButtonDanger ? "btn-danger" : "btn-outline-light") d-flex align-items-center justify-content-center flex-grow-1 flex-sm-grow-0">
+                    @if (!string.IsNullOrEmpty(Model.SecondaryButtonIcon))
+                    {
+                        <i class="@Model.SecondaryButtonIcon me-1"></i>
+                    }
+                    @Model.SecondaryButtonText
+                </a>
+            }
+        }
+    </div>
+</div> 

@@ -1,0 +1,722 @@
+@model InventoryManagementSystem.Models.ViewModels.SupplierDetailsViewModel
+
+@{
+    ViewData["Title"] = "Supplier Details";
+}
+
+<div class="container-fluid px-3 py-2">
+    @{
+        var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+            .Create(Model.Name, "fas fa-building")
+            .WithPrimaryButton("Edit Supplier", Url.Action("Edit", new { id = Model.Id }), "fas fa-edit")
+            .WithDeleteButton("supplier", Model.Name, $"delete-form-{Model.Id}");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <form id="delete-form-@Model.Id" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-none"></form>
+
+    <div class="row g-3">
+        <!-- Supplier Information Card -->
+        <div class="col-lg-8">
+            <div class="card content-card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-building text-primary"></i>
+                        </span>
+                        Supplier Information
+                    </h5>
+                    <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger") fs-6 py-1 px-3">
+                        <i class="fas @(Model.IsActive ? "fa-check-circle" : "fa-times-circle") me-1"></i>
+                        @(Model.IsActive ? "Active" : "Inactive")
+                    </span>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="section-title mb-3 d-flex align-items-center">
+                                <i class="fas fa-address-card text-primary me-2"></i>
+                                Contact Information
+                                </h6>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-user text-primary me-3"></i>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-white-50 small">Contact</span>
+                                        <span class="fw-medium">@Model.ContactPerson</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-envelope text-primary me-3"></i>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-white-50 small">Email</span>
+                                        <span class="text-primary text-break">@Model.Email</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-phone text-primary me-3"></i>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-white-50 small">Phone</span>
+                                        <span class="text-primary">@Model.Phone</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="d-flex align-items-start mb-2">
+                                    <i class="fas fa-map-marker-alt text-primary me-3 mt-1"></i>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-white-50 small">Address</span>
+                                        <span>@Model.Address</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <h6 class="section-title mb-3 d-flex align-items-center">
+                                <i class="fas fa-info-circle text-primary me-2"></i>
+                                Status Information
+                                </h6>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-box text-primary me-3"></i>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-white-50 small">Products</span>
+                                        <span class="badge bg-info">@Model.Products.Count Products</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-toggle-on text-primary me-3"></i>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-white-50 small">Status</span>
+                                        @if (Model.IsActive)
+                                        {
+                                            <span class="badge bg-success py-1 px-2">
+                                                <i class="fas fa-check-circle me-1"></i>Active
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger py-1 px-2">
+                                                <i class="fas fa-times-circle me-1"></i>Inactive
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-start mb-2">
+                                    <i class="fas fa-calendar-plus text-primary me-3 mt-1"></i>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-white-50 small">Created</span>
+                                        <div class="fw-medium">@Model.CreatedAt.ToString("MMM dd, yyyy h:mm tt")</div>
+                                        <div class="text-light-emphasis small mt-1 d-flex align-items-center">
+                                            <i class="fas fa-user-circle text-info me-1"></i>
+                                            <span>by @Model.CreatedBy</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                                    @if (Model.UpdatedAt.HasValue)
+                                    {
+                                <div>
+                                    <div class="d-flex align-items-start mb-2">
+                                        <i class="fas fa-calendar-check text-primary me-3 mt-1"></i>
+                                        <div class="d-flex flex-column">
+                                            <span class="text-white-50 small">Updated</span>
+                                            <div class="fw-medium">@Model.UpdatedAt.Value.ToString("MMM dd, yyyy h:mm tt")</div>
+                                            <div class="text-light-emphasis small mt-1 d-flex align-items-center">
+                                                <i class="fas fa-user-edit text-info me-1"></i>
+                                                <span>by @Model.UpdatedBy</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="d-flex">
+                                <a href="mailto:@Model.Email" class="btn btn-primary me-2">
+                                    <i class="fas fa-envelope me-2"></i> Send Email
+                                </a>
+                                <a href="tel:@Model.Phone" class="btn btn-outline-light">
+                                    <i class="fas fa-phone me-2"></i> Call Supplier
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar - Statistics -->
+        <div class="col-lg-4">
+            <!-- Supplier Statistics Card -->
+            <div class="card content-card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-chart-pie text-primary"></i>
+                        </span>
+                        Statistics
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    @{
+                        var preferredCount = Model.Products.Count(p => p.IsPreferred);
+                        var alternativeCount = Model.Products.Count - preferredCount;
+                        
+                        var avgLeadTime = Model.Products.Any() ? Model.Products.Average(p => p.LeadTimeDays) : 0;
+                        var avgPrice = Model.Products.Any() ? Model.Products.Average(p => p.UnitPrice) : 0;
+                    }
+                    
+                    <div class="text-center mb-3">
+                        <div class="position-relative" style="height: 160px;">
+                            <canvas id="supplierProductsCanvas"></canvas>
+                            <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                <h2 class="mb-0 text-primary fw-bold display-4">@Model.Products.Count</h2>
+                                <div class="text-white-50">products</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="supplier-metrics mt-3">
+                        <div class="metric-item mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="d-flex align-items-center">
+                                    <i class="fas fa-star me-2" style="color: #22c55e;"></i>
+                                    <span style="color: #22c55e; font-weight: 500;">Preferred</span>
+                                </span>
+                                <span class="badge bg-success px-2 py-1 fs-6">@preferredCount</span>
+                            </div>
+                            <div class="progress progress-thin bg-dark" style="height: 5px;">
+                                <div class="progress-bar" role="progressbar" 
+                                    style="width: @(Model.Products.Any() ? (preferredCount * 100.0 / Model.Products.Count) : 0)%; background-color: #22c55e;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-item mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="d-flex align-items-center">
+                                    <i class="fas fa-exchange-alt me-2" style="color: #94a3b8;"></i>
+                                    <span style="color: #94a3b8; font-weight: 500;">Alternative</span>
+                                </span>
+                                <span class="badge bg-secondary px-2 py-1 fs-6">@alternativeCount</span>
+                            </div>
+                            <div class="progress progress-thin bg-dark" style="height: 5px;">
+                                <div class="progress-bar" role="progressbar" 
+                                    style="width: @(Model.Products.Any() ? (alternativeCount * 100.0 / Model.Products.Count) : 0)%; background-color: #94a3b8;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mt-4">
+                        <div class="flex-grow-1 text-center me-3">
+                            <div class="text-white-50 small mb-1">Avg. Lead Time</div>
+                            <div class="price-value fs-5 fw-bold" style="color: #3b82f6;">@avgLeadTime.ToString("0") days</div>
+                            </div>
+                        <div class="flex-grow-1 text-center">
+                            <div class="text-white-50 small mb-1">Avg. Price</div>
+                            <div class="price-value fs-5 fw-bold" style="color: #22c55e;">@avgPrice.ToString("C")</div>
+                        </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+    <!-- Supplier Products Section -->
+    <div class="card content-card shadow-sm mt-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                    <i class="fas fa-box-open text-primary"></i>
+                        </span>
+                Supplier Products
+                <span class="badge bg-info ms-2">@Model.Products.Count</span>
+                    </h5>
+            <a asp-controller="ProductSupplier" asp-action="Create" asp-route-supplierId="@Model.Id" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add Product
+            </a>
+                </div>
+        <div class="card-body p-0">
+            @if (Model.Products.Any())
+            {
+                <div class="p-3">
+                    <div class="row align-items-center mb-3">
+                        <div class="col-sm-12 col-md-6 mb-2 mb-md-0">
+                            <div class="d-flex supplier-filters flex-wrap gap-2">
+                                <button type="button" class="filter-btn active" data-filter="all">
+                                    <i class="fas fa-list me-1"></i> All
+                                </button>
+                                <button type="button" class="filter-btn" data-filter="preferred">
+                                    <i class="fas fa-star me-1"></i> Preferred
+                                </button>
+                                <button type="button" class="filter-btn" data-filter="alternative">
+                                    <i class="fas fa-exchange-alt me-1"></i> Alternative
+                                </button>
+                        </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-0">
+                                    <i class="fas fa-search text-primary"></i>
+                                </span>
+                                <input type="text" id="productSearch" class="form-control" placeholder="Search products...">
+                    </div>
+                        </div>
+                        </div>
+                    </div>
+                    
+                <div class="table-responsive">
+                    <table class="table data-table m-0" id="productsTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="sku">
+                                    <i class="fas fa-barcode me-1"></i> SKU <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th class="sortable" data-sort="product">
+                                    <i class="fas fa-box me-1"></i> Product Name <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th class="sortable" data-sort="price">
+                                    <i class="fas fa-tag me-1"></i> Unit Price <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th class="sortable" data-sort="lead">
+                                    <i class="fas fa-clock me-1"></i> Lead Time <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th class="sortable" data-sort="order">
+                                    <i class="fas fa-shopping-cart me-1"></i> Min Order <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th class="sortable" data-sort="status">
+                                    <i class="fas fa-tag me-1"></i> Status <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th class="sortable" data-sort="purchase">
+                                    <i class="fas fa-calendar me-1"></i> Last Purchase <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in Model.Products)
+                            {
+                                <tr class="data-table-row @(product.IsPreferred ? "preferred" : "alternative")">
+                                    <td><span class="code-format">@product.ProductSKU</span></td>
+                                    <td class="fw-medium">@product.ProductName</td>
+                                    <td class="fw-bold text-success">@product.UnitPrice.ToString("C")</td>
+                                    <td>@product.LeadTimeDays days</td>
+                                    <td>@product.MinimumOrderQuantity</td>
+                                    <td>
+                                        @if (product.IsPreferred)
+                                        {
+                                            <span class="preferred-badge">
+                                                <i class="fas fa-star me-1"></i>
+                                                Preferred
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Alternative</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <small>
+                                            @(product.LastPurchaseDate.HasValue ? product.LastPurchaseDate.Value.ToString("MMM dd, yyyy") : "Never")
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex actions-container">
+                                            <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" 
+                                               class="btn btn-action btn-info" data-bs-toggle="tooltip" title="View Product">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-controller="ProductSupplier" asp-action="Edit" 
+                                               asp-route-productId="@product.ProductId" asp-route-supplierId="@Model.Id" 
+                                               class="btn btn-action btn-primary" data-bs-toggle="tooltip" title="Edit Relationship">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    </div>
+                    
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <div class="entries-dropdown">
+                        <span>Show</span>
+                        <div class="select-container">
+                            <select id="entriesDropdown" class="form-select-enhanced form-select-sm">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <div class="select-icon">
+                                <i class="fas fa-chevron-down"></i>
+                        </div>
+                        </div>
+                        <span>entries</span>
+                    </div>
+                    
+                    <div>
+                        <nav aria-label="Product pagination">
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="p-4 text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-boxes fa-3x text-muted"></i>
+            </div>
+                    <h5>No Products Found</h5>
+                    <p class="text-muted mb-3">This supplier is not associated with any products yet.</p>
+                    <a asp-controller="ProductSupplier" asp-action="Create" asp-route-supplierId="@Model.Id" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-1"></i> Add Product
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Chart initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Supplier Products Chart
+            var ctx = document.getElementById('supplierProductsCanvas').getContext('2d');
+            
+            // Get product counts
+            var preferredCount = @Model.Products.Count(p => p.IsPreferred);
+            var alternativeCount = @(Model.Products.Count - Model.Products.Count(p => p.IsPreferred));
+            
+            var data = {
+                labels: ['Preferred', 'Alternative'],
+                        datasets: [{
+                    data: [preferredCount, alternativeCount],
+                    backgroundColor: ['rgba(34, 197, 94, 0.8)', 'rgba(148, 163, 184, 0.8)'],
+                    borderColor: ['rgba(34, 197, 94, 1)', 'rgba(148, 163, 184, 1)'],
+                            borderWidth: 2,
+                    borderRadius: 5,
+                    hoverOffset: 4
+                }]
+            };
+            
+            var options = {
+                cutout: '75%',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                        backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#f8fafc',
+                                bodyFont: {
+                            size: 12
+                                },
+                        displayColors: false,
+                                padding: 10,
+                        cornerRadius: 6,
+                        caretSize: 6,
+                                callbacks: {
+                                    label: function(context) {
+                                        var label = context.label || '';
+                                        var value = context.raw || 0;
+                                        var total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                        var percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true,
+                    duration: 1000
+                }
+            };
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: data,
+                options: options
+            });
+            
+            // Filter functionality for product table
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const productRows = document.querySelectorAll('#productsTable tbody tr');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    const filter = this.getAttribute('data-filter');
+                    
+                    productRows.forEach(row => {
+                        if (filter === 'all') {
+                            row.style.display = '';
+                        } else if (filter === 'preferred' && row.classList.contains('preferred')) {
+                            row.style.display = '';
+                        } else if (filter === 'alternative' && row.classList.contains('alternative')) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Search functionality
+            const searchInput = document.getElementById('productSearch');
+            searchInput.addEventListener('keyup', function() {
+                const searchValue = this.value.toLowerCase();
+                
+                productRows.forEach(row => {
+                    const productName = row.cells[1].textContent.toLowerCase();
+                    const sku = row.cells[0].textContent.toLowerCase();
+                    
+                    if (productName.includes(searchValue) || sku.includes(searchValue)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Entries dropdown functionality
+            const entriesDropdown = document.getElementById('entriesDropdown');
+            if (entriesDropdown) {
+                entriesDropdown.addEventListener('change', function() {
+                    const limit = parseInt(this.value);
+                    let count = 0;
+                    
+                    productRows.forEach(row => {
+                        if (row.style.display !== 'none') {
+                            if (count < limit) {
+                                row.style.display = '';
+                                count++;
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            }
+            
+            // Table sorting functionality
+            const sortableColumns = document.querySelectorAll('.sortable');
+            let sortDirection = 'asc';
+            let currentSortColumn = null;
+            
+            sortableColumns.forEach(column => {
+                column.addEventListener('click', function() {
+                    const sortBy = this.getAttribute('data-sort');
+                    const table = document.getElementById('productsTable');
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+                    
+                    // Update sort direction
+                    if (currentSortColumn === sortBy) {
+                        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        sortDirection = 'asc';
+                        currentSortColumn = sortBy;
+                    }
+                    
+                    // Update visual indicators
+                    sortableColumns.forEach(col => {
+                        const icon = col.querySelector('i.fas.fa-sort');
+                        if (col.getAttribute('data-sort') === sortBy) {
+                            icon.className = sortDirection === 'asc' ? 
+                                'fas fa-sort-up ms-1' : 'fas fa-sort-down ms-1';
+                        } else {
+                            icon.className = 'fas fa-sort ms-1';
+                        }
+                    });
+                    
+                    // Determine column index
+                    let columnIndex;
+                    switch(sortBy) {
+                        case 'sku': columnIndex = 0; break;
+                        case 'product': columnIndex = 1; break;
+                        case 'price': columnIndex = 2; break;
+                        case 'lead': columnIndex = 3; break;
+                        case 'order': columnIndex = 4; break;
+                        case 'status': columnIndex = 5; break;
+                        case 'purchase': columnIndex = 6; break;
+                        default: columnIndex = 0;
+                    }
+                    
+                    // Sort the rows
+                    rows.sort((a, b) => {
+                        let aValue = a.cells[columnIndex].textContent.trim();
+                        let bValue = b.cells[columnIndex].textContent.trim();
+                        
+                        // Special handling for price column
+                        if (sortBy === 'price') {
+                            aValue = parseFloat(aValue.replace(/[^0-9.-]+/g, ''));
+                            bValue = parseFloat(bValue.replace(/[^0-9.-]+/g, ''));
+                        }
+                        // Special handling for lead time and min order
+                        else if (sortBy === 'lead' || sortBy === 'order') {
+                            aValue = parseInt(aValue.replace(/[^0-9]/g, ''));
+                            bValue = parseInt(bValue.replace(/[^0-9]/g, ''));
+                        }
+                        // Special handling for status
+                        else if (sortBy === 'status') {
+                            aValue = a.cells[columnIndex].querySelector('span').textContent.trim();
+                            bValue = b.cells[columnIndex].querySelector('span').textContent.trim();
+                        }
+                        
+                        // Perform the comparison
+                        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+                        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+                        return 0;
+                    });
+                    
+                    // Re-append rows in the new order
+                    rows.forEach(row => tbody.appendChild(row));
+                });
+            });
+            
+            // Pagination functionality
+            const pageSizeSelect = document.getElementById('entriesDropdown');
+            const paginationLinks = document.querySelectorAll('.pagination .page-link');
+            let currentPage = 1;
+            let pageSize = 10;
+            
+            function applyPagination() {
+                const visibleRows = Array.from(productRows).filter(row => row.style.display !== 'none');
+                const totalPages = Math.ceil(visibleRows.length / pageSize);
+                
+                // Update pagination controls
+                const paginationUl = document.querySelector('.pagination');
+                if (paginationUl) {
+                    paginationUl.innerHTML = '';
+                    
+                    // Previous button
+                    const prevLi = document.createElement('li');
+                    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+                    const prevLink = document.createElement('a');
+                    prevLink.className = 'page-link';
+                    prevLink.href = '#';
+                    prevLink.textContent = 'Previous';
+                    prevLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (currentPage > 1) {
+                            goToPage(currentPage - 1);
+                        }
+                    });
+                    prevLi.appendChild(prevLink);
+                    paginationUl.appendChild(prevLi);
+                    
+                    // Page buttons
+                    for (let i = 1; i <= totalPages; i++) {
+                        const pageLi = document.createElement('li');
+                        pageLi.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                        const pageLink = document.createElement('a');
+                        pageLink.className = 'page-link';
+                        pageLink.href = '#';
+                        pageLink.textContent = i;
+                        pageLink.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            goToPage(i);
+                        });
+                        pageLi.appendChild(pageLink);
+                        paginationUl.appendChild(pageLi);
+                    }
+                    
+                    // Next button
+                    const nextLi = document.createElement('li');
+                    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+                    const nextLink = document.createElement('a');
+                    nextLink.className = 'page-link';
+                    nextLink.href = '#';
+                    nextLink.textContent = 'Next';
+                    nextLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (currentPage < totalPages) {
+                            goToPage(currentPage + 1);
+                        }
+                    });
+                    nextLi.appendChild(nextLink);
+                    paginationUl.appendChild(nextLi);
+                }
+                
+                // Show/hide rows based on current page
+                visibleRows.forEach((row, index) => {
+                    const startIdx = (currentPage - 1) * pageSize;
+                    const endIdx = startIdx + pageSize - 1;
+                    
+                    if (index >= startIdx && index <= endIdx) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+            
+            function goToPage(page) {
+                currentPage = page;
+                applyPagination();
+            }
+            
+            // Initialize pagination if we have entries dropdown
+            if (pageSizeSelect) {
+                pageSizeSelect.addEventListener('change', function() {
+                    pageSize = parseInt(this.value);
+                    currentPage = 1;
+                    applyPagination();
+                });
+                
+                // Initial pagination
+                applyPagination();
+            }
+        });
+    </script>
+} 

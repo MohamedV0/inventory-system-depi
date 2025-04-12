@@ -1,0 +1,189 @@
+@{
+    ViewData["Title"] = "Welcome";
+}
+
+<!-- Add dark-mode class to body on page load -->
+<script>
+    document.body.classList.add('dark-mode');
+</script>
+
+<div class="container-fluid pt-0 pb-4 mt-n2">
+    <!-- Hero/Welcome Section -->
+    <div class="content-card mb-5 shadow-lg border-0">
+        <div class="card-body p-0">
+            <div class="hero-container position-relative overflow-hidden">
+                <div class="hero-bg-pattern"></div>
+                <div class="hero-particles"></div>
+                <div class="row g-0">
+                    <div class="col-lg-7 p-5">
+                        <div class="hero-content">
+                            <div class="badge bg-primary-subtle text-primary mb-3 py-2 px-3 rounded-pill">
+                                <i class="fas fa-rocket me-2"></i>Smart Inventory Management
+                            </div>
+                            <h1 class="display-4 fw-bold mb-1 text-gradient">Welcome to</h1>
+                            <h1 class="display-3 fw-bold mb-3 text-primary">Inventory System</h1>
+                            <p class="lead mb-4 text-secondary">Efficiently manage your inventory, products, and suppliers in one centralized platform with real-time insights and analytics.</p>
+                            
+                            <!-- Added Hero Stats Section -->
+                            <div class="hero-stats d-flex flex-wrap gap-4 mb-4">
+                                <div class="hero-stat">
+                                    <div class="hero-stat-value"><span class="counter" data-value="1500">0</span>+</div>
+                                    <div class="hero-stat-label">Active Users</div>
+                                </div>
+                                <div class="hero-stat">
+                                    <div class="hero-stat-value"><span class="counter" data-value="25000">0</span>+</div>
+                                    <div class="hero-stat-label">Items Tracked</div>
+                                </div>
+                                <div class="hero-stat">
+                                    <div class="hero-stat-value"><span class="counter" data-value="98">0</span>%</div>
+                                    <div class="hero-stat-label">Accuracy Rate</div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex flex-wrap gap-3 mb-2 action-buttons">
+                                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn-lg shadow-sm">
+                                    <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                                </a>
+                                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-primary btn-lg">
+                                    <i class="fas fa-user-plus me-2"></i> Create Account
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 d-none d-lg-block">
+                        <div class="hero-image-container">
+                            <div class="hero-illustration">
+                                <div class="illustration-element box1"></div>
+                                <div class="illustration-element box2"></div>
+                                <div class="illustration-element box3"></div>
+                                <div class="illustration-element box4"></div>
+                                <i class="fas fa-boxes-stacked fa-7x text-primary opacity-75 main-icon"></i>
+                                <div class="floating-icon icon1">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                                <div class="floating-icon icon2">
+                                    <i class="fas fa-truck"></i>
+                                </div>
+                                <div class="floating-icon icon3">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <div class="floating-icon icon4">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <h2 class="mb-4 d-flex align-items-center section-title">
+        <i class="fas fa-star text-primary me-2"></i>
+        <span>Key Features</span>
+        <span class="section-line"></span>
+    </h2>
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-primary-subtle me-3 scale-on-hover">
+                            <i class="fas fa-box text-primary"></i>
+                        </div>
+                        <h3 class="mb-0 fs-4">Product Management</h3>
+                    </div>
+                    <p class="text-secondary">Efficiently manage your product catalog with detailed tracking and organization.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-success-subtle me-3 scale-on-hover">
+                            <i class="fas fa-chart-line text-success"></i>
+                        </div>
+                        <h3 class="mb-0 fs-4">Real-time Analytics</h3>
+                    </div>
+                    <p class="text-secondary">Get instant insights into your inventory with comprehensive analytics and reporting.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-info-subtle me-3 scale-on-hover">
+                            <i class="fas fa-bell text-info"></i>
+                        </div>
+                        <h3 class="mb-0 fs-4">Smart Alerts</h3>
+                    </div>
+                    <p class="text-secondary">Stay informed with automated alerts for low stock and important updates.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Choose Us -->
+    <h2 class="mb-4 d-flex align-items-center section-title">
+        <i class="fas fa-check-circle text-primary me-2"></i>
+        <span>Why Choose Us</span>
+        <span class="section-line"></span>
+    </h2>
+    <div class="content-card shadow-sm">
+        <div class="card-body p-4">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="d-flex mb-4 hover-card">
+                        <div class="icon-circle bg-primary-subtle me-3">
+                            <i class="fas fa-shield-alt text-primary"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-2">Secure & Reliable</h4>
+                            <p class="text-secondary mb-0">Your data is protected with industry-standard security measures.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex mb-4 hover-card">
+                        <div class="icon-circle bg-success-subtle me-3">
+                            <i class="fas fa-sync text-success"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-2">Real-time Updates</h4>
+                            <p class="text-secondary mb-0">Stay synchronized with instant updates across your inventory.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex mb-4 hover-card">
+                        <div class="icon-circle bg-warning-subtle me-3">
+                            <i class="fas fa-chart-bar text-warning"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-2">Advanced Analytics</h4>
+                            <p class="text-secondary mb-0">Make data-driven decisions with powerful reporting tools.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex mb-4 hover-card">
+                        <div class="icon-circle bg-info-subtle me-3">
+                            <i class="fas fa-users text-info"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-2">Team Collaboration</h4>
+                            <p class="text-secondary mb-0">Work together seamlessly with role-based access control.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/animations.js"></script>
+} 

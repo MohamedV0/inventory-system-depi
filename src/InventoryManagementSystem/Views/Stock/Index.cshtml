@@ -1,0 +1,483 @@
+@model X.PagedList.IPagedList<InventoryManagementSystem.Models.ViewModels.StockHistoryViewModel>
+@using InventoryManagementSystem.Helpers
+@using InventoryManagementSystem.Models.ViewComponents
+
+@{
+    ViewData["Title"] = "Stock History";
+}
+
+@await Html.PartialAsync("_PageHeader", PageHeaderViewModel.Create("Stock History", "fas fa-warehouse")
+    .WithPrimaryButton("Add Stock", Url.Action("AddStock", "Stock"), "fas fa-plus")
+    .WithSecondaryButton("Remove Stock", Url.Action("RemoveStock", "Stock"), "fas fa-minus")
+    .WithSecondaryButton("Adjust Stock", Url.Action("AdjustStock", "Stock"), "fas fa-balance-scale")
+    .WithSecondaryButton("Low Stock Items", Url.Action("LowStock", "Product"), "fas fa-exclamation-triangle"))
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-history me-2 text-primary"></i>
+                <span class="fw-semibold">Stock Movement History</span>
+                <span class="badge bg-primary ms-2">@Model.TotalItemCount</span>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <div class="entries-dropdown">
+                    <span class="me-1 text-sm"><i class="fas fa-list-ul me-1 text-secondary"></i> Show</span>
+                    <div class="select-container">
+                        <select class="form-select form-select-sm form-select-enhanced bg-dark border-dark text-white" id="entriesSelect">
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <div class="select-icon">
+                            <i class="fas fa-chevron-down text-primary"></i>
+                        </div>
+                    </div>
+                    <span class="text-secondary small">entries</span>
+                </div>
+                <form asp-controller="Stock" asp-action="Index" method="get" class="d-flex search-form">
+                    <input type="hidden" name="page" value="1" />
+                    <div class="d-flex align-items-center">
+                        <div class="input-group search-group">
+                            <span class="input-group-text bg-dark border-dark text-secondary border-end-0">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" name="searchTerm" id="stockSearch" class="form-control bg-dark border-dark text-white border-start-0 border-end-0" 
+                                   style="min-width: 200px;" 
+                                   placeholder="Search transactions..." value="@ViewBag.SearchTerm" />
+                            @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+                            {
+                                <button type="button" id="clearSearch" class="btn bg-dark border-dark border-start-0 border-end-0">
+                                    <i class="fas fa-times text-secondary"></i>
+                                </button>
+                            }
+                            <button type="submit" class="btn btn-primary rounded-end search-button">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Filters -->
+    <div class="card-body py-2 border-bottom border-dark">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <div class="d-flex align-items-center me-3">
+                <i class="fas fa-filter text-primary me-2"></i>
+                <span class="text-secondary small">Filter by Type:</span>
+            </div>
+            <div class="d-flex gap-2 flex-wrap stock-filters">
+                <a href="@Url.Action("Index", new { page = 1, searchTerm = ViewBag.SearchTerm, searchAdvanced = ViewBag.SearchAdvanced, productId = ViewBag.ProductId, pageSize = ViewBag.PageSize })" 
+                   class="btn filter-btn @(ViewBag.TransactionType == null ? "active" : "")" data-filter="all" tabindex="-1">
+                    <i class="fas fa-layer-group me-2"></i> All
+                </a>
+                <a href="@Url.Action("Index", new { page = 1, searchTerm = ViewBag.SearchTerm, searchAdvanced = ViewBag.SearchAdvanced, productId = ViewBag.ProductId, transactionType = 1, pageSize = ViewBag.PageSize })" 
+                   class="btn filter-btn @(ViewBag.TransactionType == 1 ? "active" : "")" data-filter="1" tabindex="-1">
+                    <i class="fas fa-arrow-up text-success me-2"></i> Stock In
+                </a>
+                <a href="@Url.Action("Index", new { page = 1, searchTerm = ViewBag.SearchTerm, searchAdvanced = ViewBag.SearchAdvanced, productId = ViewBag.ProductId, transactionType = 2, pageSize = ViewBag.PageSize })" 
+                   class="btn filter-btn @(ViewBag.TransactionType == 2 ? "active" : "")" data-filter="2" tabindex="-1">
+                    <i class="fas fa-arrow-down text-danger me-2"></i> Stock Out
+                </a>
+                <a href="@Url.Action("Index", new { page = 1, searchTerm = ViewBag.SearchTerm, searchAdvanced = ViewBag.SearchAdvanced, productId = ViewBag.ProductId, transactionType = 3, pageSize = ViewBag.PageSize })" 
+                   class="btn filter-btn @(ViewBag.TransactionType == 3 ? "active" : "")" data-filter="3" tabindex="-1">
+                    <i class="fas fa-exchange-alt text-warning me-2"></i> Adjustment
+                </a>
+                <a href="@Url.Action("Index", new { page = 1, searchTerm = ViewBag.SearchTerm, searchAdvanced = ViewBag.SearchAdvanced, productId = ViewBag.ProductId, transactionType = 4, pageSize = ViewBag.PageSize })" 
+                   class="btn filter-btn @(ViewBag.TransactionType == 4 ? "active" : "")" data-filter="4" tabindex="-1">
+                    <i class="fas fa-box text-primary me-2"></i> Initial Stock
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Filters Toggle -->
+    <div class="card-body p-0 border-bottom border-dark">
+        <div class="d-flex">
+            <button class="btn btn-link text-decoration-none w-100 py-2 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilters" aria-expanded="false" aria-controls="advancedFilters">
+                <div class="d-flex align-items-center justify-content-center">
+                    <i class="fas fa-sliders-h text-primary me-2"></i>
+                    <span class="text-light">Advanced Filters</span>
+                    <i class="fas fa-chevron-down ms-2 text-primary advanced-filters-icon"></i>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Advanced Filters Content -->
+    <div class="collapse" id="advancedFilters">
+        <div class="card-body border-bottom border-dark bg-dark-subtle">
+            <form method="get" class="row g-3">
+                <input type="hidden" name="page" value="1" />
+                <input type="hidden" name="pageSize" value="@ViewBag.PageSize" />
+                
+                <!-- Date Range Filters -->
+                <div class="col-12">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-calendar text-primary me-2"></i>
+                        <span class="text-light fw-medium">Date Range</span>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-dark text-secondary">
+                                    <i class="fas fa-calendar-day"></i>
+                                </span>
+                                <input type="date" class="form-control bg-dark border-dark text-white" 
+                                       id="startDate" name="startDate" placeholder="Start Date"
+                                       value="@ViewBag.StartDate">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-dark text-secondary">
+                                    <i class="fas fa-calendar-day"></i>
+                                </span>
+                                <input type="date" class="form-control bg-dark border-dark text-white" 
+                                       id="endDate" name="endDate" placeholder="End Date"
+                                       value="@ViewBag.EndDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12"><hr class="border-dark opacity-25 my-1"></div>
+                
+                <!-- Product & Transaction Type Filters -->
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-box text-primary me-2"></i>
+                        <span class="text-light fw-medium">Product</span>
+                    </div>
+                    <div class="select-container w-100">
+                        <select name="productId" id="productId" class="form-select form-select-enhanced bg-dark border-dark text-white" asp-items="ViewBag.Products">
+                            <option value="">Select Product</option>
+                        </select>
+                        <div class="select-icon">
+                            <i class="fas fa-chevron-down text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-exchange-alt text-primary me-2"></i>
+                        <span class="text-light fw-medium">Transaction Type</span>
+                    </div>
+                    <div class="select-container w-100">
+                        <select name="transactionType" id="transactionType" class="form-select form-select-enhanced bg-dark border-dark text-white">
+                            <option value="">Select Transaction Type</option>
+                            <option value="1" selected="@(ViewBag.TransactionType == 1)">Stock In</option>
+                            <option value="2" selected="@(ViewBag.TransactionType == 2)">Stock Out</option>
+                            <option value="3" selected="@(ViewBag.TransactionType == 3)">Adjustment</option>
+                            <option value="4" selected="@(ViewBag.TransactionType == 4)">Initial Stock</option>
+                            <option value="5" selected="@(ViewBag.TransactionType == 5)">Transfer</option>
+                        </select>
+                        <div class="select-icon">
+                            <i class="fas fa-chevron-down text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12"><hr class="border-dark opacity-25 my-1"></div>
+                
+                <!-- Search Fields -->
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-search text-primary me-2"></i>
+                        <span class="text-light fw-medium">Reference Number</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-dark text-secondary">
+                            <i class="fas fa-hashtag"></i>
+                        </span>
+                        <input type="text" class="form-control bg-dark border-dark text-white" 
+                               id="referenceSearch" name="referenceSearch" placeholder="Search by reference..."
+                               value="@ViewBag.ReferenceSearch">
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        <span class="text-light fw-medium">Reason</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-dark text-secondary">
+                            <i class="fas fa-comment-alt"></i>
+                        </span>
+                        <input type="text" class="form-control bg-dark border-dark text-white" 
+                               id="reasonSearch" name="reasonSearch" placeholder="Search by reason..."
+                               value="@ViewBag.ReasonSearch">
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="col-12">
+                    <div class="filter-action-buttons">
+                        <button type="button" id="clearFilters" class="btn btn-outline-secondary">
+                            <i class="fas fa-eraser me-1"></i> Clear Filters
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter me-1"></i> Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card-body">
+            <div class="alert alert-info d-flex align-items-center m-0">
+                <i class="fas fa-info-circle me-3 fa-lg"></i>
+                <div>No stock history found. Use the buttons above to record stock movements.</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table m-0 data-table stock-history-table">
+                <thead>
+                    <tr>
+                        <th width="20%" class="sortable" data-sort="product">
+                            <div class="d-flex align-items-center">
+                                PRODUCT <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="10%" class="sortable" data-sort="type">
+                            <div class="d-flex align-items-center">
+                                TYPE <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="10%" class="text-center sortable" data-sort="quantity">
+                            <div class="d-flex align-items-center justify-content-center">
+                                QUANTITY <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="8%" class="text-center d-none d-md-table-cell">BEFORE</th>
+                        <th width="8%" class="text-center d-none d-md-table-cell">AFTER</th>
+                        <th width="8%" class="sortable" data-sort="price">
+                            <div class="d-flex align-items-center">
+                                PRICE <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="10%" class="sortable" data-sort="reference">
+                            <div class="d-flex align-items-center">
+                                REF# <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="15%" class="d-none d-md-table-cell">REASON</th>
+                        <th width="15%" class="sortable" data-sort="date">
+                            <div class="d-flex align-items-center">
+                                DATE <i class="fas fa-sort ms-1 text-muted"></i>
+                            </div>
+                        </th>
+                        <th width="5%" class="text-end">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        string changeClass = item.Type switch
+                        {
+                            InventoryManagementSystem.Models.Common.TransactionType.StockIn => "text-success",
+                            InventoryManagementSystem.Models.Common.TransactionType.StockOut => "text-danger",
+                            InventoryManagementSystem.Models.Common.TransactionType.Adjustment => "text-warning",
+                            InventoryManagementSystem.Models.Common.TransactionType.Initial => "text-primary",
+                            InventoryManagementSystem.Models.Common.TransactionType.Transfer => "text-info",
+                            _ => "text-secondary"
+                        };
+                        
+                        string changeIcon = item.Type switch
+                        {
+                            InventoryManagementSystem.Models.Common.TransactionType.StockIn => "fa-arrow-up",
+                            InventoryManagementSystem.Models.Common.TransactionType.StockOut => "fa-arrow-down",
+                            InventoryManagementSystem.Models.Common.TransactionType.Adjustment => "fa-exchange-alt",
+                            InventoryManagementSystem.Models.Common.TransactionType.Initial => "fa-box",
+                            InventoryManagementSystem.Models.Common.TransactionType.Transfer => "fa-exchange-alt",
+                            _ => "fa-question"
+                        };
+                        
+                        string transactionTypeClass = item.Type switch
+                        {
+                            InventoryManagementSystem.Models.Common.TransactionType.StockIn => "stock-in",
+                            InventoryManagementSystem.Models.Common.TransactionType.StockOut => "stock-out",
+                            InventoryManagementSystem.Models.Common.TransactionType.Adjustment => "adjustment",
+                            InventoryManagementSystem.Models.Common.TransactionType.Initial => "initial",
+                            InventoryManagementSystem.Models.Common.TransactionType.Transfer => "transfer",
+                            _ => ""
+                        };
+                        
+                        <tr class="data-table-row @transactionTypeClass">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-box text-primary me-2"></i>
+                                    <a asp-action="ProductHistory" asp-route-id="@item.ProductId" class="product-link">
+                                        @item.ProductName
+                                    </a>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill py-2 px-3 transaction-badge @(item.Type switch {
+                                    InventoryManagementSystem.Models.Common.TransactionType.StockIn => "bg-success",
+                                    InventoryManagementSystem.Models.Common.TransactionType.StockOut => "bg-danger",
+                                    InventoryManagementSystem.Models.Common.TransactionType.Adjustment => "bg-warning",
+                                    InventoryManagementSystem.Models.Common.TransactionType.Initial => "bg-primary",
+                                    InventoryManagementSystem.Models.Common.TransactionType.Transfer => "bg-info",
+                                    _ => "bg-secondary"
+                                })">
+                                    <i class="fas @changeIcon me-1"></i> <span class="badge-text">@item.TypeString</span>
+                                </span>
+                            </td>
+                            <td class="text-center fw-medium @changeClass">
+                                @(item.QuantityChange > 0 ? "+" : "")@item.QuantityChange
+                            </td>
+                            <td class="text-center d-none d-md-table-cell">@item.PreviousStock</td>
+                            <td class="text-center d-none d-md-table-cell">@item.NewStock</td>
+                            <td>
+                                @if (item.UnitPrice.HasValue)
+                                {
+                                    <span class="price-value">@item.UnitPrice.Value.ToString("C2")</span>
+                                }
+                                else
+                                {
+                                    <span class="price-value">N/A</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.Reference))
+                                {
+                                    <span class="code-format">@item.Reference</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td class="d-none d-md-table-cell stock-history-reason">
+                                @if (!string.IsNullOrEmpty(item.Reason))
+                                {
+                                    <span title="@item.Reason">@(item.Reason.Length > 30 ? item.Reason.Substring(0, 30) + "..." : item.Reason)</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="date-display">
+                                    <span class="date">@item.Date.ToString("MMM d, yyyy")</span>
+                                    <span class="time">@item.Date.ToString("HH:mm")</span>
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <div class="actions-container d-flex justify-content-end">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-action btn-info" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card-footer border-dark py-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="text-secondary small">
+                    <i class="fas fa-info-circle me-1"></i> Showing 1 to @Model.Count of @Model.TotalItemCount entries
+                </div>
+                <div>
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { 
+                            page, 
+                            pageSize = ViewBag.PageSize,
+                            searchTerm = ViewBag.SearchTerm,
+                            referenceSearch = ViewBag.ReferenceSearch,
+                            reasonSearch = ViewBag.ReasonSearch,
+                            productId = ViewBag.ProductId,
+                            transactionType = ViewBag.TransactionType,
+                            startDate = ViewBag.StartDate,
+                            endDate = ViewBag.EndDate
+                        }),
+                        PagedListAdapter.GetStandardOptions())
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/table-utils.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize table sorting
+            new TableUtils('.data-table');
+
+            // Initialize entries dropdown
+            initializeEntriesDropdown('#entriesSelect');
+
+            // Initialize search clear
+            initializeSearchClear('#clearSearch');
+            
+            // Handle advanced filters
+            $('#advancedFilters').on('show.bs.collapse', function() {
+                $('.advanced-filters-icon').addClass('rotate');
+            }).on('hide.bs.collapse', function() {
+                $('.advanced-filters-icon').removeClass('rotate');
+            });
+            
+            // Clear filters button functionality
+            $('#clearFilters').click(function() {
+                // Clear all input fields, including date inputs
+                $('#advancedFilters input[type="text"], #advancedFilters input[type="date"]').val('');
+                
+                // Reset selects to default option
+                $('#productId, #transactionType').each(function() {
+                    $(this).val($(this).find('option:first').val());
+                });
+                
+                // Visual feedback
+                $(this).html('<i class="fas fa-check me-1"></i> Filters Cleared');
+                setTimeout(function() {
+                    $('#clearFilters').html('<i class="fas fa-eraser me-1"></i> Clear Filters');
+                }, 1500);
+            });
+            
+            // Add animation to the advanced filters collapse
+            $('#advancedFilters').on('show.bs.collapse', function () {
+                $(this).animate({
+                    opacity: 1
+                }, 300);
+            }).on('hide.bs.collapse', function () {
+                $(this).animate({
+                    opacity: 0
+                }, 300);
+            });
+            
+            // Initialize date pickers with current date if empty
+            $('#startDate, #endDate').on('focus', function() {
+                if (!$(this).val()) {
+                    // Don't set a default, just enhance focus effect
+                    $(this).css('box-shadow', '0 0 0 3px rgba(59, 130, 246, 0.25)');
+                }
+            }).on('blur', function() {
+                $(this).css('box-shadow', '');
+            });
+        });
+    </script>
+} 

@@ -1,0 +1,278 @@
+@model InventoryManagementSystem.Models.ViewModels.AdjustStockViewModel
+@using InventoryManagementSystem.Models.ViewComponents
+
+@{
+    ViewData["Title"] = "Adjust Stock";
+}
+
+<!-- Use a more compact container with consistent padding -->
+<div class="container-fluid px-3 py-2">
+    <!-- Use the existing PageHeader partial with fluent API -->
+    @{
+        var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+            .Create("Adjust Stock", "fas fa-balance-scale")
+            .WithPrimaryButton("Back to Stock History", Url.Action("Index", "Stock"), "fas fa-arrow-left");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <div class="row g-3">
+        <!-- Main Form Card -->
+        <div class="col-lg-8">
+            <form asp-action="AdjustStock" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 p-3 border rounded bg-danger-subtle"></div>
+                
+                <!-- Stock Adjustment Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-warning-subtle me-2">
+                                <i class="fas fa-balance-scale text-warning"></i>
+                            </span>
+                            Adjust Inventory Stock Level
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="alert alert-info d-flex align-items-center mb-3">
+                            <i class="fas fa-info-circle me-3 fa-lg"></i>
+                            <div>Use this form to correct inventory discrepancies or adjust stock levels to match physical counts.</div>
+                        </div>
+
+                        <div class="row g-4 mb-0">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label asp-for="ProductId" class="form-label d-flex align-items-center">
+                                        <i class="fas fa-box-open text-primary me-2"></i>Product
+                                        <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                           title="Select the product whose stock level needs adjustment."><i class="fas fa-info"></i></span>
+                                    </label>
+                                    <div class="select-container">
+                                        <select asp-for="ProductId" class="form-select form-select-enhanced" 
+                                                asp-items="ViewBag.Products" required id="productSelect">
+                                            <option value="">Select Product</option>
+                                        </select>
+                                        <div class="select-icon">
+                                            <i class="fas fa-chevron-down text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="ProductId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label d-flex align-items-center">
+                                        <i class="fas fa-database text-primary me-2"></i>Current Stock
+                                        <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                           title="The current inventory level recorded in the system for this product."><i class="fas fa-info"></i></span>
+                                    </label>
+                                    <input type="text" id="currentStockDisplay" class="form-control-readonly" readonly />
+                                    <input type="hidden" id="currentStockValue" name="CurrentStock" />
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="NewQuantity" class="form-label d-flex align-items-center">
+                                        <i class="fas fa-edit text-primary me-2"></i>New Stock Level
+                                        <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                           title="Enter the correct stock level that should be in the system. The system will calculate the adjustment automatically."><i class="fas fa-info"></i></span>
+                                    </label>
+                                    <input asp-for="NewQuantity" class="form-control" min="0" required placeholder="Enter new quantity" />
+                                    <span asp-validation-for="NewQuantity" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Adjustment Details Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-info-circle text-primary"></i>
+                            </span>
+                            Adjustment Details
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-4 mb-0">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Reason" class="form-label d-flex align-items-center">
+                                        <i class="fas fa-question-circle text-primary me-2"></i>Reason for Adjustment
+                                        <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                           title="The reason you're making this adjustment - used for audit and reporting purposes."><i class="fas fa-info"></i></span>
+                                    </label>
+                                    <div class="select-container">
+                                        <select asp-for="Reason" class="form-select form-select-enhanced" required>
+                                            <option value="">Select Reason</option>
+                                            <option value="Physical Count">Physical Count / Inventory Audit</option>
+                                            <option value="Data Entry Error">Data Entry Error</option>
+                                            <option value="Damaged">Damaged Inventory Write-off</option>
+                                            <option value="System Migration">System Migration</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <div class="select-icon">
+                                            <i class="fas fa-chevron-down text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="Reason" class="text-danger"></span>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label asp-for="Reference" class="form-label d-flex align-items-center">
+                                        <i class="fas fa-hashtag text-primary me-2"></i>Reference
+                                        <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                           title="Optional reference number for this adjustment, such as audit ID, count sheet number, etc."><i class="fas fa-info"></i></span>
+                                    </label>
+                                    <input asp-for="Reference" class="form-control code-format" placeholder="Audit reference, count sheet number, etc." />
+                                    <span asp-validation-for="Reference" class="text-danger"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3 h-100">
+                                    <label asp-for="Notes" class="form-label d-flex align-items-center">
+                                        <i class="fas fa-sticky-note text-primary me-2"></i>Notes
+                                        <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                           title="Detailed explanation for why this adjustment is necessary. Required for audit purposes."><i class="fas fa-info"></i></span>
+                                    </label>
+                                    <textarea asp-for="Notes" class="form-control h-75" rows="5" required 
+                                             placeholder="Please provide a detailed explanation for this adjustment..."></textarea>
+                                    <span asp-validation-for="Notes" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 justify-content-end mb-4">
+                    <a asp-action="Index" class="btn btn-outline-light">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-warning px-4">
+                        <i class="fas fa-balance-scale me-1"></i> Adjust Stock
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Help & Tips Card -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-lightbulb text-primary"></i>
+                        </span>
+                        Tips & Information
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="tip-item mb-3 p-2 rounded bg-primary-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-info-circle me-2"></i> Stock Adjustment Tips
+                        </h6>
+                        <ul class="mb-0 ps-3 small">
+                            <li>Verify the correct product before adjusting</li>
+                            <li>Always check the current level is accurate</li>
+                            <li>Enter the new total quantity (not the difference)</li>
+                            <li>Provide detailed notes for audit purposes</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tip-item mb-3 p-2 rounded bg-warning-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i> Caution
+                        </h6>
+                        <p class="small mb-0">Stock adjustments are logged and audited. Only make adjustments when necessary and always provide clear documentation explaining the reason.</p>
+                    </div>
+                    
+                    <div class="tip-item p-2 rounded bg-success-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle me-2"></i> Best Practices
+                        </h6>
+                        <p class="small mb-0">Regular inventory counts help maintain accuracy. Schedule weekly or monthly audits to reduce the need for large adjustments. Document all findings during physical counts.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Adjustment Information -->
+            <div class="card content-card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-warning-subtle me-2">
+                            <i class="fas fa-calculator text-warning"></i>
+                        </span>
+                        How Adjustments Work
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <p class="small mb-3">When you adjust stock, the system:</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent border-secondary-subtle">
+                            <i class="fas fa-long-arrow-alt-right text-primary me-2"></i>
+                            <span class="text-light">Calculates the difference between current and new</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle">
+                            <i class="fas fa-plus-minus text-primary me-2"></i>
+                            <span class="text-light">Creates a positive or negative adjustment entry</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle">
+                            <i class="fas fa-history text-primary me-2"></i>
+                            <span class="text-light">Records the adjustment with your reason and notes</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle">
+                            <i class="fas fa-database text-primary me-2"></i>
+                            <span class="text-light">Updates the current stock to the new quantity</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle">
+                            <i class="fas fa-file-alt text-primary me-2"></i>
+                            <span class="text-light">Creates an audit trail for future reference</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+            
+            // Product selection change handlers
+            $("#productSelect").change(function() {
+                var productId = $(this).val();
+                if (productId) {
+                    $.ajax({
+                        url: '@Url.Action("GetCurrentStock", "Stock")/' + productId,
+                        type: 'GET',
+                        success: function(result) {
+                            $("#currentStockDisplay").val(result);
+                            $("#currentStockValue").val(result);
+                            $("#NewQuantity").val(result);
+                        },
+                        error: function() {
+                            $("#currentStockDisplay").val("Error loading stock information");
+                            $("#currentStockValue").val(0);
+                        }
+                    });
+                } else {
+                    $("#currentStockDisplay").val("");
+                    $("#currentStockValue").val(0);
+                    $("#NewQuantity").val("");
+                }
+            });
+        });
+    </script>
+} 

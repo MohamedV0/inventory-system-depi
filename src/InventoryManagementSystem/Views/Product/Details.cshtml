@@ -1,0 +1,598 @@
+@model InventoryManagementSystem.Models.ViewModels.ProductDetailsViewModel
+
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+<!-- Use a more compact container with less padding -->
+<div class="container-fluid px-3 py-2">
+    <!-- Use the existing PageHeader partial with fluent API -->
+    @{
+        var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+            .Create(Model.Name, "fas fa-box")
+            .WithPrimaryButton("Edit Product", Url.Action("Edit", new { id = Model.Id }), "fas fa-edit")
+            .WithDeleteButton("product", Model.Name, $"delete-form-{Model.Id}");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <!-- Add the delete form -->
+    <form id="delete-form-@Model.Id" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-none"></form>
+
+    <div class="row g-3">
+        <!-- Product Information Card -->
+        <div class="col-lg-8">
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-box text-primary"></i>
+                        </span>
+                        Product Information
+                    </h5>
+                    <span class="badge @(Model.CurrentStock > Model.ReorderLevel ? "bg-success" : "bg-danger") fs-6 py-1 px-3">
+                        <i class="fas @(Model.CurrentStock > Model.ReorderLevel ? "fa-check-circle" : "fa-exclamation-circle") me-1"></i>
+                        @(Model.CurrentStock > Model.ReorderLevel ? "In Stock" : "Low Stock")
+                    </span>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-4 mb-0">
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <h6 class="section-title mb-3">
+                                    <i class="fas fa-info-circle text-primary me-2"></i>Basic Details
+                                </h6>
+                                <dl class="row mb-0 info-grid">
+                                    <dt class="col-sm-4">
+                                        <span class="info-label">
+                                            <i class="fas fa-barcode text-primary me-1"></i>SKU
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-8 fw-bold">@Model.SKU</dd>
+
+                                    <dt class="col-sm-4">
+                                        <span class="info-label">
+                                            <i class="fas fa-ruler text-primary me-1"></i>Unit
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-8">@Model.UnitOfMeasurement</dd>
+
+                                    <dt class="col-sm-4">
+                                        <span class="info-label">
+                                            <i class="fas fa-tags text-primary me-1"></i>Category
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        <span class="badge bg-info">@Model.CategoryName</span>
+                                    </dd>
+
+                                    <dt class="col-sm-4">
+                                        <span class="info-label">
+                                            <i class="fas fa-tag text-primary me-1"></i>Price
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-8 fw-bold price-value">@Model.Price.ToString("C")</dd>
+
+                                    <dt class="col-sm-4">
+                                        <span class="info-label">
+                                            <i class="fas fa-dollar-sign text-primary me-1"></i>Cost
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-8 cost-value">@Model.Cost.ToString("C")</dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <h6 class="section-title mb-3">
+                                    <i class="fas fa-chart-line text-primary me-2"></i>Inventory Status
+                                </h6>
+                                <dl class="row mb-0 info-grid">
+                                    <dt class="col-sm-5">
+                                        <span class="info-label">
+                                            <i class="fas fa-cubes text-primary me-1"></i>Current Stock
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-7">
+                                        <div class="d-flex align-items-center stock-indicator">
+                                            <div class="fs-4 fw-bold me-2 @(Model.CurrentStock <= Model.ReorderLevel ? "text-danger" : "text-success")">
+                                                @Model.CurrentStock
+                                            </div>
+                                            <div class="progress flex-grow-1 progress-thin">
+                                                <div class="progress-bar @(Model.CurrentStock <= Model.ReorderLevel ? "bg-danger" : "bg-success")" 
+                                                     role="progressbar" 
+                                                     style="width: @(Math.Min(100, (double)Model.CurrentStock / (Model.ReorderLevel * 2) * 100))%"></div>
+                                            </div>
+                                        </div>
+                                    </dd>
+
+                                    <dt class="col-sm-5">
+                                        <span class="info-label">
+                                            <i class="fas fa-level-down-alt text-primary me-1"></i>Reorder Level
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-7">@Model.ReorderLevel</dd>
+
+                                    <dt class="col-sm-5">
+                                        <span class="info-label">
+                                            <i class="fas fa-toggle-on text-primary me-1"></i>Status
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-7">
+                                        @if (Model.IsActive)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Active
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times-circle me-1"></i>Inactive
+                                            </span>
+                                        }
+                                    </dd>
+
+                                    <dt class="col-sm-5">
+                                        <span class="info-label">
+                                            <i class="fas fa-calendar-plus text-primary me-1"></i>Created
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-7 small">
+                                        <div>@Model.CreatedAt.ToString("MMM dd, yyyy h:mm tt")</div>
+                                        <div class="text-light-emphasis small mt-1 d-flex align-items-center">
+                                            <i class="fas fa-user-circle text-info me-1"></i>
+                                            <span>by @Model.CreatedBy</span>
+                                        </div>
+                                    </dd>
+
+                                    @if (Model.UpdatedAt.HasValue)
+                                    {
+                                        <dt class="col-sm-5">
+                                            <span class="info-label">
+                                                <i class="fas fa-calendar-check text-primary me-1"></i>Last Updated
+                                            </span>
+                                        </dt>
+                                        <dd class="col-sm-7 small">
+                                            <div>@Model.UpdatedAt.Value.ToString("MMM dd, yyyy h:mm tt")</div>
+                                            <div class="text-light-emphasis small mt-1 d-flex align-items-center">
+                                                <i class="fas fa-user-edit text-info me-1"></i>
+                                                <span>by @Model.UpdatedBy</span>
+                                            </div>
+                                        </dd>
+                                    }
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="product-description">
+                                    <h6 class="section-title mb-2">
+                                        <i class="fas fa-align-left text-primary me-2"></i>Description
+                                    </h6>
+                                    <div class="description-content p-3">@Model.Description</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Stock History Section -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header bg-white py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history me-1"></i>
+                            Stock History
+                        </h5>
+                        <a asp-controller="Stock" asp-action="AddStock" asp-route-productId="@Model.Id" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus-circle me-1"></i> Stock Transaction
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.StockHistory != null && Model.StockHistory.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table m-0">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width: 140px">DATE</th>
+                                        <th style="min-width: 100px">TYPE</th>
+                                        <th style="min-width: 100px">QUANTITY</th>
+                                        <th style="min-width: 100px">NEW STOCK</th>
+                                        <th>REASON</th>
+                                        <th style="min-width: 120px">USER</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var entry in Model.StockHistory.OrderByDescending(h => h.Date).Take(3))
+                                    {
+                                        <tr class="align-middle">
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    <span class="fw-medium">@entry.Date.ToString("MMM d, yyyy")</span>
+                                                    <span class="text-muted small">@entry.Date.ToString("HH:mm")</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if (entry.QuantityChange > 0)
+                                                {
+                                                    <span class="badge bg-success text-white">
+                                                        <i class="fas fa-arrow-up me-1"></i> Stock In
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger text-white">
+                                                        <i class="fas fa-arrow-down me-1"></i> Stock Out
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="@(entry.QuantityChange > 0 ? "text-success" : "text-danger") fw-bold">
+                                                    @(entry.QuantityChange > 0 ? "+" : "")@Math.Abs(entry.QuantityChange)
+                                                </span>
+                                            </td>
+                                            <td class="fw-medium">@entry.NewStock</td>
+                                            <td>
+                                                <span class="text-truncate d-inline-block" style="max-width: 200px;" title="@entry.Reason">
+                                                    @entry.Reason
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-dark text-white border border-secondary d-inline-flex align-items-center">
+                                                    <i class="fas fa-user me-1"></i>
+                                                    <span class="text-truncate" style="max-width: 80px;" title="@entry.UpdatedBy">@entry.UpdatedBy</span>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="border-top p-3 d-flex justify-content-center">
+                            <a asp-controller="Stock" asp-action="ProductHistory" asp-route-id="@Model.Id" 
+                               class="btn btn-primary btn-sm px-4">
+                                <i class="fas fa-history me-2"></i> View All History
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-box fa-3x text-muted mb-2"></i>
+                            <p class="mb-0">No stock history available for this product.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Enhanced Stock Status Card -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-chart-pie text-primary"></i>
+                        </span>
+                        Stock Status
+                    </h5>
+                    <span class="badge @(Model.CurrentStock > Model.ReorderLevel ? "bg-success" : "bg-danger") fs-6 px-3 py-1">
+                        @(Model.CurrentStock > Model.ReorderLevel ? "In Stock" : "Low Stock")
+                    </span>
+                </div>
+                <div class="card-body p-3">
+                    <div class="stock-visualization mb-3">
+                        <div class="row">
+                            <div class="col-7">
+                                <div class="chart-wrapper position-relative">
+                                    <div id="stockChart" class="chart-container">
+                                        <canvas id="stockChartCanvas"></canvas>
+                                    </div>
+                                    <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                        <h2 class="mb-0" style="color: @(Model.CurrentStock <= Model.ReorderLevel ? "#FF5252" : "#2ECC71");">@Model.CurrentStock</h2>
+                                        <div class="small text-white">units</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-5 d-flex flex-column justify-content-center">
+                                <div class="stock-metrics">
+                                    <div class="stock-metric-item mb-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="d-flex align-items-center">
+                                                <i class="fas fa-cubes me-2" style="color: @(Model.CurrentStock <= Model.ReorderLevel ? "#FF5252" : "#2ECC71");"></i>
+                                                <span style="color: @(Model.CurrentStock <= Model.ReorderLevel ? "#FF5252" : "#2ECC71"); font-weight: 500;">Current</span>
+                                            </span>
+                                            <span class="fw-bold" style="color: @(Model.CurrentStock <= Model.ReorderLevel ? "#FF5252" : "#2ECC71");">@Model.CurrentStock</span>
+                                        </div>
+                                        <div class="progress progress-thin bg-dark" style="height: 5px;">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: @(Math.Min(100, (double)Model.CurrentStock / Math.Max(Model.ReorderLevel * 2, 1) * 100))%; background-color: @(Model.CurrentStock <= Model.ReorderLevel ? "#FF5252" : "#2ECC71");"></div>
+                                        </div>
+                                    </div>
+                                    <div class="stock-metric-item">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="d-flex align-items-center">
+                                                <i class="fas fa-level-down-alt me-2" style="color: #F1C40F;"></i>
+                                                <span style="color: #F1C40F; font-weight: 500;">Reorder At</span>
+                                            </span>
+                                            <span class="fw-bold" style="color: #F1C40F;">@Model.ReorderLevel</span>
+                                        </div>
+                                        <div class="progress progress-thin bg-dark" style="height: 5px;">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: @(Math.Min(100, (double)Model.ReorderLevel / Math.Max(Model.ReorderLevel * 2, 1) * 100))%; background-color: #F1C40F;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stock Insights -->
+                    <div class="stock-insights">
+                        <div class="insight-item d-flex justify-content-between align-items-center p-2 rounded mb-2" 
+                             style="background-color: @(Model.CurrentStock <= Model.ReorderLevel ? "rgba(255, 82, 82, 0.15)" : "rgba(46, 204, 113, 0.15)");">
+                            <div class="d-flex align-items-center">
+                                <i class="fas @(Model.CurrentStock <= Model.ReorderLevel ? "fa-exclamation-circle" : "fa-check-circle") me-2" 
+                                   style="color: @(Model.CurrentStock <= Model.ReorderLevel ? "#FF5252" : "#2ECC71");"></i>
+                                <span style="color: @(Model.CurrentStock <= Model.ReorderLevel ? "#FF5252" : "#2ECC71"); font-weight: 500;">
+                                    @(Model.CurrentStock <= Model.ReorderLevel ? "Reorder Needed" : "Stock Level Good")
+                                </span>
+                            </div>
+                            <span class="badge rounded-pill px-2 py-1" 
+                                  style="background-color: @(Model.CurrentStock <= Model.ReorderLevel ? "#FF5252" : "#2ECC71");">
+                                @(Model.CurrentStock <= Model.ReorderLevel ? Model.ReorderLevel - Model.CurrentStock + " needed" : Model.CurrentStock - Model.ReorderLevel + " above min")
+                            </span>
+                        </div>
+                        
+                        @if (Model.CurrentStock <= Model.ReorderLevel)
+                        {
+                            <div class="text-center mt-3">
+                                <a href="@Url.Action("Create", "PurchaseOrders", new { productId = Model.Id })" class="btn btn-sm w-100" style="background-color: #FF5252; color: white;">
+                                    <i class="fas fa-shopping-cart me-1"></i> Create Purchase Order
+                                </a>
+                            </div>
+                        }
+                        
+                        @if (Model.StockHistory != null && Model.StockHistory.Any())
+                        {
+                            var lastTransaction = Model.StockHistory.OrderByDescending(h => h.Date).FirstOrDefault();
+                            if (lastTransaction != null)
+                            {
+                                <div class="last-update mt-3 p-2 rounded bg-dark-subtle">
+                                    <div class="small text-muted mb-1">Last Updated</div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="small">@lastTransaction.Date.ToString("MMM d, yyyy HH:mm")</span>
+                                        <span class="@(lastTransaction.QuantityChange > 0 ? "text-success" : "text-danger") small">
+                                            @(lastTransaction.QuantityChange > 0 ? "+" : "")@lastTransaction.QuantityChange
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suppliers Section -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-truck text-primary"></i>
+                            </span>
+                            Suppliers
+                        </h5>
+                        <a asp-controller="Suppliers" asp-action="Create" asp-route-productId="@Model.Id" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus-circle me-1"></i> Add Supplier
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Suppliers != null && Model.Suppliers.Any())
+                    {
+                        <div class="list-group list-group-flush supplier-list">
+                            @foreach (var supplier in Model.Suppliers)
+                            {
+                                <div class="list-group-item px-3 py-3 list-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0 d-flex align-items-center">
+                                            <i class="fas fa-building text-primary me-2"></i>
+                                            <a href="@Url.Action("Details", "Suppliers", new { id = supplier.SupplierId })" class="text-decoration-none item-name">
+                                                @supplier.SupplierName
+                                            </a>
+                                        </h6>
+                                        @if (supplier.IsPreferredSupplier)
+                                        {
+                                            <span class="preferred-badge">
+                                                <i class="fas fa-star me-1"></i> Preferred
+                                            </span>
+                                        }
+                                    </div>
+                                    <div class="supplier-details">
+                                        <div class="row g-2 small">
+                                            <div class="col-6">
+                                                <div class="label-icon">
+                                                    <i class="fas fa-tag text-primary"></i>
+                                                    <span class="text-muted">Unit Price:</span>
+                                                </div>
+                                                <div class="value fw-bold price-value">@supplier.UnitPrice.ToString("C")</div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="label-icon">
+                                                    <i class="fas fa-boxes text-primary"></i>
+                                                    <span class="text-muted">Min Order:</span>
+                                                </div>
+                                                <div class="value">@supplier.MinimumOrderQuantity</div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="label-icon">
+                                                    <i class="fas fa-clock text-primary"></i>
+                                                    <span class="text-muted">Lead Time:</span>
+                                                </div>
+                                                <div class="value">@supplier.LeadTimeDays days</div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="label-icon">
+                                                    <i class="fas fa-calendar text-primary"></i>
+                                                    <span class="text-muted">Last Purchase:</span>
+                                                </div>
+                                                <div class="value">@(supplier.LastPurchaseDate.HasValue ? supplier.LastPurchaseDate.Value.ToShortDateString() : "Never")</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <a href="@Url.Action("Create", "PurchaseOrders", new { supplierId = supplier.SupplierId, productId = Model.Id })" class="btn btn-primary w-100">
+                                            <i class="fas fa-shopping-cart me-1"></i> Create Order
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-truck fa-3x text-muted mb-3"></i>
+                            <p class="mb-3">No suppliers found for this product.</p>
+                            <a asp-controller="Product" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary px-4">
+                                <i class="fas fa-link me-1"></i> Assign Supplier
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Delete Confirmation Modal -->
+<div class="modal fade confirmation-modal" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-icon danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <p class="confirmation-message">Are you sure you want to delete the product:</p>
+                <div class="confirmation-target">"@Model.Name"</div>
+                <div class="confirmation-warning">
+                    <i class="fas fa-info-circle"></i>
+                    This action cannot be undone. All related inventory records will remain, but the product will be removed from the system.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </button>
+                <form id="delete-form-@Model.Id" asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                    <button type="submit" class="btn btn-delete">
+                        <i class="fas fa-trash me-1"></i> Delete Product
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Add modal attributes to the delete button
+            $(".page-header a:contains('Delete')").attr({
+                "data-bs-toggle": "modal",
+                "data-bs-target": "#deleteModal"
+            });
+            
+            // Create the stock chart
+            createEnhancedStockChart();
+        });
+        
+        function createEnhancedStockChart() {
+            var ctx = document.getElementById('stockChartCanvas');
+            
+            // Only create chart if canvas exists
+            if (ctx) {
+                var currentStock = @Model.CurrentStock;
+                var reorderLevel = @Model.ReorderLevel;
+                var maxCapacity = Math.max(reorderLevel * 2, currentStock * 1.2);
+                
+                // Determine color based on stock level
+                var primaryColor = currentStock <= reorderLevel ? 'rgba(255, 82, 82, 0.8)' : 'rgba(46, 204, 113, 0.8)';
+                var secondaryColor = 'rgba(241, 196, 15, 0.8)';
+                
+                var myChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Current Stock', 'Reorder Level'],
+                        datasets: [{
+                            data: [currentStock, reorderLevel],
+                            backgroundColor: [
+                                primaryColor,
+                                secondaryColor
+                            ],
+                            borderColor: [
+                                currentStock <= reorderLevel ? 'rgba(255, 82, 82, 1)' : 'rgba(46, 204, 113, 1)',
+                                'rgba(241, 196, 15, 1)'
+                            ],
+                            borderWidth: 2,
+                            hoverOffset: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%',
+                        animation: {
+                            animateScale: true,
+                            animateRotate: true,
+                            duration: 1000
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: true,
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleFont: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 13
+                                },
+                                padding: 10,
+                                callbacks: {
+                                    label: function(context) {
+                                        var label = context.label || '';
+                                        var value = context.raw || 0;
+                                        if (label === 'Current Stock') {
+                                            return 'Current: ' + value + ' units';
+                                        } else if (label === 'Reorder Level') {
+                                            return 'Reorder at: ' + value + ' units';
+                                        }
+                                        return label + ': ' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+} 

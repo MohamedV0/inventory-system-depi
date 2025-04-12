@@ -1,0 +1,316 @@
+@using InventoryManagementSystem.Models.ViewComponents
+@using InventoryManagementSystem.Models.ViewModels
+
+@{
+    ViewData["Title"] = "Inventory Management";
+}
+
+@await Html.PartialAsync("_PageHeader", PageHeaderViewModel.Create("Inventory Management", "fas fa-warehouse")
+    .WithDescription("Manage your inventory with comprehensive tools for tracking stock levels, movements, and alerts"))
+
+<div class="container-fluid px-3 py-2">
+    <!-- Main action cards -->
+    <div class="row g-3 mb-4">
+        <!-- Stock Management Card -->
+        <div class="col-md-4">
+            <div class="card content-card shadow-sm h-100">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exchange-alt text-primary me-2"></i>
+                        <span class="fw-semibold">Stock Management</span>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-2">Inventory Transactions</h5>
+                    <p class="card-text text-secondary mb-4">View and manage your inventory movements with complete history tracking.</p>
+                    <a asp-controller="Stock" asp-action="Index" class="btn btn-primary w-100 mt-auto">
+                        <i class="fas fa-history me-2"></i> View Transactions
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Addition Card -->
+        <div class="col-md-4">
+            <div class="card content-card shadow-sm h-100">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-plus-circle text-success me-2"></i>
+                        <span class="fw-semibold">Stock Addition</span>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-2">Receive Inventory</h5>
+                    <p class="card-text text-secondary mb-4">Record new stock when receiving products from suppliers.</p>
+                    <a asp-controller="Stock" asp-action="AddStock" class="btn btn-success w-100 mt-auto">
+                        <i class="fas fa-plus me-2"></i> Add Stock
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Reduction Card -->
+        <div class="col-md-4">
+            <div class="card content-card shadow-sm h-100">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-minus-circle text-danger me-2"></i>
+                        <span class="fw-semibold">Stock Reduction</span>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-2">Issue Inventory</h5>
+                    <p class="card-text text-secondary mb-4">Record inventory items being removed from stock.</p>
+                    <a asp-controller="Stock" asp-action="RemoveStock" class="btn btn-danger w-100 mt-auto">
+                        <i class="fas fa-minus me-2"></i> Remove Stock
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secondary action cards -->
+    <div class="row g-3 mb-4">
+        <!-- Low Stock Alert Card -->
+        <div class="col-lg-6">
+            <div class="card content-card shadow-sm h-100">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        <span class="fw-semibold">Low Stock Alert</span>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-2">Items Needing Attention</h5>
+                    <p class="card-text text-secondary mb-4">Products with stock levels below their reorder points.</p>
+                    <a asp-controller="Product" asp-action="LowStock" class="btn btn-warning w-100 mt-auto">
+                        <i class="fas fa-exclamation-triangle me-2"></i> View Low Stock (@ViewBag.LowStockCount)
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Correction Card -->
+        <div class="col-lg-6">
+            <div class="card content-card shadow-sm h-100">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-balance-scale text-info me-2"></i>
+                        <span class="fw-semibold">Stock Adjustment</span>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-2">Inventory Correction</h5>
+                    <p class="card-text text-secondary mb-4">Adjust stock levels to match physical counts and correct discrepancies.</p>
+                    <a asp-controller="Stock" asp-action="AdjustStock" class="btn btn-info w-100 mt-auto">
+                        <i class="fas fa-sliders-h me-2"></i> Adjust Stock
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data tables section -->
+    <div class="row g-3">
+        <!-- Low Stock Items Table -->
+        <div class="col-xl-6">
+            <div class="card content-card shadow-sm mb-4 h-100">
+                <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                        <span class="fw-semibold">Low Stock Items</span>
+                        <span class="badge bg-warning ms-2">@ViewBag.LowStockCount</span>
+                    </div>
+                    <a asp-controller="Product" asp-action="LowStock" class="btn btn-sm btn-outline-primary d-flex align-items-center">
+                        View All <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+                <div class="card-body p-0 d-flex flex-column">
+                    @if(ViewBag.LowStockItems == null || ViewBag.LowStockItems.Count == 0)
+                    {
+                        <div class="text-center py-5 flex-grow-1 d-flex flex-column justify-content-center">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <p class="text-muted mb-0">All inventory items are above their reorder levels.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive flex-grow-1">
+                            <table class="table data-table m-0">
+                                <thead>
+                                    <tr>
+                                        <th width="50%">
+                                            <div class="d-flex align-items-center">
+                                                PRODUCT
+                                            </div>
+                                        </th>
+                                        <th width="25%" class="text-center">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                STOCK
+                                            </div>
+                                        </th>
+                                        <th width="25%" class="text-center">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                REORDER LEVEL
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in ViewBag.LowStockItems)
+                                    {
+                                        var statusClass = item.StockLevel == 0 ? "badge bg-danger" : "badge bg-warning";
+                                        var statusText = item.StockLevel == 0 ? "Out of Stock" : "Low Stock";
+                                        var statusIcon = item.StockLevel == 0 ? "fas fa-times-circle" : "fas fa-exclamation-triangle";
+                                        
+                                        <tr class="data-table-row @(item.StockLevel == 0 ? "out-of-stock" : "low-stock")">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-box text-primary me-2"></i>
+                                                    <div>
+                                                        <div class="fw-medium">@item.ProductName</div>
+                                                        <small class="text-muted code-format">@item.SKU</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center position-relative">
+                                                <span class="@(item.StockLevel <= 0 ? "text-danger fw-medium" : "text-warning fw-medium")">
+                                                    @item.StockLevel
+                                                </span>
+                                                <div class="stock-progress mt-1" title="Stock Level: @item.StockLevel / Reorder at: @item.ReorderLevel">
+                                                    <div class="progress progress-thin">
+                                                        <div class="progress-bar @(item.StockLevel <= 0 ? "bg-danger" : "bg-warning")" 
+                                                             role="progressbar" 
+                                                             style="width: @(Math.Min(100, (int)(item.StockLevel * 100 / (Math.Max(1, item.ReorderLevel * 2)))))%"
+                                                             aria-valuenow="@item.StockLevel" 
+                                                             aria-valuemin="0" 
+                                                             aria-valuemax="@(item.ReorderLevel * 2)">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">@item.ReorderLevel</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions Table -->
+        <div class="col-xl-6">
+            <div class="card content-card shadow-sm mb-4 h-100">
+                <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-history text-primary me-2"></i>
+                        <span class="fw-semibold">Recent Transactions</span>
+                    </div>
+                    <a asp-controller="Stock" asp-action="Index" class="btn btn-sm btn-outline-primary d-flex align-items-center">
+                        View All <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+                <div class="card-body p-0 d-flex flex-column">
+                    @if(ViewBag.RecentTransactions == null || ViewBag.RecentTransactions.Count == 0)
+                    {
+                        <div class="text-center py-5 flex-grow-1 d-flex flex-column justify-content-center">
+                            <i class="fas fa-info-circle fa-3x text-info mb-3"></i>
+                            <p class="text-muted mb-0">No recent stock transactions.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive flex-grow-1">
+                            <table class="table data-table m-0">
+                                <thead>
+                                    <tr>
+                                        <th width="25%">
+                                            <div class="d-flex align-items-center">
+                                                DATE <i class="fas fa-sort ms-1 text-muted"></i>
+                                            </div>
+                                        </th>
+                                        <th width="30%">
+                                            <div class="d-flex align-items-center">
+                                                PRODUCT <i class="fas fa-sort ms-1 text-muted"></i>
+                                            </div>
+                                        </th>
+                                        <th width="25%">
+                                            <div class="d-flex align-items-center">
+                                                TYPE <i class="fas fa-sort ms-1 text-muted"></i>
+                                            </div>
+                                        </th>
+                                        <th width="20%" class="text-end">
+                                            <div class="d-flex align-items-center justify-content-end">
+                                                QUANTITY <i class="fas fa-sort ms-1 text-muted"></i>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var transaction in ViewBag.RecentTransactions)
+                                    {
+                                        string badgeClass = transaction.TypeString switch
+                                        {
+                                            "Stock In" => "bg-success",
+                                            "Stock Out" => "bg-danger",
+                                            "Adjustment" => "bg-warning text-dark",
+                                            "Initial Stock" => "bg-info",
+                                            _ => "bg-secondary"
+                                        };
+                                        
+                                        string typeIcon = transaction.TypeString switch
+                                        {
+                                            "Stock In" => "fas fa-arrow-up",
+                                            "Stock Out" => "fas fa-arrow-down",
+                                            "Adjustment" => "fas fa-sliders-h",
+                                            "Initial Stock" => "fas fa-boxes",
+                                            _ => "fas fa-exchange-alt"
+                                        };
+                                        
+                                        <tr class="data-table-row">
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    <span class="fw-medium">@transaction.Date.ToString("MMM d, yyyy")</span>
+                                                    <span class="text-muted small">@transaction.Date.ToString("h:mm tt")</span>
+                                                </div>
+                                            </td>
+                                            <td class="fw-medium">@transaction.ProductName</td>
+                                            <td>
+                                                <span class="badge rounded-pill @badgeClass fw-normal px-3 py-2">
+                                                    <i class="@typeIcon me-1"></i> @transaction.TypeString
+                                                </span>
+                                            </td>
+                                            <td class="text-end fw-bold @(transaction.QuantityChange > 0 ? "text-success" : "text-danger")">
+                                                @(transaction.QuantityChange > 0 ? "+" : "")@transaction.QuantityChange
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/table-utils.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize table sorting
+            new TableUtils('.data-table');
+            
+            // Initialize tooltips for action buttons
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    delay: { show: 500, hide: 100 }
+                });
+            });
+        });
+    </script>
+} 

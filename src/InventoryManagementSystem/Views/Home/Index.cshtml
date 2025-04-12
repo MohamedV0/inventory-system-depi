@@ -1,0 +1,334 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- Add dark-mode class to body on page load -->
+<script>
+    document.body.classList.add('dark-mode');
+</script>
+
+<div class="container-fluid pt-0 pb-4 mt-n2">
+    <!-- Hero/Welcome Section -->
+    <div class="content-card mb-5 shadow-lg border-0">
+        <div class="card-body p-0">
+            <div class="hero-container position-relative overflow-hidden">
+                <div class="hero-bg-pattern"></div>
+                <div class="hero-particles"></div>
+                <div class="row g-0">
+                    <div class="col-lg-7 p-5">
+                        <div class="hero-content">
+                            <div class="badge bg-primary-subtle text-primary mb-3 py-2 px-3 rounded-pill">
+                                <i class="fas fa-rocket me-2"></i>Smart Inventory Management
+                            </div>
+                            <h1 class="display-4 fw-bold mb-1 text-gradient">Welcome to</h1>
+                            <h1 class="display-3 fw-bold mb-3 text-primary">Inventory System</h1>
+                            <p class="lead mb-4 text-secondary">Efficiently manage your inventory, products, and suppliers in one centralized platform with real-time insights and analytics.</p>
+                            <div class="hero-stats d-flex flex-wrap gap-4 mb-4">
+                                <div class="hero-stat">
+                                    <div class="hero-stat-value"><span class="counter" data-value="@(ViewBag.ProductCount ?? 0)">@(ViewBag.ProductCount ?? 0)</span>+</div>
+                                    <div class="hero-stat-label">Products</div>
+                                </div>
+                                <div class="hero-stat">
+                                    <div class="hero-stat-value"><span class="counter" data-value="@(ViewBag.SupplierCount ?? 0)">@(ViewBag.SupplierCount ?? 0)</span>+</div>
+                                    <div class="hero-stat-label">Suppliers</div>
+                                </div>
+                                <div class="hero-stat">
+                                    <div class="hero-stat-value"><span class="counter" data-value="@(ViewBag.CategoryCount ?? 0)">@(ViewBag.CategoryCount ?? 0)</span>+</div>
+                                    <div class="hero-stat-label">Categories</div>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-3 mb-2 action-buttons">
+                                <a href="/Dashboard" class="btn btn-primary btn-lg shadow-sm">
+                                    <i class="fas fa-chart-line me-2"></i> Go to Dashboard
+                                </a>
+                                <a href="/Product/LowStock" class="btn btn-outline-warning btn-lg low-stock-btn glow-effect">
+                                    <i class="fas fa-exclamation-triangle me-2"></i> Low Stock Items
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 d-none d-lg-block">
+                        <div class="hero-image-container">
+                            <div class="hero-illustration">
+                                <div class="illustration-element box1"></div>
+                                <div class="illustration-element box2"></div>
+                                <div class="illustration-element box3"></div>
+                                <div class="illustration-element box4"></div>
+                                <i class="fas fa-boxes-stacked fa-7x text-primary opacity-75 main-icon"></i>
+                                <div class="floating-icon icon1">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                                <div class="floating-icon icon2">
+                                    <i class="fas fa-truck"></i>
+                                </div>
+                                <div class="floating-icon icon3">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <div class="floating-icon icon4">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Access Cards -->
+    <h2 class="mb-4 d-flex align-items-center section-title">
+        <i class="fas fa-bolt text-primary me-2"></i>
+        <span>Quick Access</span>
+        <span class="section-line"></span>
+    </h2>
+    <div class="row g-4 mb-5">
+        <!-- First Row: Products, Suppliers, Categories -->
+        <!-- Products Card -->
+        <div class="col-md-4">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-primary-subtle me-3 scale-on-hover">
+                            <i class="fas fa-box text-primary"></i>
+                        </div>
+                        <h3 class="mb-0 fs-4">Products</h3>
+                    </div>
+                    <p class="text-secondary mb-4">Manage your product catalog, edit details, and monitor stock levels.</p>
+                    <div class="mt-auto d-flex gap-2">
+                        <a href="/Product" class="btn btn-primary btn-sm">
+                            <i class="fas fa-list me-2"></i>View All
+                        </a>
+                        <a href="/Product/Create" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-plus me-2"></i>Add New
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Suppliers Card -->
+        <div class="col-md-4">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-success-subtle me-3 scale-on-hover">
+                            <i class="fas fa-truck text-success"></i>
+                        </div>
+                        <h3 class="mb-0 fs-4">Suppliers</h3>
+                    </div>
+                    <p class="text-secondary mb-4">Manage your suppliers, contact information, and associated products.</p>
+                    <div class="mt-auto d-flex gap-2">
+                        <a href="/Suppliers" class="btn btn-success btn-sm">
+                            <i class="fas fa-list me-2"></i>View All
+                        </a>
+                        <a href="/Suppliers/Create" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-plus me-2"></i>Add New
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Card -->
+        <div class="col-md-4">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-primary-subtle me-3 scale-on-hover">
+                            <i class="fas fa-tags text-primary"></i>
+                        </div>
+                        <h3 class="mb-0 fs-4">Categories</h3>
+                    </div>
+                    <p class="text-secondary mb-4">Organize your products with categories for better management.</p>
+                    <div class="mt-auto d-flex gap-2">
+                        <a href="/Category" class="btn btn-primary btn-sm">
+                            <i class="fas fa-list me-2"></i>View All
+                        </a>
+                        <a href="/Category/Create" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-plus me-2"></i>Add New
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Row: Low Stock, Reports, Inventory -->
+        <!-- Low Stock Card -->
+        <div class="col-md-4">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle icon-bg-warning me-3 scale-on-hover">
+                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                        </div>
+                        <h3 class="mb-0 fs-4">Low Stock</h3>
+                    </div>
+                    <p class="text-secondary mb-4">View and manage products that are running low and need attention.</p>
+                    <div class="mt-auto">
+                        <a href="/Product/LowStock" class="btn btn-warning btn-sm">
+                            <i class="fas fa-eye me-2"></i>View Low Stock
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Card -->
+        <div class="col-md-4">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-danger-subtle me-3 scale-on-hover">
+                            <i class="fas fa-chart-bar text-danger"></i>
+                        </div>
+                        <h3 class="mb-0 fs-4">Reports</h3>
+                    </div>
+                    <p class="text-secondary mb-4">Generate inventory reports and export data for analysis.</p>
+                    <div class="mt-auto d-flex gap-2">
+                        <a href="/Reports" class="btn btn-danger btn-sm">
+                            <i class="fas fa-file-alt me-2"></i>View Reports
+                        </a>
+                        <a href="/Reports/Generate" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-download me-2"></i>Generate
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Card -->
+        <div class="col-md-4">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-info-subtle me-3 scale-on-hover">
+                            <i class="fas fa-warehouse text-info"></i>
+                        </div>
+                        <h3 class="mb-0 fs-4">Inventory</h3>
+                    </div>
+                    <p class="text-secondary mb-4">Add, remove, or adjust stock levels and view transaction history.</p>
+                    <div class="mt-auto d-flex gap-2">
+                        <a href="/Stock/Dashboard" class="btn btn-info btn-sm">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a href="/Stock" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-history me-2"></i>Transactions
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Info -->
+    <h2 class="mb-4 d-flex align-items-center section-title">
+        <i class="fas fa-info-circle text-primary me-2"></i>
+        <span>System Overview</span>
+        <span class="section-line"></span>
+    </h2>
+    <div class="content-card mb-5 shadow-sm bg-dark-blue">
+        <div class="card-body p-0">
+            <div class="row g-0">
+                <div class="col-md-6 col-lg-3 stat-column">
+                    <div class="stat-card-dark text-center p-4">
+                        <div class="stat-icon-dark mb-3">
+                            <i class="fas fa-box fa-2x text-primary"></i>
+                        </div>
+                        <h6 class="stat-label-dark mb-2">TOTAL PRODUCTS</h6>
+                        <h2 class="stat-value-dark" data-value="@(ViewBag.ProductCount ?? 0)">@(ViewBag.ProductCount ?? 0)</h2>
+                        <div class="stat-border stat-border-primary"></div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 stat-column">
+                    <div class="stat-card-dark text-center p-4">
+                        <div class="stat-icon-dark mb-3">
+                            <i class="fas fa-truck fa-2x text-success"></i>
+                        </div>
+                        <h6 class="stat-label-dark mb-2">SUPPLIERS</h6>
+                        <h2 class="stat-value-dark" data-value="@(ViewBag.SupplierCount ?? 0)">@(ViewBag.SupplierCount ?? 0)</h2>
+                        <div class="stat-border stat-border-success"></div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 stat-column">
+                    <div class="stat-card-dark text-center p-4">
+                        <div class="stat-icon-dark mb-3">
+                            <i class="fas fa-tag fa-2x text-info"></i>
+                        </div>
+                        <h6 class="stat-label-dark mb-2">CATEGORIES</h6>
+                        <h2 class="stat-value-dark" data-value="@(ViewBag.CategoryCount ?? 0)">@(ViewBag.CategoryCount ?? 0)</h2>
+                        <div class="stat-border stat-border-info"></div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 stat-column">
+                    <div class="stat-card-dark text-center p-4">
+                        <div class="stat-icon-dark mb-3">
+                            <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                        </div>
+                        <h6 class="stat-label-dark mb-2">LOW STOCK ITEMS</h6>
+                        <h2 class="stat-value-dark" data-value="@(ViewBag.LowStockCount ?? 0)">@(ViewBag.LowStockCount ?? 0)</h2>
+                        <div class="stat-border stat-border-warning"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Getting Started -->
+    <h2 class="mb-4 d-flex align-items-center section-title">
+        <i class="fas fa-flag-checkered text-primary me-2"></i>
+        <span>Getting Started</span>
+        <span class="section-line"></span>
+    </h2>
+    <div class="content-card shadow-sm">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center mb-4">
+                <div class="icon-circle bg-primary-subtle me-3 scale-on-hover">
+                    <i class="fas fa-book-open text-primary"></i>
+                </div>
+                <h4 class="mb-0">Quick Start Guide</h4>
+            </div>
+            <p class="fw-medium mb-4">New to the system? Here's a quick guide to help you get started:</p>
+            <div class="getting-started-steps">
+                <div class="step d-flex align-items-start mb-4 hover-card">
+                    <div class="step-number bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">1</div>
+                    <div>
+                        <h5 class="mb-1">Create Categories</h5>
+                        <p class="mb-0 text-secondary">Organize your inventory by <a href="/Category/Create" class="text-primary">creating categories</a> for your products.</p>
+                    </div>
+                </div>
+                <div class="step d-flex align-items-start mb-4 hover-card">
+                    <div class="step-number bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">2</div>
+                    <div>
+                        <h5 class="mb-1">Add Suppliers</h5>
+                        <p class="mb-0 text-secondary">Set up <a href="/Suppliers/Create" class="text-primary">supplier profiles</a> for each of your vendors.</p>
+                    </div>
+                </div>
+                <div class="step d-flex align-items-start mb-4 hover-card">
+                    <div class="step-number bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">3</div>
+                    <div>
+                        <h5 class="mb-1">Add Products</h5>
+                        <p class="mb-0 text-secondary"><a href="/Product/Create" class="text-primary">Create product listings</a> with initial stock levels and detailed information.</p>
+                    </div>
+                </div>
+                <div class="step d-flex align-items-start mb-4 hover-card">
+                    <div class="step-number bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">4</div>
+                    <div>
+                        <h5 class="mb-1">Manage Inventory</h5>
+                        <p class="mb-0 text-secondary">Use the <a href="/Stock/Dashboard" class="text-primary">inventory dashboard</a> for day-to-day stock management.</p>
+                    </div>
+                </div>
+                <div class="step d-flex align-items-start hover-card">
+                    <div class="step-number bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">5</div>
+                    <div>
+                        <h5 class="mb-1">Monitor Stock Levels</h5>
+                        <p class="mb-0 text-secondary">Check the <a href="/Product/LowStock" class="text-primary">low stock page</a> regularly to prevent stockouts.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/animations.js"></script>
+}

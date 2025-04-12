@@ -1,0 +1,39 @@
+@using Microsoft.AspNetCore.Identity
+@using InventoryManagementSystem.Models.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="btn-group">
+        <button type="button" class="btn btn-sm btn-outline-light dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle me-1"></i>
+            @User.Identity?.Name
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary">
+            <li>
+                <a class="dropdown-item text-white-50" asp-area="Identity" asp-page="/Account/Manage/Index">
+                    <i class="fas fa-user-cog me-1"></i> Profile
+                </a>
+            </li>
+            <li><hr class="dropdown-divider border-secondary"></li>
+            <li>
+                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="dropdown-item text-white-50">
+                        <i class="fas fa-sign-out-alt me-1"></i> Logout
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+}
+else
+{
+    <a class="btn btn-sm btn-outline-light d-flex align-items-center me-2" asp-area="Identity" asp-page="/Account/Login">
+        <i class="fas fa-sign-in-alt me-1"></i> Login
+    </a>
+    <a class="btn btn-sm btn-primary d-flex align-items-center" asp-area="Identity" asp-page="/Account/Register">
+        <i class="fas fa-user-plus me-1"></i> Register
+    </a>
+}
