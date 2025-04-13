@@ -1,475 +1,826 @@
 @model InventoryManagementSystem.Models.ViewModels.DashboardViewModel
+@using InventoryManagementSystem.Models.ViewComponents
+@using Microsoft.AspNetCore.Html
 @{
     ViewData["Title"] = "Dashboard";
 }
 
-<style>
-    /* Modern Color Palette */
-    :root {
-        --bg-dark: #0f172a;
-        --bg-card: #1e293b;
-        --bg-hover: #334155;
-        --accent-primary: #3b82f6;
-        --accent-secondary: #0ea5e9;
-        --text-primary: #f8fafc;
-        --text-secondary: #94a3b8;
-        --text-muted: #64748b;
-        --border-color: #2d3a4f;
-        --success: #22c55e;
-        --warning: #eab308;
-        --danger: #ef4444;
+<div class="container-fluid px-3 py-2">
+    <!-- Use the PageHeader partial with fluent API similar to Details.cshtml -->
+    @{
+        var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+            .Create("Analytics Dashboard", "fas fa-chart-line")
+            .WithSecondaryButton("Export Report", "#", "fas fa-file-export");
     }
+    <partial name="_PageHeader" model="headerModel" />
 
-    body {
-        background-color: var(--bg-dark);
-        color: var(--text-primary);
-    }
-
-    /* Card Styles */
-    .dashboard-card {
-        background-color: var(--bg-card);
-        border: 1px solid var(--border-color);
-        border-radius: 16px;
-        transition: all 0.3s ease;
-        overflow: hidden;
-    }
-
-    .dashboard-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-        border-color: var(--accent-primary);
-    }
-
-    .stat-card {
-        position: relative;
-        padding: 1.5rem;
-    }
-
-    .stat-card .icon-shape {
-        position: absolute;
-        right: -15px;
-        bottom: -15px;
-        font-size: 5rem;
-        opacity: 0.05;
-        transform: rotate(-15deg);
-        transition: all 0.3s ease;
-    }
-
-    .dashboard-card:hover .icon-shape {
-        transform: rotate(0deg) scale(1.1);
-        opacity: 0.1;
-    }
-
-    .stat-value {
-        font-size: 2.25rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin: 0.5rem 0;
-        line-height: 1;
-    }
-
-    .stat-label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    /* Table Styles */
-    .card {
-        background-color: var(--bg-card);
-        border: 1px solid var(--border-color);
-        border-radius: 16px;
-        overflow: hidden;
-    }
-
-    .card-header {
-        background-color: rgba(59, 130, 246, 0.1) !important;
-        border-bottom: 1px solid var(--border-color);
-        padding: 1.25rem 1.5rem;
-    }
-
-    .table {
-        color: var(--text-primary);
-        margin-bottom: 0;
-    }
-
-    .table thead th {
-        background-color: rgba(59, 130, 246, 0.05);
-        color: var(--text-secondary);
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .table tbody td {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid var(--border-color);
-        vertical-align: middle;
-    }
-
-    .table tbody tr:hover {
-        background-color: var(--bg-hover);
-    }
-
-    /* Badge Styles */
-    .badge {
-        font-size: 0.75rem;
-        padding: 0.5rem 0.75rem;
-        border-radius: 8px;
-        font-weight: 600;
-    }
-
-    .badge-danger {
-        background-color: rgba(239, 68, 68, 0.2);
-        color: #fca5a5;
-    }
-
-    .badge-warning {
-        background-color: rgba(234, 179, 8, 0.2);
-        color: #fcd34d;
-    }
-
-    /* Button Styles */
-    .btn {
-        padding: 0.5rem 1rem;
-        font-weight: 600;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-    }
-
-    .btn-primary {
-        background-color: var(--accent-primary);
-        border: none;
-    }
-
-    .btn-primary:hover {
-        background-color: var(--accent-secondary);
-        transform: translateY(-1px);
-    }
-
-    .btn-outline-light {
-        border: 1px solid var(--border-color);
-        color: var(--text-primary);
-    }
-
-    .btn-outline-light:hover {
-        background-color: var(--bg-hover);
-        border-color: var(--accent-primary);
-        color: var(--text-primary);
-    }
-
-    .btn-action {
-        width: 36px;
-        height: 36px;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: all 0.2s ease;
-    }
-
-    .btn-action:hover {
-        transform: translateY(-2px);
-    }
-
-    /* DataTable Customization */
-    .dataTables_wrapper {
-        color: var(--text-secondary);
-        padding: 1rem;
-    }
-
-    .dataTables_length select,
-    .dataTables_filter input {
-        background-color: var(--bg-dark);
-        color: var(--text-primary);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 0.375rem 0.75rem;
-    }
-
-    .dataTables_length select:focus,
-    .dataTables_filter input:focus {
-        border-color: var(--accent-primary);
-        outline: none;
-    }
-
-    .dataTables_filter input {
-        min-width: 250px;
-    }
-
-    .page-item.active .page-link {
-        background-color: var(--accent-primary);
-        border-color: var(--accent-primary);
-    }
-
-    .page-link {
-        background-color: var(--bg-card);
-        border-color: var(--border-color);
-        color: var(--text-primary);
-    }
-
-    .page-link:hover {
-        background-color: var(--bg-hover);
-        border-color: var(--accent-primary);
-        color: var(--text-primary);
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: var(--bg-dark);
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: var(--accent-primary);
-    }
-
-    /* Responsive Adjustments */
-    @@media (max-width: 768px) {
-        .stat-value {
-            font-size: 1.75rem;
-        }
-        .stat-card {
-            padding: 1rem;
-        }
-        .table thead th,
-        .table tbody td {
-            padding: 0.75rem 1rem;
-        }
-        .dataTables_filter input {
-            min-width: 200px;
-        }
-    }
-</style>
-
-@section Styles {
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-}
-
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 d-flex align-items-center">
-            <i class="fas fa-chart-line me-3 text-primary"></i>
-            Inventory Dashboard
-        </h1>
-        <div class="d-flex gap-3">
-            <button class="btn btn-primary d-flex align-items-center">
-                <i class="fas fa-sync-alt me-2"></i>
-                Refresh
-            </button>
-            <button class="btn btn-outline-light d-flex align-items-center">
-                <i class="fas fa-file-export me-2"></i>
-                Export
-            </button>
-        </div>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="dashboard-card stat-card shadow-sm">
-                <div class="stat-label">Total Products</div>
-                <div class="stat-value">@Model.TotalProducts</div>
-                <div class="icon-shape">
-                    <i class="fas fa-boxes"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="dashboard-card stat-card shadow-sm">
-                <div class="stat-label">Inventory Value</div>
-                <div class="stat-value">@Model.TotalInventoryValue.ToString("C")</div>
-                <div class="icon-shape">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="dashboard-card stat-card shadow-sm">
-                <div class="stat-label">Low Stock Items</div>
-                <div class="stat-value">@Model.LowStockCount</div>
-                <div class="icon-shape">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="dashboard-card stat-card shadow-sm">
-                <div class="stat-label">Active Suppliers</div>
-                <div class="stat-value">@Model.TotalSuppliers</div>
-                <div class="icon-shape">
-                    <i class="fas fa-truck"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Low Stock Products -->
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-                <h5 class="mb-0 d-flex align-items-center">
-                    <i class="fas fa-exclamation-circle me-2 text-warning"></i>
-                    Low Stock Products
-                </h5>
-                <div class="d-flex gap-2">
-                    <a href="@Url.Action("Create", "Products")" class="btn btn-primary d-flex align-items-center">
-                        <i class="fas fa-plus me-2"></i>
-                        Add Product
-                    </a>
-                    <a href="@Url.Action("Index", "Products")" class="btn btn-outline-light d-flex align-items-center">
-                        <i class="fas fa-list me-2"></i>
-                        View All
-                    </a>
-                </div>
-            </div>
-
-        </div>
-        <div class="card-body p-0">
-            @if (Model.HasLowStockProducts)
-            {
-                <div class="table-responsive">
-                    <table class="table" id="lowStockTable">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>SKU</th>
-                                <th class="text-center">Current Stock</th>
-                                <th class="text-center">Reorder Level</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var product in Model.LowStockProducts)
-                            {
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="me-3">
-                                                <i class="fas fa-box text-primary"></i>
-                                            </div>
-                                            <div>
-                                                <div class="fw-semibold">@product.Name</div>
-                                                <small class="text-muted">@product.SKU</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>@product.SKU</td>
-                                    <td class="text-center">
-                                        <span class="@(product.CurrentStock == 0 ? "text-danger" : "text-warning") fw-semibold">
-                                            @product.CurrentStock
-                                        </span>
-                                    </td>
-                                    <td class="text-center">@product.ReorderLevel</td>
-                                    <td class="text-center">
-                                        @if (product.CurrentStock == 0)
-                                        {
-                                            <span class="badge badge-danger">
-                                                <i class="fas fa-times-circle me-1"></i>
-                                                Out of Stock
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge badge-warning">
-                                                <i class="fas fa-exclamation-circle me-1"></i>
-                                                Low Stock
-                                            </span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <a href="@Url.Action("Details", "Products", new { id = product.Id })" 
-                                               class="btn btn-action btn-primary"
-                                               data-bs-toggle="tooltip" title="View Details">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="@Url.Action("Edit", "Products", new { id = product.Id })" 
-                                               class="btn btn-action btn-outline-light"
-                                               data-bs-toggle="tooltip" title="Edit Product">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <a href="@Url.Action("Restock", "Products", new { id = product.Id })" 
-                                               class="btn btn-action" style="background-color: var(--success); border: none;"
-                                               data-bs-toggle="tooltip" title="Restock Product">
-                                                <i class="fas fa-plus-circle"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+    <!-- Stats Cards Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            @{
+                var productsCard = StatCardViewModel
+                    .Create("Total Products", Model.TotalProducts.ToString(), "fas fa-boxes text-primary")
+                    .WithIconClass("bg-primary-subtle")
+                    .WithTrend(Model.ProductTrend);
             }
-            else
-            {
-                <div class="p-4">
-                    <div class="alert mb-0 text-center" style="background-color: rgba(59, 130, 246, 0.1); border: 1px solid var(--border-color); border-radius: 12px;">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <i class="fas fa-check-circle text-success me-3 fa-2x"></i>
-                            <div>
-                                <h6 class="mb-1 fw-semibold">All Products Well Stocked</h6>
-                                <span class="text-secondary">Your inventory levels are healthy. No products require immediate attention.</span>
-                            </div>
+            <partial name="_StatCard" model="productsCard" />
+        </div>
+        <div class="col-md-3">
+            @{
+                var inventoryCard = StatCardViewModel
+                    .Create("Inventory Value", $"${Model.TotalInventoryValue.ToString("N0")}", "fas fa-dollar-sign text-success")
+                    .WithIconClass("bg-success-subtle")
+                    .WithTrend(Model.InventoryValueTrend);
+            }
+            <partial name="_StatCard" model="inventoryCard" />
+        </div>
+        <div class="col-md-3">
+            @{
+                // Create the HTML content for low stock indicators
+                var lowStockHtml = new HtmlString(
+                    $@"<div class=""mt-1"">
+                        <small class=""text-danger me-2""><i class=""fas fa-exclamation-circle""></i> Critical: {Model.CriticalStockCount}</small>
+                        <small class=""text-warning""><i class=""fas fa-exclamation-triangle""></i> Warning: {Model.LowStockCount - Model.CriticalStockCount}</small>
+                    </div>");
+                
+                var lowStockCard = StatCardViewModel
+                    .Create("Low Stock Items", Model.LowStockCount.ToString(), "fas fa-exclamation-triangle text-warning")
+                    .WithIconClass("bg-warning-subtle")
+                    .WithAdditionalContent(lowStockHtml);
+            }
+            <partial name="_StatCard" model="lowStockCard" />
+        </div>
+        <div class="col-md-3">
+            @{
+                var suppliersCard = StatCardViewModel
+                    .Create("Total Suppliers", Model.TotalSuppliers.ToString(), "fas fa-truck text-info")
+                    .WithIconClass("bg-info-subtle")
+                    .WithSubtitle("Registered suppliers");
+            }
+            <partial name="_StatCard" model="suppliersCard" />
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- Main Charts Section -->
+        <div class="col-md-8">
+            <!-- Inventory Value Chart -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-chart-line text-primary"></i>
+                        </span>
+                        Inventory Value Over Time
+                    </h5>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-dark time-filter active" data-period="week">Week</button>
+                        <button type="button" class="btn btn-sm btn-dark time-filter" data-period="month">Month</button>
+                        <button type="button" class="btn btn-sm btn-dark time-filter" data-period="quarter">Quarter</button>
+                    </div>
+                </div>
+                <div class="card-body p-3" style="height: 300px;">
+                    <canvas id="inventoryValueChart"></canvas>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 py-2">
+                    <div class="row text-center">
+                        <div class="col">
+                            <small class="text-muted">Predicted Next Week:</small><br>
+                            <span class="text-success">$@Model.PredictedInventoryValue.ToString("N0")</span>
+                        </div>
+                        <div class="col">
+                            <small class="text-muted">Optimal Range:</small><br>
+                            <span class="text-primary">$@Model.OptimalInventoryRange.Item1.ToString("N0") - $@Model.OptimalInventoryRange.Item2.ToString("N0")</span>
+                        </div>
+                        <div class="col">
+                            <small class="text-muted">Trend:</small><br>
+                            <span class="@(Model.InventoryValueTrend >= 0 ? "text-success" : "text-danger")">
+                                <i class="fas fa-arrow-@(Model.InventoryValueTrend >= 0 ? "up" : "down")"></i>
+                                @Math.Abs(Model.InventoryValueTrend)%
+                            </span>
                         </div>
                     </div>
                 </div>
-            }
+            </div>
+            
+            <!-- Stock Movement Chart -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-exchange-alt text-primary"></i>
+                        </span>
+                        Stock Movement Analysis
+                    </h5>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-dark mvt-filter active" data-type="all">All</button>
+                        <button type="button" class="btn btn-sm btn-dark mvt-filter" data-type="in">Stock In</button>
+                        <button type="button" class="btn btn-sm btn-dark mvt-filter" data-type="out">Stock Out</button>
+                    </div>
+                </div>
+                <div class="card-body p-3" style="height: 300px;">
+                    <canvas id="stockMovementChart"></canvas>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 py-2">
+                    <div class="row text-center">
+                        <div class="col">
+                            <small class="text-muted">Average Daily Movement:</small><br>
+                            <span class="text-primary">@Model.AverageDailyMovement items</span>
+                        </div>
+                        <div class="col">
+                            <small class="text-muted">Peak Hours:</small><br>
+                            <span class="text-primary">
+                                @string.Join(", ", Model.PeakMovementHours.Select(h => $"{h:D2}:00"))
+                            </span>
+                        </div>
+                        <div class="col">
+                            <small class="text-muted">Efficiency:</small><br>
+                            <span class="text-success">@Model.MovementEfficiency%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side Charts Section -->
+        <div class="col-md-4">
+            <!-- Stock Health Score -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-heartbeat text-primary"></i>
+                        </span>
+                        Stock Health Score
+                    </h5>
+                    <span class="badge @(Model.StockHealthScore >= 80 ? "bg-success" : Model.StockHealthScore >= 60 ? "bg-info" : Model.StockHealthScore >= 40 ? "bg-warning" : "bg-danger") fs-6 py-1 px-3">
+                        <i class="fas @(Model.StockHealthScore >= 80 ? "fa-check-circle" : Model.StockHealthScore >= 60 ? "fa-info-circle" : Model.StockHealthScore >= 40 ? "fa-exclamation-circle" : "fa-times-circle") me-1"></i>
+                        @(Model.StockHealthScore >= 80 ? "Excellent" : Model.StockHealthScore >= 60 ? "Good" : Model.StockHealthScore >= 40 ? "Fair" : "Poor")
+                    </span>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-5">
+                            <div class="chart-wrapper position-relative">
+                                <div class="health-score-circle">
+                                    <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                        <h2 class="mb-0 score @Model.StockHealthClass">@Model.StockHealthScore</h2>
+                                        <div class="small text-white">health score</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-7 d-flex flex-column justify-content-center">
+                            <div class="stock-metrics">
+                                <div class="stock-metric-item mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="d-flex align-items-center">
+                                            <i class="fas fa-sync-alt me-2" style="color: #3B82F6;"></i>
+                                            <span style="color: #3B82F6; font-weight: 500;">Turnover</span>
+                                        </span>
+                                        <span class="fw-bold" style="color: #3B82F6;">@Model.TurnoverRate.ToString("0.0")%</span>
+                                    </div>
+                                    <div class="progress progress-thin" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: @Math.Min(100, Model.TurnoverRate)%; background-color: #3B82F6;"></div>
+                                    </div>
+                                </div>
+                                <div class="stock-metric-item mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="d-flex align-items-center">
+                                            <i class="fas fa-box me-2" style="color: #EF4444;"></i>
+                                            <span style="color: #EF4444; font-weight: 500;">Dead Stock</span>
+                                        </span>
+                                        <span class="fw-bold" style="color: #EF4444;">@Model.DeadStockPercentage.ToString("0.0")%</span>
+                                    </div>
+                                    <div class="progress progress-thin" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: @Math.Min(100, Model.DeadStockPercentage)%; background-color: #EF4444;"></div>
+                                    </div>
+                                </div>
+                                <div class="stock-metric-item mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="d-flex align-items-center">
+                                            <i class="fas fa-check-double me-2" style="color: #10B981;"></i>
+                                            <span style="color: #10B981; font-weight: 500;">Accuracy</span>
+                                        </span>
+                                        <span class="fw-bold" style="color: #10B981;">@Model.StockAccuracy.ToString("0.0")%</span>
+                                    </div>
+                                    <div class="progress progress-thin" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: @Math.Min(100, Model.StockAccuracy)%; background-color: #10B981;"></div>
+                                    </div>
+                                </div>
+                                <div class="stock-metric-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="d-flex align-items-center">
+                                            <i class="fas fa-shopping-cart me-2" style="color: #F59E0B;"></i>
+                                            <span style="color: #F59E0B; font-weight: 500;">Reorder Rate</span>
+                                        </span>
+                                        <span class="fw-bold" style="color: #F59E0B;">@Model.ReorderRate.ToString("0.0")%</span>
+                                    </div>
+                                    <div class="progress progress-thin" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: @Math.Min(100, Model.ReorderRate)%; background-color: #F59E0B;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stock Insights -->
+                    <div class="stock-insights mt-3">
+                        <div class="insight-item d-flex justify-content-between align-items-center p-2 rounded mb-2" 
+                             style="background-color: rgba(59, 130, 246, 0.15);">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-info-circle me-2 text-primary"></i>
+                                <span class="fw-medium">Health Score Factors</span>
+                            </div>
+                            <a href="#" class="text-primary text-decoration-none small">
+                                <i class="fas fa-question-circle me-1"></i>Details
+                            </a>
+                        </div>
+                        
+                        <div class="position-relative mt-3">
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between mb-1 small text-muted">
+                                        <div>Poor</div>
+                                        <div>Fair</div>
+                                        <div>Good</div>
+                                        <div>Excellent</div>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <div class="position-absolute" style="top: 22px; left: calc(@Model.StockHealthScore% - 7px);">
+                                        <i class="fas fa-caret-up text-white fs-5"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Health Recommendations -->
+                        <div class="health-recommendation mt-3 p-2 rounded" 
+                             style="background-color: @(Model.StockHealthScore >= 80 ? "rgba(16, 185, 129, 0.15)" : Model.StockHealthScore >= 60 ? "rgba(59, 130, 246, 0.15)" : Model.StockHealthScore >= 40 ? "rgba(245, 158, 11, 0.15)" : "rgba(239, 68, 68, 0.15)");">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-lightbulb me-2" 
+                                   style="color: @(Model.StockHealthScore >= 80 ? "#10B981" : Model.StockHealthScore >= 60 ? "#3B82F6" : Model.StockHealthScore >= 40 ? "#F59E0B" : "#EF4444");"></i>
+                                <span class="fw-medium" 
+                                      style="color: @(Model.StockHealthScore >= 80 ? "#10B981" : Model.StockHealthScore >= 60 ? "#3B82F6" : Model.StockHealthScore >= 40 ? "#F59E0B" : "#EF4444");">
+                                    Recommendation
+                                </span>
+                            </div>
+                            <p class="small mb-0">
+                                @(Model.StockHealthScore >= 80 ? "Your inventory is in excellent health. Continue monitoring turnover rates to maintain optimal levels." : 
+                                Model.StockHealthScore >= 60 ? "Stock health is good. Consider reviewing dead stock items to further improve efficiency." : 
+                                Model.StockHealthScore >= 40 ? "Fair health score. Focus on improving stock accuracy and reducing dead stock items." : 
+                                "Stock health needs immediate attention. Prioritize stock accuracy, reduce dead inventory, and review reorder processes.")
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Critical Alerts -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex align-items-center py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bell text-warning me-2"></i>
+                        Critical Alerts
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="alert-list">
+                        @if (Model.LowStockCount > 0)
+                        {
+                            <div class="alert-item bg-warning-subtle">
+                                <div class="alert-icon">
+                                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <div class="alert-title">Low Stock Alert</div>
+                                    <small class="text-muted">@Model.LowStockCount products below reorder level</small>
+                                </div>
+                                <div class="alert-action">
+                                    <a href="/Product/LowStock" class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-search"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        
+                        @if (Model.CriticalStockCount > 0)
+                        {
+                            <div class="alert-item bg-danger-subtle">
+                                <div class="alert-icon">
+                                    <i class="fas fa-times-circle text-danger"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <div class="alert-title">Out of Stock Alert</div>
+                                    <small class="text-muted">@Model.CriticalStockCount products out of stock</small>
+                                </div>
+                                <div class="alert-action">
+                                    <a href="@Url.Action("Index", "Stock", new { page = 1, transactionType = 2 })" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-search"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Recommendations -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex align-items-center py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        Recommended Actions
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="action-list">
+                        @foreach (var recommendation in Model.Recommendations)
+                        {
+                            <div class="action-item">
+                                <div class="action-icon">
+                                    <i class="@recommendation.Icon"></i>
+                                </div>
+                                <div class="action-content">
+                                    <div class="action-title">@recommendation.Title</div>
+                                    <small class="text-muted">@recommendation.Description</small>
+                                </div>
+                                <div class="action-button">
+                                    <a href="@recommendation.ActionUrl" class="btn btn-sm btn-success">
+                                        @recommendation.ActionText
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Tables Row -->
+    <div class="row g-3">
+        <!-- Product Movement Table -->
+        <div class="col-md-6">
+            <div class="card content-card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-star text-primary"></i>
+                        </span>
+                        Top Products by Stock Movement
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table m-0">
+                            <thead>
+                                <tr>
+                                    <th>PRODUCT</th>
+                                    <th class="text-center">STOCK IN</th>
+                                    <th class="text-center">STOCK OUT</th>
+                                    <th class="text-center">TURNOVER</th>
+                                    <th class="text-center">TREND</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var product in Model.TopProducts)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="product-name">@product.Name</div>
+                                                @if (product.NeedsReorder)
+                                                {
+                                                    <span class="badge bg-warning ms-2">Reorder</span>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td class="text-center text-success">+@product.StockIn</td>
+                                        <td class="text-center text-danger">-@product.StockOut</td>
+                                        <td class="text-center">
+                                            <div class="progress progress-thin" style="height: 6px;">
+                                                <div class="progress-bar @product.TurnoverClass" 
+                                                     style="width: @product.TurnoverRate%">
+                                                </div>
+                                            </div>
+                                            <span class="small">@product.TurnoverRate.ToString("0.0")%</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="@product.TrendClass">
+                                                <i class="fas fa-arrow-@product.TrendDirection"></i>
+                                                @Math.Abs(product.TrendPercentage).ToString("0.0")%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Supplier Performance -->
+        <div class="col-md-6">
+            <div class="card content-card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-truck text-primary"></i>
+                        </span>
+                        Supplier Performance
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table m-0">
+                            <thead>
+                                <tr>
+                                    <th>SUPPLIER</th>
+                                    <th class="text-center">LEAD TIME</th>
+                                    <th class="text-center">COMPLETION</th>
+                                    <th class="text-center">QUALITY</th>
+                                    <th class="text-center">RISK</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var supplier in Model.SupplierPerformances)
+                                {
+                                    <tr>
+                                        <td>@supplier.SupplierName</td>
+                                        <td class="text-center">
+                                            <span class="@(supplier.LeadTimeDays <= 3 ? "text-success" : supplier.LeadTimeDays <= 5 ? "text-warning" : "text-danger")">
+                                                @supplier.LeadTimeDays days
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="progress progress-thin" style="height: 6px;">
+                                                <div class="progress-bar @(supplier.OrderCompletionRate >= 90 ? "bg-success" : supplier.OrderCompletionRate >= 75 ? "bg-warning" : "bg-danger")" 
+                                                     style="width: @supplier.OrderCompletionRate%">
+                                                </div>
+                                            </div>
+                                            <span class="small">@supplier.OrderCompletionRate.ToString("0.0")%</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="supplier-rating">
+                                                @{
+                                                    // Calculate quality rating based on completion rate
+                                                    var qualityRating = supplier.OrderCompletionRate >= 95 ? 5 :
+                                                                     supplier.OrderCompletionRate >= 90 ? 4 :
+                                                                     supplier.OrderCompletionRate >= 80 ? 3 :
+                                                                     supplier.OrderCompletionRate >= 70 ? 2 : 1;
+                                                }
+                                                @for (var i = 1; i <= 5; i++)
+                                                {
+                                                    if (i <= qualityRating)
+                                                    {
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-star text-muted"></i>
+                                                    }
+                                                }
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            @{
+                                                var riskLevel = supplier.OrderCompletionRate >= 90 ? "Low" :
+                                                             supplier.OrderCompletionRate >= 75 ? "Medium" : "High";
+                                                var riskClass = riskLevel == "Low" ? "bg-success" :
+                                                             riskLevel == "Medium" ? "bg-warning" : "bg-danger";
+                                            }
+                                            <span class="badge @riskClass">
+                                                @riskLevel
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Initialize DataTable with custom styling
-            $('#lowStockTable').DataTable({
-                responsive: true,
-                pageLength: 10,
-                language: {
-                    search: "<i class='fas fa-search me-2'></i>Search:",
-                    lengthMenu: "<i class='fas fa-list-ul me-2'></i>Show _MENU_ entries",
-                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                    infoEmpty: "Showing 0 to 0 of 0 entries",
-                    infoFiltered: "(filtered from _MAX_ total entries)",
-                    emptyTable: "<div class='text-center py-4'><i class='fas fa-box-open fa-3x mb-3 text-secondary'></i><br>No low stock products found</div>"
-                },
-                dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-                     "<'row'<'col-sm-12'tr>>" +
-                     "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-                drawCallback: function() {
-                    $('.dataTables_paginate > .pagination').addClass('justify-content-end');
-                }
-            });
+@section Styles {
+    <style>
+        .health-score-circle {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 4px solid;
+            border-color: var(--bs-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-            // Initialize tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            });
+        .health-score-circle .score {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .score.excellent { color: #10B981; }
+        .score.good { color: #3B82F6; }
+        .score.fair { color: #F59E0B; }
+        .score.poor { color: #EF4444; }
+
+        .stock-metric-item {
+            padding: 0.25rem 0;
+        }
+
+        .progress-thin {
+            height: 5px !important;
+            background-color: rgba(0, 0, 0, 0.15);
+        }
+        
+        .progress {
+            background-color: rgba(0, 0, 0, 0.15);
+        }
+
+        .alert-list .alert-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .alert-list .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-item .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .alert-item .alert-content {
+            flex: 1;
+        }
+
+        .alert-item .alert-title {
+            font-weight: 500;
+        }
+
+        .action-list .action-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .action-list .action-item:last-child {
+            border-bottom: none;
+        }
+
+        .action-item .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .action-item .action-content {
+            flex: 1;
+        }
+
+        .action-item .action-title {
+            font-weight: 500;
+        }
+
+        .supplier-rating {
+            line-height: 1;
+        }
+
+        .supplier-rating i {
+            font-size: 0.8rem;
+        }
+    </style>
+}
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Common chart configuration
+    const chartConfig = {
+        initializeChartDefaults() {
+            Chart.defaults.color = '#c2c7d0';
+            Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+        },
+
+        getCommonOptions(type) {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                animations: {
+                    tension: {
+                        duration: 1000,
+                        easing: 'linear'
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: type !== 'line'
+                    }
+                }
+            };
+        },
+
+        destroyChartIfExists(chart) {
+            if (chart) {
+                chart.destroy();
+            }
+        }
+    };
+
+    // Chart instances
+    let inventoryValueChart;
+    let stockMovementChart;
+    
+    // Data sets
+    const inventoryValueData = {
+        week: {
+            labels: @Json.Serialize(Model.WeeklyInventoryValues.Keys.Select(d => d.ToString("ddd"))),
+            data: @Json.Serialize(Model.WeeklyInventoryValues.Values)
+        },
+        month: {
+            labels: @Json.Serialize(Model.MonthlyInventoryValues.Keys.Select(d => $"Week {((d.Day - 1) / 7) + 1}")),
+            data: @Json.Serialize(Model.MonthlyInventoryValues.Values)
+        },
+        quarter: {
+            labels: @Json.Serialize(Model.QuarterlyInventoryValues.Keys.Select(d => d.ToString("MMM"))),
+            data: @Json.Serialize(Model.QuarterlyInventoryValues.Values)
+        }
+    };
+    
+    const stockMovementData = {
+        all: {
+            labels: @Json.Serialize(Model.WeeklyStockMovements.Select(m => m.Date.ToString("MMM dd"))),
+            stockIn: @Json.Serialize(Model.WeeklyStockMovements.Select(m => m.StockIn)),
+            stockOut: @Json.Serialize(Model.WeeklyStockMovements.Select(m => m.StockOut))
+        },
+        in: {
+            labels: @Json.Serialize(Model.WeeklyStockMovements.Select(m => m.Date.ToString("MMM dd"))),
+            stockIn: @Json.Serialize(Model.WeeklyStockMovements.Select(m => m.StockIn)),
+            stockOut: []
+        },
+        out: {
+            labels: @Json.Serialize(Model.WeeklyStockMovements.Select(m => m.Date.ToString("MMM dd"))),
+            stockIn: [],
+            stockOut: @Json.Serialize(Model.WeeklyStockMovements.Select(m => m.StockOut))
+        }
+    };
+
+    $(document).ready(function() {
+        chartConfig.initializeChartDefaults();
+        createInventoryValueChart('week');
+        createStockMovementChart('all');
+        
+        // Event handlers
+        $('.time-filter').click(function(e) {
+            e.preventDefault();
+            $('.time-filter').removeClass('active');
+            $(this).addClass('active');
+            updateInventoryValueChart($(this).data('period'));
         });
-    </script>
+        
+        $('.mvt-filter').click(function(e) {
+            e.preventDefault();
+            $('.mvt-filter').removeClass('active');
+            $(this).addClass('active');
+            updateStockMovementChart($(this).data('type'));
+        });
+    });
+    
+    // Generic chart creation function to reduce duplication
+    function createChart(chartId, chartType, labels, datasets, options, chartInstance) {
+        const ctx = document.getElementById(chartId).getContext('2d');
+        
+        chartConfig.destroyChartIfExists(chartInstance);
+        
+        return new Chart(ctx, {
+            type: chartType,
+            data: { 
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                ...chartConfig.getCommonOptions(chartType),
+                ...options
+            }
+        });
+    }
+    
+    function createInventoryValueChart(period) {
+        const periodData = inventoryValueData[period];
+        
+        const datasets = [{
+            label: 'Inventory Value',
+            data: periodData.data,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+        }];
+        
+        const options = {
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: value => '$' + value.toLocaleString()
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: context => new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: 'USD'
+                        }).format(context.raw)
+                    }
+                }
+            }
+        };
+        
+        inventoryValueChart = createChart('inventoryValueChart', 'line', periodData.labels, datasets, options, inventoryValueChart);
+    }
+    
+    function createStockMovementChart(type) {
+        const typeData = stockMovementData[type];
+        
+        const datasets = [];
+        if (typeData.stockIn.length > 0) {
+            datasets.push({
+                label: 'Stock In',
+                data: typeData.stockIn,
+                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                borderColor: 'rgba(16, 185, 129, 1)',
+                borderWidth: 1,
+                borderRadius: 4
+            });
+        }
+        
+        if (typeData.stockOut.length > 0) {
+            datasets.push({
+                label: 'Stock Out',
+                data: typeData.stockOut,
+                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                borderColor: 'rgba(239, 68, 68, 1)',
+                borderWidth: 1,
+                borderRadius: 4
+            });
+        }
+        
+        const options = {
+            scales: {
+                x: {
+                    grid: { display: false }
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        };
+        
+        stockMovementChart = createChart('stockMovementChart', 'bar', typeData.labels, datasets, options, stockMovementChart);
+    }
+    
+    function updateInventoryValueChart(period) {
+        createInventoryValueChart(period);
+    }
+    
+    function updateStockMovementChart(type) {
+        createStockMovementChart(type);
+    }
+</script>
 } 
