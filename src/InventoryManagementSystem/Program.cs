@@ -93,7 +93,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("CanViewStock", policy => policy.RequireRole("Admin", "Staff"));
     options.AddPolicy("CanAddStock", policy => policy.RequireRole("Admin", "Staff"));
     options.AddPolicy("CanRemoveStock", policy => policy.RequireRole("Admin", "Staff"));
-    options.AddPolicy("CanAdjustStock", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CanAdjustStock", policy => policy.RequireRole("Admin", "Staff"));
     
     // Category policies
     options.AddPolicy("CanViewCategories", policy => policy.RequireRole("Admin", "Staff"));

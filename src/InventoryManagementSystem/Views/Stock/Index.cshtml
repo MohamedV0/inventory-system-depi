@@ -12,14 +12,6 @@
     .WithSecondaryButton("Adjust Stock", Url.Action("AdjustStock", "Stock"), "fas fa-balance-scale")
     .WithSecondaryButton("Low Stock Items", Url.Action("LowStock", "Product"), "fas fa-exclamation-triangle"))
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
 <div class="card shadow-sm mb-4">
     <div class="card-header">
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">

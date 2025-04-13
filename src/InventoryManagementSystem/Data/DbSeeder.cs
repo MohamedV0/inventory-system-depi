@@ -212,6 +212,39 @@ namespace InventoryManagementSystem.Data
             return $"{GetRandomItem(_firstNames)} {GetRandomItem(_lastNames)}";
         }
         
+        private static decimal ApplySeasonalFactor(decimal baseValue, DateTime date)
+        {
+            // Define seasonal factors (Q1: Winter, Q2: Spring, Q3: Summer, Q4: Fall)
+            var month = date.Month;
+            var seasonalFactor = month switch
+            {
+                12 or 1 or 2 => 1.3m,  // Winter - high demand
+                3 or 4 or 5 => 1.1m,   // Spring - moderate high
+                6 or 7 or 8 => 0.8m,   // Summer - low
+                _ => 1.2m              // Fall - rising
+            };
+
+            // Add some random variation
+            var randomFactor = 0.9m + (decimal)(_random.NextDouble() * 0.2);
+            return baseValue * seasonalFactor * randomFactor;
+        }
+
+        private static int ApplyDailyPattern(int baseQuantity, DateTime date)
+        {
+            // Define daily patterns
+            var hour = date.Hour;
+            var dayFactor = hour switch
+            {
+                >= 9 and <= 11 => 1.5,  // Morning peak
+                >= 14 and <= 16 => 1.3, // Afternoon peak
+                >= 17 and <= 19 => 1.2, // Evening moderate
+                >= 20 or <= 8 => 0.7,   // Night/early morning low
+                _ => 1.0                // Normal hours
+            };
+
+            return (int)(baseQuantity * dayFactor);
+        }
+
         private static async Task SeedDataAsync(ApplicationDbContext context)
         {
             // Only seed if database is empty
@@ -226,13 +259,14 @@ namespace InventoryManagementSystem.Data
             const int PRODUCT_COUNT = 1000;
             const int MIN_SUPPLIERS_PER_PRODUCT = 0;  // Some products may have no suppliers
             const int MAX_SUPPLIERS_PER_PRODUCT = 4;
-            const int MIN_STOCK_HISTORY_PER_PRODUCT = 1;
-            const int MAX_STOCK_HISTORY_PER_PRODUCT = 10;
+            const int MIN_STOCK_HISTORY_PER_PRODUCT = 50;  // Increased for more data points
+            const int MAX_STOCK_HISTORY_PER_PRODUCT = 200; // Increased for more data points
             
-            // Distribution of stock scenarios
-            const double NORMAL_STOCK_PROBABILITY = 0.6;  // 60% normal stock
-            const double LOW_STOCK_PROBABILITY = 0.3;     // 30% low stock
-            const double OUT_OF_STOCK_PROBABILITY = 0.1;  // 10% out of stock
+            // Distribution of stock scenarios with more nuanced probabilities
+            const double NORMAL_STOCK_PROBABILITY = 0.5;    // 50% normal stock
+            const double LOW_STOCK_PROBABILITY = 0.25;      // 25% low stock
+            const double CRITICAL_STOCK_PROBABILITY = 0.15; // 15% critical stock
+            const double OUT_OF_STOCK_PROBABILITY = 0.1;    // 10% out of stock
 
             Console.WriteLine("Starting to seed database with large dataset...");
 
@@ -405,109 +439,134 @@ namespace InventoryManagementSystem.Data
             await context.SaveChangesAsync();
             Console.WriteLine("Product-supplier relationships seeded successfully.");
 
-            // Seed StockHistory
-            Console.WriteLine("Generating stock history records...");
+            // Enhanced Stock History Generation
+            Console.WriteLine("Generating detailed stock history records...");
             var stockHistories = new List<StockHistory>();
+            var startDate = DateTime.UtcNow.AddYears(-1); // Start from one year ago
 
             foreach (var productId in allProductIds)
             {
                 var product = await context.Products.FindAsync(productId);
+                var runningStock = 0;
                 
-                // Start with running stock variables
-                int runningStock = 0;
+                // Create product performance profile
+                var isHighDemand = GetRandomBool(0.3); // 30% are high demand products
+                var isSeasonalProduct = GetRandomBool(0.4); // 40% are seasonal products
+                var hasTrend = GetRandomBool(0.6); // 60% have a trend (up or down)
+                var trendFactor = hasTrend ? (_random.NextDouble() > 0.5 ? 1.002 : 0.998) : 1.0; // Subtle trend
+
+                // Initial stock entry
+                var initialStockDate = startDate;
+                var initialQuantity = GetRandomNumber(20, 100);
                 
-                // Determine how many stock history entries this product will have
-                int historyCount = GetRandomNumber(MIN_STOCK_HISTORY_PER_PRODUCT, MAX_STOCK_HISTORY_PER_PRODUCT);
-                
-                // Always create at least one initial stock entry
-                DateTime initialStockDate = GetRandomDate(30, 120);
-                int initialQuantity = GetRandomNumber(10, 50);
-                
-            stockHistories.Add(new StockHistory
-            {
+                stockHistories.Add(new StockHistory
+                {
                     ProductId = productId,
                     QuantityChange = initialQuantity,
-                PreviousStock = 0,
+                    PreviousStock = 0,
                     NewStock = initialQuantity,
-                Reason = "Initial stock",
+                    Reason = "Initial stock",
                     Date = initialStockDate,
                     ReferenceNumber = GenerateReferenceNumber("INI", stockHistories.Count + 1),
                     UnitPrice = product.Cost,
-                Type = TransactionType.Initial,
-                IsActive = true
-            });
+                    Type = TransactionType.Initial,
+                    IsActive = true
+                });
 
                 runningStock = initialQuantity;
                 
-                // Add additional history entries if needed
+                // Generate history entries across the year
+                var currentDate = startDate;
+                var historyCount = GetRandomNumber(MIN_STOCK_HISTORY_PER_PRODUCT, MAX_STOCK_HISTORY_PER_PRODUCT);
+                
                 for (int i = 1; i < historyCount; i++)
                 {
-                    // Determine the type of transaction
+                    // Advance time randomly (1-3 days)
+                    currentDate = currentDate.AddDays(_random.Next(1, 4));
+                    if (currentDate > DateTime.UtcNow) break;
+
+                    // Apply seasonal and trend factors
+                    var baseQuantity = isHighDemand ? GetRandomNumber(10, 30) : GetRandomNumber(5, 15);
+                    if (isSeasonalProduct)
+                    {
+                        baseQuantity = (int)(baseQuantity * (decimal)ApplySeasonalFactor(1m, currentDate));
+                    }
+                    baseQuantity = (int)(baseQuantity * (decimal)Math.Pow(trendFactor, (currentDate - startDate).Days));
+
+                    // Determine transaction type with time-based patterns
                     TransactionType transactionType;
                     int quantityChange;
                     string reason;
                     string referencePrefix;
+
+                    var hourOfDay = currentDate.Hour;
+                    var dayOfWeek = (int)currentDate.DayOfWeek;
+                    var isBusinessHour = hourOfDay >= 9 && hourOfDay <= 17;
+                    var isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+
+                    // Adjust probabilities based on time
+                    var stockInProb = isBusinessHour && isWeekday ? 0.4 : 0.2;
+                    var stockOutProb = isBusinessHour ? 0.5 : 0.3;
+
+                    var typeRandom = _random.NextDouble();
                     
-                    double typeRandom = _random.NextDouble();
-                    
-                    if (typeRandom < 0.4) // 40% stock in
+                    if (typeRandom < stockInProb)
                     {
                         transactionType = TransactionType.StockIn;
-                        quantityChange = GetRandomNumber(5, 20);
+                        quantityChange = ApplyDailyPattern(baseQuantity, currentDate);
                         reason = GetRandomItem(_stockReasons);
                         referencePrefix = "PO";
                     }
-                    else if (typeRandom < 0.9) // 50% stock out
+                    else if (typeRandom < stockInProb + stockOutProb)
                     {
                         transactionType = TransactionType.StockOut;
-                        // Don't allow stock to go negative
-                        int maxOut = Math.Min(runningStock, GetRandomNumber(5, 15));
+                        var maxOut = Math.Min(runningStock, ApplyDailyPattern(baseQuantity, currentDate));
                         quantityChange = maxOut > 0 ? -maxOut : 0;
                         reason = "Customer order";
                         referencePrefix = "SO";
                     }
-                    else // 10% adjustment
+                    else
                     {
                         transactionType = TransactionType.Adjustment;
-                        // Adjustment can be positive or negative
-                        quantityChange = GetRandomNumber(-5, 5);
-                        // Don't allow stock to go negative
+                        quantityChange = GetRandomNumber(-3, 3); // Smaller adjustments
                         if (runningStock + quantityChange < 0)
                             quantityChange = -runningStock;
-                            
                         reason = "Inventory adjustment";
                         referencePrefix = "ADJ";
                     }
-                    
-                    // Skip if no change
+
                     if (quantityChange == 0) continue;
-                    
-                    int previousStock = runningStock;
+
+                    var previousStock = runningStock;
                     runningStock += quantityChange;
-                    
-                    // Create history entry
-            stockHistories.Add(new StockHistory
-            {
+
+                    // Add price variation based on market conditions
+                    var priceVariation = 1m + ((decimal)_random.NextDouble() * 0.1m - 0.05m); // ±5% variation
+                    var transactionPrice = transactionType == TransactionType.StockOut ? 
+                        product.Price * priceVariation : 
+                        product.Cost * priceVariation;
+
+                    stockHistories.Add(new StockHistory
+                    {
                         ProductId = productId,
                         QuantityChange = quantityChange,
                         PreviousStock = previousStock,
                         NewStock = runningStock,
                         Reason = reason,
-                        Date = GetRandomDate(1, 30), // More recent than initial stock
+                        Date = currentDate,
                         ReferenceNumber = GenerateReferenceNumber(referencePrefix, stockHistories.Count + 1),
-                        UnitPrice = transactionType == TransactionType.StockOut ? product.Price : product.Cost,
+                        UnitPrice = Math.Round(transactionPrice, 2),
                         Type = transactionType,
-                IsActive = true
-            });
+                        IsActive = true
+                    });
                 }
-                
-                // Update the product's current stock to match the last stock history entry
+
+                // Update product's current stock
                 if (stockHistories.Where(sh => sh.ProductId == productId).Any())
                 {
                     var lastHistory = stockHistories.Where(sh => sh.ProductId == productId)
-                                                    .OrderByDescending(sh => sh.Date)
-                                                    .First();
-                    
+                                                  .OrderByDescending(sh => sh.Date)
+                                                  .First();
                     product.CurrentStock = lastHistory.NewStock;
                     context.Products.Update(product);
                 }

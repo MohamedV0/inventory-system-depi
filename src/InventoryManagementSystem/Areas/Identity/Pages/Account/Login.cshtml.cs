@@ -128,6 +128,7 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account
                     }
                     
                     _logger.LogInformation("User logged in.");
+                    TempData["SuccessMessage"] = "Welcome back! You have successfully logged in.";
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -137,16 +138,20 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("User account locked out.");
+                    TempData["ErrorMessage"] = "Your account has been locked out. Please try again later or contact support.";
                     return RedirectToPage("./Lockout");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    _logger.LogWarning("Failed login attempt for user {Email}", Input.Email);
+                    TempData["ErrorMessage"] = "Invalid email or password. Please try again.";
                     return Page();
                 }
             }
 
             // If we got this far, something failed, redisplay form
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+            TempData["ErrorMessage"] = string.Join(" ", errors);
             return Page();
         }
     }

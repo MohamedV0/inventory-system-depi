@@ -368,6 +368,29 @@ namespace InventoryManagementSystem.Controllers
             return Content(result.Value.CurrentStock.ToString());
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SearchProducts(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return Json(new { results = new List<object>() });
+
+            var productsResult = await _productService.GetProductsAsync(
+                page: 1,
+                pageSize: 10,
+                searchTerm: term);
+
+            if (!productsResult.IsSuccess)
+                return Json(new { results = new List<object>() });
+
+            var result = productsResult.Value.Select(p => new 
+            {
+                id = p.Id,
+                text = $"{p.Name} ({p.SKU})"
+            });
+
+            return Json(new { results = result });
+        }
+
         public async Task<IActionResult> Dashboard()
         {
             try

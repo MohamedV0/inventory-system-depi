@@ -33,6 +33,16 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account.Manage
         public string Username { get; set; }
 
         /// <summary>
+        /// The user's email address
+        /// </summary>
+        public string Email { get; set; }
+
+        /// <summary>
+        /// Whether the user's email is confirmed
+        /// </summary>
+        public bool IsEmailConfirmed { get; set; }
+
+        /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
@@ -53,6 +63,14 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account.Manage
         public class InputModel
         {
             /// <summary>
+            /// The user's full name
+            /// </summary>
+            [Required]
+            [Display(Name = "Full Name")]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
+            public string FullName { get; set; }
+
+            /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
@@ -65,11 +83,15 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account.Manage
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            var email = await _userManager.GetEmailAsync(user);
 
             Username = userName;
+            Email = email;
+            IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
 
             Input = new InputModel
             {
+                FullName = user.FullName,
                 PhoneNumber = phoneNumber
             };
         }
@@ -100,6 +122,19 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
+            // Update full name if changed
+            if (user.FullName != Input.FullName)
+            {
+                user.FullName = Input.FullName;
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    StatusMessage = "Unexpected error when trying to update your full name.";
+                    TempData["ErrorMessage"] = "An unexpected error occurred while updating your profile.";
+                    return RedirectToPage();
+                }
+            }
+
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)
             {
@@ -107,12 +142,14 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account.Manage
                 if (!setPhoneResult.Succeeded)
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
+                    TempData["ErrorMessage"] = "An unexpected error occurred while updating your phone number.";
                     return RedirectToPage();
                 }
             }
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
+            TempData["SuccessMessage"] = "Your profile has been updated successfully.";
             return RedirectToPage();
         }
     }

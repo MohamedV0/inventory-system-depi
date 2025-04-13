@@ -19,8 +19,6 @@
                 </div>
                 <div class="card-body p-3">
                     <form id="account" method="post">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 mb-3" role="alert"></div>
-                        
                         <div class="mb-3">
                             <label asp-for="Input.Email" class="form-label text-white-50">Email Address</label>
                             <div class="input-group">
@@ -39,8 +37,14 @@
                                 <span class="input-group-text bg-dark border-dark text-secondary">
                                     <i class="fas fa-lock"></i>
                                 </span>
-                                <input asp-for="Input.Password" class="form-control bg-dark border-dark text-white" 
+                                <input asp-for="Input.Password" class="form-control bg-dark border-dark text-white password-input" 
                                        autocomplete="current-password" aria-required="true" placeholder="Enter your password" />
+                                <button class="btn btn-dark border-dark password-toggle" type="button" 
+                                        aria-label="Toggle password visibility" 
+                                        data-password-toggle="true" 
+                                        title="Show/Hide Password">
+                                    <i class="fas fa-eye toggle-icon"></i>
+                                </button>
                             </div>
                             <span asp-validation-for="Input.Password" class="text-danger small"></span>
                         </div>
@@ -111,4 +115,41 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <partial name="_ToastrNotifications" />
+    <script>
+        $(document).ready(function() {
+            // Password visibility toggle functionality
+            $('.password-toggle').on('click', function(e) {
+                e.preventDefault();
+                
+                const $button = $(this);
+                const $input = $button.closest('.input-group').find('.password-input');
+                const $icon = $button.find('.toggle-icon');
+                
+                // Toggle password visibility
+                const isVisible = $input.attr('type') === 'text';
+                $input.attr('type', isVisible ? 'password' : 'text');
+                
+                // Toggle icon
+                $icon.toggleClass('fa-eye fa-eye-slash');
+                
+                // Update button title for accessibility
+                $button.attr('title', isVisible ? 'Show Password' : 'Hide Password');
+                
+                // Prevent the button from submitting the form
+                return false;
+            });
+
+            // Security measure: Reset password field to type="password" when form is submitted
+            $('#account').on('submit', function() {
+                $('.password-input').attr('type', 'password');
+            });
+
+            // Security measure: Reset password visibility when user navigates away
+            $(window).on('beforeunload', function() {
+                $('.password-input').attr('type', 'password');
+                $('.toggle-icon').removeClass('fa-eye-slash').addClass('fa-eye');
+            });
+        });
+    </script>
 }

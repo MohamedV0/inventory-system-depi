@@ -1,4 +1,12 @@
-
 @{
-    Layout = "/Views/Shared/_Layout.cshtml";
+    // Check if we're in the Account/Manage area
+    var controllerName = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+    if (controllerName.StartsWith("/Account/Manage/"))
+    {
+        Layout = "/Areas/Identity/Pages/Account/Manage/_Layout.cshtml";
+    }
+    else 
+    {
+        Layout = "/Views/Shared/_Layout.cshtml";
+    }
 }

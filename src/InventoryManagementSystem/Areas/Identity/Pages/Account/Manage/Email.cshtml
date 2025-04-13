@@ -1,0 +1,135 @@
+@page
+@model EmailModel
+@{
+    ViewData["Title"] = "Email";
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+<div class="container-fluid px-3 py-2">
+    <!-- Use the existing PageHeader partial with fluent API -->
+    @{
+        var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+            .Create("Manage Email", "fas fa-envelope");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <div class="row g-3">
+        <!-- Main Form Card -->
+        <div class="col-lg-8">
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-envelope text-primary"></i>
+                        </span>
+                        Email Settings
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <partial name="_StatusMessage" for="StatusMessage" />
+                    
+                    <form id="email-form" method="post">
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+                        }
+                        
+                        <!-- Current Email -->
+                        <div class="mb-4">
+                            <label asp-for="Email" class="form-label d-flex align-items-center">
+                                <i class="fas fa-envelope text-primary me-2"></i>Current Email
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-dark text-secondary">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input asp-for="Email" class="form-control bg-dark border-dark text-white" disabled />
+                                @if (Model.IsEmailConfirmed)
+                                {
+                                    <span class="input-group-text bg-dark border-dark text-success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="input-group-text bg-dark border-dark text-warning" title="Email not confirmed">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        
+                        @if (!Model.IsEmailConfirmed)
+                        {
+                            <div class="mb-4">
+                                <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-outline-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Send verification email
+                                </button>
+                            </div>
+                        }
+                        
+                        <!-- New Email -->
+                        <div class="mb-4">
+                            <label asp-for="Input.NewEmail" class="form-label d-flex align-items-center">
+                                <i class="fas fa-envelope-open text-primary me-2"></i>New Email
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-dark text-secondary">
+                                    <i class="fas fa-at"></i>
+                                </span>
+                                <input asp-for="Input.NewEmail" class="form-control bg-dark border-dark text-white" 
+                                       placeholder="Enter new email address" />
+                            </div>
+                            <span asp-validation-for="Input.NewEmail" class="text-danger small"></span>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Change Email
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Help & Tips Card -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-lightbulb text-primary"></i>
+                        </span>
+                        Tips & Information
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="tip-item mb-3 p-2 rounded bg-primary-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-info-circle me-2"></i>Email Management
+                        </h6>
+                        <ul class="mb-0 ps-3 small">
+                            <li>Email is used for account recovery</li>
+                            <li>Verification helps secure your account</li>
+                            <li>You'll need to confirm new email addresses</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tip-item p-2 rounded bg-warning-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-shield-alt me-2"></i>Security Note
+                        </h6>
+                        <p class="small mb-0">When you change your email, you'll need to confirm access to the new address before it becomes active. This helps protect your account.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_ToastrNotifications" />
+} 

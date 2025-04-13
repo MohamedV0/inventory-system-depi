@@ -147,21 +147,26 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
+                        TempData["InfoMessage"] = "Please check your email to confirm your account.";
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
+                        TempData["SuccessMessage"] = "Welcome! Your account has been created successfully.";
                         return LocalRedirect(returnUrl);
                     }
                 }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                
+                // If there are any errors, display them using Toastr
+                var errorMessage = string.Join(" ", result.Errors.Select(e => e.Description));
+                TempData["ErrorMessage"] = errorMessage;
+                return Page();
             }
 
-            // If we got this far, something failed, redisplay form
+            // If we got this far, something failed, collect all validation errors
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+            TempData["ErrorMessage"] = string.Join(" ", errors);
             return Page();
         }
 

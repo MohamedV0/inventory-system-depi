@@ -63,6 +63,10 @@ namespace InventoryManagementSystem.Services
                 dashboardViewModel.TotalSuppliers = await GetTotalSuppliersAsync();
                 dashboardViewModel.ActiveSuppliers = await GetActiveSuppliers(now.AddDays(-30));
                 
+                // Get total active categories
+                var categoriesResult = await _unitOfWork.Categories.CountAsync(c => c.IsActive);
+                dashboardViewModel.TotalCategories = categoriesResult.IsSuccess ? categoriesResult.Value : 0;
+                
                 // Calculate stock levels
                 var stockMetrics = await GetStockMetrics();
                 dashboardViewModel.LowStockProducts = stockMetrics.LowStockProducts;
