@@ -52,8 +52,20 @@ namespace InventoryManagementSystem.Data
                 var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 var userManagementService = services.GetRequiredService<IUserManagementService>();
+                var logger = services.GetRequiredService<ILogger<ApplicationDbContext>>();
                 
                 await context.Database.MigrateAsync();
+
+                // Check if database is already seeded
+                if (await context.Categories.AnyAsync() || 
+                    await context.Products.AnyAsync() || 
+                    await userManager.Users.CountAsync() > 1) // More than 1 user means we already have seeded users (admin + staff)
+                {
+                    logger.LogInformation("Database already seeded. Skipping seed process.");
+                    return;
+                }
+                
+                logger.LogInformation("Starting database seeding process...");
                 
                 // First create default permissions
                 await userManagementService.CreateDefaultPermissionsAsync();
@@ -69,6 +81,8 @@ namespace InventoryManagementSystem.Data
                 
                 // Finally seed other data
                 await SeedDataAsync(context);
+                
+                logger.LogInformation("Database seeding completed successfully.");
             }
             catch (Exception ex)
             {
@@ -652,6 +666,13 @@ namespace InventoryManagementSystem.Data
 
         private static async Task SeedUsersAsync(UserManager<ApplicationUser> userManager, IServiceProvider serviceProvider)
         {
+            // First check if we already have staff users
+            if (await userManager.Users.CountAsync() > 1)
+            {
+                Console.WriteLine("Staff users already exist. Skipping user seeding.");
+                return;
+            }
+
             Console.WriteLine("Starting to seed 50 users...");
             
             // Get the UserManagementService from the service provider
@@ -695,6 +716,79 @@ namespace InventoryManagementSystem.Data
             }
             
             Console.WriteLine("Finished seeding users.");
+        }
+
+        public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
+        {
+            // Create roles if they don't exist
+            string[] roles = { "Admin", "Staff" };
+            foreach (var roleName in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+        }
+
+        public static async Task SeedAdminUserAsync(UserManager<ApplicationUser> userManager)
+        {
+            // Create admin user if it doesn't exist
+            var adminEmail = "admin@inventory.com";
+            if (await userManager.FindByEmailAsync(adminEmail) == null)
+            {
+                var admin = new ApplicationUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    EmailConfirmed = true,
+                    FullName = "System Administrator",
+                    LastLoginDate = DateTime.UtcNow
+                };
+
+                var result = await userManager.CreateAsync(admin, "Admin123!");
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(admin, "Admin");
+                }
+            }
+        }
+
+        public static async Task SeedDemoDataAsync(ApplicationDbContext context)
+        {
+            // Only seed if the database is empty
+            if (await context.Categories.AnyAsync() || await context.Products.AnyAsync())
+            {
+                return;
+            }
+
+            // Add a sample category
+            var category = new Category
+            {
+                Name = "Office Supplies",
+                Description = "Basic office supplies and stationery",
+                IsActive = true
+            };
+            context.Categories.Add(category);
+            await context.SaveChangesAsync();
+
+            // Add a sample product
+            var product = new Product
+            {
+                Name = "Premium Paper A4",
+                Description = "High-quality A4 paper for printing and copying",
+                SKU = "PAP-001",
+                CategoryId = category.Id,
+                UnitOfMeasurement = "Ream",
+                ReorderLevel = 10,
+                MinimumStockLevel = 5,
+                CurrentStock = 0,
+                Price = 25.00m,
+                Cost = 20.00m,
+                IsActive = true
+            };
+            context.Products.Add(product);
+            await context.SaveChangesAsync();
         }
     }
 } 
