@@ -10,6 +10,16 @@
 
 The Inventory Management System (IMS) is a comprehensive web-based solution developed as a graduation project for the Digital Egypt Pioneers Initiative (DEPI). This system streamlines inventory management through real-time tracking, intelligent notifications, and detailed analytics.
 
+## 💫 Interface Preview
+
+<div align="center">
+
+![Hero Image](docs/ui-screenshots/Hero.png)
+
+**[🎯 View all system screenshots](docs/ui-screenshots)**
+
+</div>
+
 <div align="center">
 
 #### Frontend & UI
@@ -66,16 +76,6 @@ The Inventory Management System (IMS) is a comprehensive web-based solution deve
 <td><b>Dashboard</b><br>KPIs, stock overview, activity tracking</td>
 </tr>
 </table>
-
-</div>
-
-## 💫 Interface Preview
-
-<div align="center">
-
-![Hero Image](docs/ui-screenshots/Hero.png)
-
-**[🎯 View all system screenshots](docs/ui-screenshots)**
 
 </div>
 
