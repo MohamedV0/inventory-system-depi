@@ -225,13 +225,10 @@ namespace InventoryManagementSystem.Filters
             context.HttpContext.Response.StatusCode = statusCode;
 
             // Create view model for error page
-            var viewModel = new ErrorViewModel
+            var viewModel = new Models.ErrorViewModel
             {
                 RequestId = context.HttpContext.TraceIdentifier,
-                CorrelationId = correlationId,
                 Message = message,
-                ShowStackTrace = _environment.IsDevelopment(),
-                StackTrace = _environment.IsDevelopment() ? context.Exception.ToString() : null
             };
 
             var result = new ViewResult
@@ -248,7 +245,7 @@ namespace InventoryManagementSystem.Filters
     }
 
     /// <summary>
-    /// View model for error pages
+    /// Model class for error views - internal to this filter
     /// </summary>
     public class ErrorViewModel
     {
@@ -257,5 +254,8 @@ namespace InventoryManagementSystem.Filters
         public string Message { get; set; } = string.Empty;
         public bool ShowStackTrace { get; set; }
         public string? StackTrace { get; set; }
+        
+        // These properties are automatically mapped to Models.ErrorViewModel to avoid conflicts
+        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
     }
 } 

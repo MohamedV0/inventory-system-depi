@@ -14,6 +14,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using InventoryManagementSystem.Filters;
 using InventoryManagementSystem.Models.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,11 +64,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedEmail = false;
+    options.User.RequireUniqueEmail = true;
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 8;
     
     // Configure lockout settings
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
@@ -112,7 +117,17 @@ builder.Services.AddAuthorization(options =>
     
     // Dashboard policy
     options.AddPolicy("CanAccessDashboard", policy => policy.RequireRole("Admin", "Staff"));
+    
+    // User Management policies
+    options.AddPolicy("CanViewUsers", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CanCreateUsers", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CanEditUsers", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CanDeleteUsers", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CanManagePermissions", policy => policy.RequireRole("Admin"));
 });
+
+// Add custom authorization handler for dynamic permissions
+builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
 // Add UserActivity service
 builder.Services.AddScoped<IUserActivityService, UserActivityService>();
@@ -159,6 +174,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 
 // Register caching services
 builder.Services.AddMemoryCache();
@@ -235,6 +251,13 @@ if (app.Environment.IsDevelopment() && databaseConfig?.EnableAutoMigration == tr
         // Seed the database with test data
         await DbSeeder.SeedDatabaseAsync(app.Services);
         
+        // Create default permissions
+        var userManagementService = scope.ServiceProvider.GetRequiredService<IUserManagementService>();
+        await userManagementService.CreateDefaultPermissionsAsync();
+        
+        // Fix admin permissions
+        await userManagementService.FixAdminPermissionsAsync();
+        
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         logger.LogInformation("Database migration and seeding completed successfully.");
     }
@@ -253,3 +276,70 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Run();
+
+// Custom authorization handler for dynamic permissions
+public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
+{
+    private readonly ApplicationDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public PermissionAuthorizationHandler(
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager)
+    {
+        _context = context;
+        _userManager = userManager;
+    }
+
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        PermissionRequirement requirement)
+    {
+        if (context.User == null || !context.User.Identity.IsAuthenticated)
+        {
+            return;
+        }
+
+        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return;
+        }
+
+        // Check if the user is in the Admin role, which bypasses permission checks
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+        {
+            context.Succeed(requirement);
+            return;
+        }
+
+        // Check if the user has the required permission
+        var permission = await _context.Permissions
+            .FirstOrDefaultAsync(p => p.Name == requirement.PermissionName);
+
+        if (permission != null)
+        {
+            var userPermission = await _context.UserPermissions
+                .FirstOrDefaultAsync(up => up.UserId == userId && 
+                                         up.PermissionId == permission.Id && 
+                                         up.IsGranted);
+
+            if (userPermission != null)
+            {
+                context.Succeed(requirement);
+            }
+        }
+    }
+}
+
+// Custom authorization requirement for permissions
+public class PermissionRequirement : IAuthorizationRequirement
+{
+    public string PermissionName { get; }
+
+    public PermissionRequirement(string permissionName)
+    {
+        PermissionName = permissionName;
+    }
+}

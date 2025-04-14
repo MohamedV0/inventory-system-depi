@@ -1,0 +1,253 @@
+@model CreateUserViewModel
+@using InventoryManagementSystem.Models.ViewComponents
+
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<!-- Use a more compact container with consistent padding -->
+<div class="container-fluid px-3 py-2">
+    <!-- Use the existing PageHeader partial with fluent API -->
+    @{
+        var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+            .Create("Create User", "fas fa-user-plus")
+            .WithPrimaryButton("Back to Users", Url.Action("Index", "UserManagement"), "fas fa-arrow-left");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <div class="row g-3">
+        <!-- Main Form Card -->
+        <div class="col-lg-8">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 p-3 border rounded bg-danger-subtle"></div>
+                
+                <!-- User Information Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-user text-primary"></i>
+                            </span>
+                            User Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-4 mb-0">
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h6 class="section-title mb-3">
+                                        <i class="fas fa-info-circle text-primary me-2"></i>Account Details
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="UserName" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-user-tag text-primary me-2"></i>Username
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="A unique identifier used for login. Once set, this cannot be changed easily."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="UserName" class="form-control bg-dark border-dark text-white" placeholder="Enter username" />
+                                        <span asp-validation-for="UserName" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="Email" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-envelope text-primary me-2"></i>Email Address
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The user's email address. This will be used for account-related communications and can be used for login."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="Email" class="form-control bg-dark border-dark text-white" placeholder="Enter email address" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="FullName" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-id-card text-primary me-2"></i>Full Name
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The user's full name as it will appear throughout the system."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="FullName" class="form-control bg-dark border-dark text-white" placeholder="Enter full name" />
+                                        <span asp-validation-for="FullName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h6 class="section-title mb-3">
+                                        <i class="fas fa-lock text-primary me-2"></i>Security
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="Password" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-key text-primary me-2"></i>Password
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Create a strong password with at least 8 characters, including uppercase letters, lowercase letters, numbers, and special characters."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="Password" class="form-control bg-dark border-dark text-white" placeholder="Enter password" />
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="ConfirmPassword" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-check-double text-primary me-2"></i>Confirm Password
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Re-enter the password to confirm it matches."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="ConfirmPassword" class="form-control bg-dark border-dark text-white" placeholder="Confirm password" />
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label d-flex align-items-center">
+                                            <i class="fas fa-shield-alt text-primary me-2"></i>User Status
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Active users can log in and access the system. Inactive users are locked out."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="userActiveSwitch" checked>
+                                            <label class="form-check-label" for="userActiveSwitch">User is active</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Roles Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-id-badge text-primary"></i>
+                            </span>
+                            User Roles
+                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                               title="Roles determine what permissions and access levels the user will have in the system."><i class="fas fa-info"></i></span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="border border-dark rounded p-3 mb-2" style="max-height: 250px; overflow-y: auto; background-color: rgba(0, 0, 0, 0.15);">
+                            @foreach (var role in Model.AvailableRoles)
+                            {
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="SelectedRoles"
+                                           value="@role.Value" id="role_@role.Value" 
+                                           @(Model.SelectedRoles?.Contains(role.Value) == true ? "checked" : "") />
+                                    <label class="form-check-label d-flex align-items-center" for="role_@role.Value">
+                                        <i class="fas fa-user-shield me-2 text-primary"></i>
+                                        <span>@role.Text</span>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                        <div class="form-text text-muted mt-2">
+                            <i class="fas fa-info-circle me-1"></i> You can assign multiple roles to a user. Each role provides specific permissions within the system.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 justify-content-end mb-4">
+                    <a asp-action="Index" class="btn btn-outline-light">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-save me-1"></i> Create User
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Help & Tips Card -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-lightbulb text-primary"></i>
+                        </span>
+                        Tips & Information
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="tip-item mb-3 p-2 rounded bg-primary-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-info-circle me-2"></i> User Creation Tips
+                        </h6>
+                        <ul class="mb-0 ps-3 small">
+                            <li>Use clear, memorable usernames</li>
+                            <li>Assign appropriate roles based on job function</li>
+                            <li>Ensure strong passwords are used</li>
+                            <li>Limit admin roles to trusted staff only</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tip-item mb-3 p-2 rounded bg-warning-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i> Security Best Practices
+                        </h6>
+                        <p class="small mb-0">Follow the principle of least privilege: only grant users the minimum level of access needed to perform their job functions. This helps maintain system security.</p>
+                    </div>
+                    
+                    <div class="tip-item p-2 rounded bg-success-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle me-2"></i> What Happens Next?
+                        </h6>
+                        <p class="small mb-0">After creating a user, you can further customize their permissions, manage their account status, and monitor their activity in the system.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Access Card -->
+            <div class="card content-card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-key text-primary"></i>
+                        </span>
+                        Access Management
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <h6 class="text-primary mb-3">Common roles and their access levels:</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-user-cog text-danger me-2"></i>
+                            <span class="text-light"><strong>Administrator:</strong> Full system access</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-user-tie text-warning me-2"></i>
+                            <span class="text-light"><strong>Manager:</strong> Department-level access</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-user text-success me-2"></i>
+                            <span class="text-light"><strong>Staff:</strong> Basic inventory operations</span>
+                        </li>
+                        <li class="list-group-item bg-transparent border-secondary-subtle d-flex align-items-center">
+                            <i class="fas fa-user-edit text-info me-2"></i>
+                            <span class="text-light"><strong>Read-Only:</strong> View-only access</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Password strength check functionality could be added here
+        });
+    </script>
+} 

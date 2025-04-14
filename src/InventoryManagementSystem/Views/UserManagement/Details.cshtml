@@ -1,0 +1,614 @@
+@model UserViewModel
+@using InventoryManagementSystem.Models.ViewComponents
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<!-- Use a more compact container with less padding -->
+<div class="container-fluid px-3 py-2">
+    <!-- Use the PageHeader partial with fluent API -->
+    @{
+        var headerModel = PageHeaderViewModel
+            .Create(Model.UserName, "fas fa-user")
+            .WithPrimaryButton("Edit User", Url.Action("Edit", new { id = Model.Id }), "fas fa-edit")
+            .WithSecondaryButton("Manage Permissions", Url.Action("ManagePermissions", new { id = Model.Id }), "fas fa-key")
+            .WithDeleteButton("user", Model.UserName, $"delete-form-{Model.Id}");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <!-- Add the delete form -->
+    <form id="delete-form-@Model.Id" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-none"></form>
+
+    <div class="row g-3">
+        <!-- User Information Card -->
+        <div class="col-lg-8">
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-user text-primary"></i>
+                        </span>
+                        User Information
+                    </h5>
+                    <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger") fs-6 py-1 px-3">
+                        <i class="fas @(Model.IsActive ? "fa-check-circle" : "fa-ban") me-1"></i>
+                        @(Model.IsActive ? "Active" : "Inactive")
+                    </span>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-4 mb-0">
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <h6 class="section-title mb-3">
+                                    <i class="fas fa-info-circle text-primary me-2"></i>Basic Details
+                                </h6>
+                                <dl class="row mb-0 info-grid">
+                                    <dt class="col-sm-4">
+                                        <span class="info-label">
+                                            <i class="fas fa-user-tag text-primary me-1"></i>Username
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-8 fw-bold">@Model.UserName</dd>
+
+                                    <dt class="col-sm-4">
+                                        <span class="info-label">
+                                            <i class="fas fa-envelope text-primary me-1"></i>Email
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-8">@Model.Email</dd>
+
+                                    <dt class="col-sm-4">
+                                        <span class="info-label">
+                                            <i class="fas fa-id-card text-primary me-1"></i>Full Name
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-8">@Model.FullName</dd>
+
+                                    <dt class="col-sm-4">
+                                        <span class="info-label">
+                                            <i class="fas fa-clock text-primary me-1"></i>Last Login
+                                        </span>
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @if (Model.LastLoginDate.HasValue)
+                                        {
+                                            @Model.LastLoginDate.Value.ToString("MMM dd, yyyy h:mm tt")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted fst-italic">Never</span>
+                                        }
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <h6 class="section-title mb-3">
+                                    <i class="fas fa-id-badge text-primary me-2"></i>Roles
+                                </h6>
+                                <div class="mb-3">
+                                    @if (Model.Roles.Any())
+                                    {
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach (var role in Model.Roles)
+                                            {
+                                                <span class="badge rounded-pill category-badge py-2 px-3">
+                                                    <i class="fas fa-user-shield me-1"></i> @role
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-info d-inline-flex align-items-center mb-0">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            <div>No roles assigned</div>
+                                        </div>
+                                    }
+                                </div>
+                                
+                                <h6 class="section-title mb-3 mt-4">
+                                    <i class="fas fa-shield-alt text-primary me-2"></i>Account Status
+                                </h6>
+                                <div class="account-status">
+                                    <div class="d-flex align-items-center status-indicator mb-3">
+                                        <div class="me-3">
+                                            <span class="icon-circle @(Model.IsActive ? "bg-success-subtle" : "bg-danger-subtle")">
+                                                <i class="fas @(Model.IsActive ? "fa-check" : "fa-ban") @(Model.IsActive ? "text-success" : "text-danger")"></i>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 @(Model.IsActive ? "text-success" : "text-danger")">
+                                                @(Model.IsActive ? "Active Account" : "Inactive Account")
+                                            </h6>
+                                            <p class="mb-0 small">
+                                                @(Model.IsActive ? "User can log in and access the system" : "User is blocked from accessing the system")
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center status-indicator">
+                                        <div class="me-3">
+                                            <span class="icon-circle bg-info-subtle">
+                                                <i class="fas fa-clock text-info"></i>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 text-info">
+                                                Login Status
+                                            </h6>
+                                            <p class="mb-0 small">
+                                                @if (Model.LastLoginDate.HasValue)
+                                                {
+                                                    <span>Last logged in @((DateTime.UtcNow - Model.LastLoginDate.Value).Days) days ago</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>Never logged in</span>
+                                                }
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Permissions Section -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-key text-primary"></i>
+                        </span>
+                        User Permissions
+                    </h5>
+                    <a asp-action="ManagePermissions" asp-route-id="@Model.Id" class="btn btn-sm btn-primary">
+                        <i class="fas fa-edit me-1"></i> Manage Permissions
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Permissions.Any())
+                    {
+                        var permissionsByCategory = Model.Permissions
+                            .GroupBy(p => p.Category)
+                            .OrderBy(g => g.Key);
+                        
+                        <div class="permission-summary px-3 pt-3">
+                            <div class="row g-2 mb-3">
+                                @{
+                                    var grantedPermissions = Model.Permissions.Count(p => p.IsGranted);
+                                    var totalPermissions = Model.Permissions.Count;
+                                    var percentageGranted = (int)Math.Round((double)grantedPermissions / totalPermissions * 100);
+                                }
+                                <div class="col-md-4">
+                                    <div class="card bg-dark border-0">
+                                        <div class="card-body py-2 px-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div class="text-muted small">Total Permissions</div>
+                                                    <div class="fs-4 fw-bold">@totalPermissions</div>
+                                                </div>
+                                                <div class="fs-3 text-primary">
+                                                    <i class="fas fa-shield-alt"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-dark border-0">
+                                        <div class="card-body py-2 px-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div class="text-muted small">Granted</div>
+                                                    <div class="fs-4 fw-bold text-success">@grantedPermissions</div>
+                                                </div>
+                                                <div class="fs-3 text-success">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-dark border-0">
+                                        <div class="card-body py-2 px-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div class="text-muted small">Not Granted</div>
+                                                    <div class="fs-4 fw-bold text-danger">@(totalPermissions - grantedPermissions)</div>
+                                                </div>
+                                                <div class="fs-3 text-danger">
+                                                    <i class="fas fa-times-circle"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="progress mb-3" style="height: 8px; background-color: #2d3748;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: @percentageGranted%"></div>
+                            </div>
+                        </div>
+                            
+                        <div class="accordion accordion-flush border-top border-dark" id="permissionsAccordion">
+                            @foreach (var category in permissionsByCategory)
+                            {
+                                var categoryGrantedCount = category.Count(p => p.IsGranted);
+                                var categoryPercentage = (int)Math.Round((double)categoryGrantedCount / category.Count() * 100);
+                                
+                                <div class="accordion-item bg-dark border-bottom border-dark">
+                                    <h2 class="accordion-header" id="heading@(category.Key.Replace(" ", ""))">
+                                        <button class="accordion-button collapsed bg-dark text-white" type="button" data-bs-toggle="collapse" 
+                                                data-bs-target="#collapse@(category.Key.Replace(" ", ""))" 
+                                                aria-expanded="false" aria-controls="collapse@(category.Key.Replace(" ", ""))">
+                                            <i class="fas fa-folder me-2 text-primary"></i>
+                                            <div class="d-flex justify-content-between align-items-center flex-grow-1 me-2">
+                                                <span>@category.Key</span>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-info me-2">@categoryGrantedCount / @category.Count()</span>
+                                                    <div class="progress" style="width: 100px; height: 6px; background-color: #2d3748;">
+                                                        <div class="progress-bar @(categoryPercentage == 100 ? "bg-success" : categoryPercentage == 0 ? "bg-danger" : "bg-warning")" 
+                                                             role="progressbar" style="width: @categoryPercentage%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse@(category.Key.Replace(" ", ""))" class="accordion-collapse collapse" 
+                                         aria-labelledby="heading@(category.Key.Replace(" ", ""))" data-bs-parent="#permissionsAccordion">
+                                        <div class="accordion-body p-0">
+                                            <div class="table-responsive">
+                                                <table class="table table-dark table-striped table-hover mb-0">
+                                                    <thead class="bg-dark">
+                                                        <tr>
+                                                            <th>Permission Name</th>
+                                                            <th>Description</th>
+                                                            <th class="text-center">Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var permission in category.OrderBy(p => p.PermissionName))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="d-flex align-items-center">
+                                                                        <i class="fas fa-shield-alt text-primary me-2"></i>
+                                                                        <span class="fw-medium">@permission.PermissionName</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td>@permission.Description</td>
+                                                                <td class="text-center">
+                                                                    @if (permission.IsGranted)
+                                                                    {
+                                                                        <span class="badge bg-success">
+                                                                            <i class="fas fa-check-circle me-1"></i> Granted
+                                                                        </span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span class="badge bg-danger">
+                                                                            <i class="fas fa-times-circle me-1"></i> Not Granted
+                                                                        </span>
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center">
+                            <div class="alert bg-dark border-secondary d-inline-flex align-items-center mb-0">
+                                <i class="fas fa-info-circle me-3 fa-lg text-info"></i>
+                                <div>No permissions have been assigned to this user.</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Enhanced User Status Card -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-chart-pie text-primary"></i>
+                        </span>
+                        Account Status
+                    </h5>
+                    <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger") fs-6 px-3 py-1">
+                        @(Model.IsActive ? "Active" : "Inactive")
+                    </span>
+                </div>
+                <div class="card-body p-3">
+                    <div class="status-visualization mb-3">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="chart-wrapper position-relative" style="height: 150px;">
+                                    <div id="statusChart" class="chart-container">
+                                        <canvas id="statusChartCanvas"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Insights -->
+                    <div class="status-insights">
+                        <div class="insight-item d-flex justify-content-between align-items-center p-2 rounded mb-2 
+                                    @(Model.IsActive ? "bg-success-subtle" : "bg-danger-subtle")">
+                            <div class="d-flex align-items-center">
+                                <i class="fas @(Model.IsActive ? "fa-check-circle" : "fa-exclamation-circle") me-2 
+                                   @(Model.IsActive ? "text-success" : "text-danger")"></i>
+                                <span class="@(Model.IsActive ? "text-success" : "text-danger") fw-medium">
+                                    @(Model.IsActive ? "Account is Active" : "Account is Inactive")
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-item d-flex justify-content-between align-items-center p-2 rounded mb-2 
+                                    @(Model.LastLoginDate.HasValue && (DateTime.UtcNow - Model.LastLoginDate.Value).TotalDays < 30 
+                                        ? "bg-success-subtle" : "bg-warning-subtle")">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock me-2 
+                                   @(Model.LastLoginDate.HasValue && (DateTime.UtcNow - Model.LastLoginDate.Value).TotalDays < 30 
+                                        ? "text-success" : "text-warning")"></i>
+                                <span class="@(Model.LastLoginDate.HasValue && (DateTime.UtcNow - Model.LastLoginDate.Value).TotalDays < 30 
+                                        ? "text-success" : "text-warning") fw-medium">
+                                    @if (Model.LastLoginDate.HasValue)
+                                    {
+                                        <span>Last login @((DateTime.UtcNow - Model.LastLoginDate.Value).Days) days ago</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Never logged in</span>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Sidebar -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-clipboard-list text-primary"></i>
+                        </span>
+                        Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item p-3 text-center bg-dark border-0">
+                            <div class="text-center py-4">
+                                <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                                <p class="mb-0 text-white-50">User activity tracking coming soon.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions Card -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-bolt text-primary"></i>
+                        </span>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                            <i class="fas fa-user-edit me-2"></i> Edit User Details
+                        </a>
+                        <a asp-action="ManagePermissions" asp-route-id="@Model.Id" class="btn btn-info">
+                            <i class="fas fa-key me-2"></i> Manage Permissions
+                        </a>
+                        <button type="button" class="btn btn-danger delete-user" 
+                                data-user-id="@Model.Id" data-user-name="@Model.UserName">
+                            <i class="fas fa-user-times me-2"></i> Delete User
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/sweetalert-utils.js"></script>
+    <script>
+        $(document).ready(function() {
+            createStatusChart();
+            
+            // Initialize delete confirmations for users
+            initDeleteConfirmations({
+                selector: '.delete-user',
+                entityIdAttr: 'data-user-id',
+                entityNameAttr: 'data-user-name',
+                formIdPrefix: 'delete-form-',
+                entityType: 'user'
+            });
+        });
+        
+        function createStatusChart() {
+            var ctx = document.getElementById('statusChartCanvas');
+            
+            // Only create chart if canvas exists
+            if (ctx) {
+                var isActive = @(Model.IsActive ? "true" : "false");
+                var hasLoggedIn = @(Model.LastLoginDate.HasValue ? "true" : "false");
+                
+                // Calculate roles percentage
+                var rolesCount = @Model.Roles.Count;
+                var rolesPercentage = Math.min(100, rolesCount * 25); // Assume 4+ roles is 100%
+                
+                // Calculate permissions percentage
+                var grantedPermissions = @Model.Permissions.Count(p => p.IsGranted);
+                var totalPermissions = @Model.Permissions.Count;
+                var permissionsPercentage = totalPermissions > 0 ? (grantedPermissions / totalPermissions) * 100 : 0;
+                
+                // Colors
+                var activeColor = 'rgba(46, 204, 113, 0.8)';
+                var inactiveColor = 'rgba(255, 82, 82, 0.8)';
+                var warningColor = 'rgba(241, 196, 15, 0.8)';
+                
+                var myChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Active Status', 'Roles', 'Permissions'],
+                        datasets: [{
+                            data: [
+                                isActive ? 100 : 0, 
+                                rolesPercentage,
+                                permissionsPercentage
+                            ],
+                            backgroundColor: [
+                                isActive ? activeColor : inactiveColor,
+                                warningColor,
+                                permissionsPercentage > 50 ? activeColor : warningColor
+                            ],
+                            borderColor: [
+                                isActive ? 'rgba(46, 204, 113, 1)' : 'rgba(255, 82, 82, 1)',
+                                'rgba(241, 196, 15, 1)',
+                                permissionsPercentage > 50 ? 'rgba(46, 204, 113, 1)' : 'rgba(241, 196, 15, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#f8f9fa',
+                                    padding: 10,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        var label = context.label || '';
+                                        var value = context.raw || 0;
+                                        return label + ': ' + Math.round(value) + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .icon-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+        
+        .info-label {
+            color: var(--bs-gray-600);
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        
+        .info-grid dt, .info-grid dd {
+            padding: 0.5rem 0;
+            margin-bottom: 0;
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+        
+        .category-badge {
+            background-color: rgba(var(--bs-primary-rgb), 0.15);
+            color: var(--bs-primary);
+            border: 1px solid rgba(var(--bs-primary-rgb), 0.2);
+            font-weight: 500;
+        }
+        
+        .confirmation-icon {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .confirmation-message {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .confirmation-target {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .confirmation-warning {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+        
+        .progress-thin {
+            height: 6px;
+        }
+        
+        /* Dark Theme Accordion Styles */
+        .accordion-button:not(.collapsed) {
+            color: white;
+            background-color: #1e2733;
+            box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.125);
+        }
+        
+        .accordion-button:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            border-color: #495057;
+        }
+        
+        .accordion-button::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        }
+        
+        .accordion-button:not(.collapsed)::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        }
+    </style>
+} 

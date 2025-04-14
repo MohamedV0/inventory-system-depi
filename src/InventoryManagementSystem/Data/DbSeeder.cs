@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
 using InventoryManagementSystem.Models.Identity;
+using InventoryManagementSystem.Services.Interfaces;
+using InventoryManagementSystem.Models.ViewModels;
 
 namespace InventoryManagementSystem.Data
 {
@@ -49,13 +51,23 @@ namespace InventoryManagementSystem.Data
                 var context = services.GetRequiredService<ApplicationDbContext>();
                 var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                var userManagementService = services.GetRequiredService<IUserManagementService>();
                 
                 await context.Database.MigrateAsync();
                 
-                // First seed roles and admin user
+                // First create default permissions
+                await userManagementService.CreateDefaultPermissionsAsync();
+                
+                // Then seed roles and admin user
                 await SeedRolesAndAdminAsync(userManager, roleManager);
                 
-                // Then seed other data
+                // Then seed admin permissions
+                await SeedAdminPermissionsAsync(services);
+                
+                // Then seed regular users
+                await SeedUsersAsync(userManager, serviceProvider);
+                
+                // Finally seed other data
                 await SeedDataAsync(context);
             }
             catch (Exception ex)
@@ -577,6 +589,112 @@ namespace InventoryManagementSystem.Data
             Console.WriteLine("Stock history records seeded successfully.");
             
             Console.WriteLine("Database seeding completed successfully!");
+        }
+
+        /// <summary>
+        /// Seeds initial permissions for admin user
+        /// </summary>
+        private static async Task SeedAdminPermissionsAsync(IServiceProvider services)
+        {
+            var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+            var context = services.GetRequiredService<ApplicationDbContext>();
+            var logger = services.GetRequiredService<ILogger<ApplicationDbContext>>();
+            
+            try
+            {
+                // Get admin user
+                var admin = await userManager.FindByNameAsync("admin");
+                if (admin == null)
+                {
+                    logger.LogWarning("Admin user not found when seeding permissions");
+                    return;
+                }
+                
+                // Get all permissions
+                var permissions = await context.Permissions.ToListAsync();
+                if (!permissions.Any())
+                {
+                    logger.LogWarning("No permissions found when seeding admin permissions");
+                    return;
+                }
+                
+                // Check if admin already has permissions
+                var existingPermissions = await context.UserPermissions
+                    .Where(up => up.UserId == admin.Id)
+                    .ToListAsync();
+                    
+                if (existingPermissions.Any())
+                {
+                    logger.LogInformation("Admin user already has permissions assigned");
+                    return;
+                }
+                
+                // Assign all permissions to admin
+                var userPermissions = permissions.Select(p => new UserPermission
+                {
+                    UserId = admin.Id,
+                    PermissionId = p.Id,
+                    IsGranted = true,
+                    GrantedBy = "System",
+                    GrantedDate = DateTime.UtcNow
+                }).ToList();
+                
+                await context.UserPermissions.AddRangeAsync(userPermissions);
+                await context.SaveChangesAsync();
+                
+                logger.LogInformation("Successfully assigned {PermissionCount} permissions to admin user", permissions.Count);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error seeding admin permissions");
+            }
+        }
+
+        private static async Task SeedUsersAsync(UserManager<ApplicationUser> userManager, IServiceProvider serviceProvider)
+        {
+            Console.WriteLine("Starting to seed 50 users...");
+            
+            // Get the UserManagementService from the service provider
+            using var scope = serviceProvider.CreateScope();
+            var userManagementService = scope.ServiceProvider.GetRequiredService<IUserManagementService>();
+            
+            for (int i = 1; i <= 50; i++)
+            {
+                string firstName = GetRandomItem(_firstNames);
+                string lastName = GetRandomItem(_lastNames);
+                string fullName = $"{firstName} {lastName}";
+                string email = GenerateEmail($"{firstName}.{lastName}", "inventory");
+                
+                // Skip if user already exists
+                if (await userManager.FindByEmailAsync(email) != null)
+                {
+                    continue;
+                }
+                
+                var createUserModel = new CreateUserViewModel
+                {
+                    Email = email,
+                    FullName = fullName,
+                    Password = "User123!",
+                    SelectedRoles = new List<string> { "Staff" }
+                };
+                
+                var result = await userManagementService.CreateUserAsync(createUserModel);
+                if (result.Succeeded)
+                {
+                    Console.WriteLine($"Created user: {fullName} ({email})");
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to create user: {fullName} ({email})");
+                    foreach (var error in result.Errors)
+                    {
+                        Console.WriteLine($"- {error.Description}");
+                    }
+                }
+            }
+            
+            Console.WriteLine("Finished seeding users.");
         }
     }
 } 

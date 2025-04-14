@@ -1,0 +1,351 @@
+@model X.PagedList.IPagedList<InventoryManagementSystem.Models.ViewModels.UserViewModel>
+@using InventoryManagementSystem.Models.ViewComponents
+@using InventoryManagementSystem.Helpers
+@using X.PagedList.Mvc.Core
+@{
+    ViewData["Title"] = "User Management";
+}
+
+@await Html.PartialAsync("_PageHeader", PageHeaderViewModel.Create("User Management", "fas fa-users")
+    .WithPrimaryButton("Add New User", Url.Action("Create", "UserManagement"), "fas fa-plus")
+    .WithSecondaryButton("Fix Admin Permissions", Url.Action("FixAdminPermissions", "UserManagement"), "fas fa-key"))
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-users me-2 text-primary"></i>
+                <span class="fw-semibold">All Users</span>
+                <span class="badge bg-primary ms-2">@Model.TotalItemCount</span>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <div class="entries-dropdown">
+                    <span class="me-1 text-sm"><i class="fas fa-list-ul me-1 text-secondary"></i> Show</span>
+                    <div class="select-container">
+                        <select name="pageSize" class="form-select form-select-sm form-select-enhanced bg-dark border-dark text-white" id="entriesSelect" onchange="window.location = updateUrlParameter(window.location.href, 'pageSize', this.value);">
+                            @if (ViewBag.PageSize == 10)
+                            {
+                                <option value="10" selected>10</option>
+                            }
+                            else
+                            {
+                                <option value="10">10</option>
+                            }
+                            
+                            @if (ViewBag.PageSize == 25)
+                            {
+                                <option value="25" selected>25</option>
+                            }
+                            else
+                            {
+                                <option value="25">25</option>
+                            }
+                            
+                            @if (ViewBag.PageSize == 50)
+                            {
+                                <option value="50" selected>50</option>
+                            }
+                            else
+                            {
+                                <option value="50">50</option>
+                            }
+                            
+                            @if (ViewBag.PageSize == 100)
+                            {
+                                <option value="100" selected>100</option>
+                            }
+                            else
+                            {
+                                <option value="100">100</option>
+                            }
+                        </select>
+                        <div class="select-icon">
+                            <i class="fas fa-chevron-down text-primary"></i>
+                        </div>
+                    </div>
+                    <span class="text-secondary small">entries</span>
+                </div>
+                <form asp-action="Index" method="get" class="d-flex search-form">
+                    <input type="hidden" name="page" value="1" />
+                    <div class="d-flex align-items-center">
+                        <div class="input-group search-group">
+                            <span class="input-group-text bg-dark border-dark text-secondary border-end-0">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" name="searchTerm" id="userSearch" value="@ViewBag.SearchTerm" class="form-control bg-dark border-dark text-white border-start-0 border-end-0" 
+                                   style="min-width: 200px;" 
+                                   placeholder="Search users..." />
+                            @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+                            {
+                                <button type="button" id="clearSearch" class="btn bg-dark border-dark border-start-0 border-end-0">
+                                    <i class="fas fa-times text-secondary"></i>
+                                </button>
+                            }
+                            <button type="submit" class="btn btn-primary rounded-end search-button">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Filters -->
+    <div class="card-body py-2 border-bottom border-dark">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <div class="d-flex align-items-center me-3">
+                <i class="fas fa-filter text-primary me-2"></i>
+                <span class="text-secondary small">Status:</span>
+            </div>
+            <div class="d-flex gap-2 category-filters">
+                <button type="button" class="btn filter-btn @(string.IsNullOrEmpty(ViewBag.StatusFilter) ? "active" : "")" data-filter="all">
+                    <i class="fas fa-layer-group me-2"></i> All
+                </button>
+                <button type="button" class="btn filter-btn @(ViewBag.StatusFilter == "active" ? "active" : "")" data-filter="active">
+                    <i class="fas fa-check-circle text-success me-2"></i> Active
+                </button>
+                <button type="button" class="btn filter-btn @(ViewBag.StatusFilter == "inactive" ? "active" : "")" data-filter="inactive">
+                    <i class="fas fa-times-circle text-danger me-2"></i> Inactive
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card-body">
+            <div class="alert alert-info d-flex align-items-center m-0">
+                <i class="fas fa-info-circle me-3 fa-lg"></i>
+                <div>No users found. Add your first user to get started.</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table m-0 data-table" id="usersTable">
+                <thead>
+                    <tr>
+                        <th width="15%" class="sortable" data-sort="username">
+                            <div class="d-flex align-items-center">
+                                USERNAME
+                                <a href="@Url.Action("Index", new { sortBy = "UserName", ascending = ViewBag.SortBy == "UserName" ? !ViewBag.SortAscending : true, searchTerm = ViewBag.SearchTerm, statusFilter = ViewBag.StatusFilter, pageSize = ViewBag.PageSize })">
+                                    @if (ViewBag.SortBy == "UserName")
+                                    {
+                                        <i class="fas @(ViewBag.SortAscending ? "fa-sort-up" : "fa-sort-down") ms-1"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-sort ms-1 text-muted"></i>
+                                    }
+                                </a>
+                            </div>
+                        </th>
+                        <th width="20%" class="sortable" data-sort="email">
+                            <div class="d-flex align-items-center">
+                                EMAIL
+                                <a href="@Url.Action("Index", new { sortBy = "Email", ascending = ViewBag.SortBy == "Email" ? !ViewBag.SortAscending : true, searchTerm = ViewBag.SearchTerm, statusFilter = ViewBag.StatusFilter, pageSize = ViewBag.PageSize })">
+                                    @if (ViewBag.SortBy == "Email")
+                                    {
+                                        <i class="fas @(ViewBag.SortAscending ? "fa-sort-up" : "fa-sort-down") ms-1"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-sort ms-1 text-muted"></i>
+                                    }
+                                </a>
+                            </div>
+                        </th>
+                        <th width="15%" class="sortable" data-sort="fullname">
+                            <div class="d-flex align-items-center">
+                                FULL NAME
+                                <a href="@Url.Action("Index", new { sortBy = "FullName", ascending = ViewBag.SortBy == "FullName" ? !ViewBag.SortAscending : true, searchTerm = ViewBag.SearchTerm, statusFilter = ViewBag.StatusFilter, pageSize = ViewBag.PageSize })">
+                                    @if (ViewBag.SortBy == "FullName")
+                                    {
+                                        <i class="fas @(ViewBag.SortAscending ? "fa-sort-up" : "fa-sort-down") ms-1"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-sort ms-1 text-muted"></i>
+                                    }
+                                </a>
+                            </div>
+                        </th>
+                        <th width="15%">ROLES</th>
+                        <th width="15%" class="sortable" data-sort="lastlogin">
+                            <div class="d-flex align-items-center">
+                                LAST LOGIN
+                                <a href="@Url.Action("Index", new { sortBy = "LastLoginDate", ascending = ViewBag.SortBy == "LastLoginDate" ? !ViewBag.SortAscending : true, searchTerm = ViewBag.SearchTerm, statusFilter = ViewBag.StatusFilter, pageSize = ViewBag.PageSize })">
+                                    @if (ViewBag.SortBy == "LastLoginDate")
+                                    {
+                                        <i class="fas @(ViewBag.SortAscending ? "fa-sort-up" : "fa-sort-down") ms-1"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-sort ms-1 text-muted"></i>
+                                    }
+                                </a>
+                            </div>
+                        </th>
+                        <th width="10%" class="text-center">STATUS</th>
+                        <th width="10%" class="text-end">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        var statusClass = user.IsActive ? "badge bg-success" : "badge bg-danger";
+                        var statusText = user.IsActive ? "Active" : "Inactive";
+                        var statusIcon = user.IsActive ? "fas fa-check-circle" : "fas fa-times-circle";
+                        
+                        <tr class="data-table-row @(!user.IsActive ? "inactive-user" : "")">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user text-primary me-2"></i>
+                                    <span class="code-format">@user.UserName</span>
+                                </div>
+                            </td>
+                            <td>@user.Email</td>
+                            <td class="fw-medium">@user.FullName</td>
+                            <td>
+                                @if (user.Roles.Any())
+                                {
+                                    foreach (var role in user.Roles)
+                                    {
+                                        <span class="badge rounded-pill category-badge py-2 px-3 me-1">
+                                            <i class="fas fa-id-badge me-1"></i> @role
+                                        </span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">
+                                        <i class="fas fa-exclamation-circle me-1"></i> No roles assigned
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                @if (user.LastLoginDate.HasValue)
+                                {
+                                    @user.LastLoginDate.Value.ToString("yyyy-MM-dd HH:mm")
+                                }
+                                else
+                                {
+                                    <span>Never</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <span class="@statusClass">
+                                    <i class="@statusIcon me-1"></i> @statusText
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="actions-container d-flex justify-content-end">
+                                    <a asp-action="Details" asp-route-id="@user.Id" 
+                                       class="btn btn-action btn-info me-1" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@user.Id" 
+                                       class="btn btn-action btn-primary me-1" title="Edit User">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <a asp-action="ManagePermissions" asp-route-id="@user.Id" 
+                                       class="btn btn-action btn-warning me-1" title="Manage Permissions">
+                                        <i class="fas fa-key"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-action btn-danger delete-user" title="Delete User"
+                                            data-user-id="@user.Id" data-user-name="@user.UserName">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    
+                                    <!-- Hidden form for delete submission -->
+                                    <form asp-action="Delete" asp-route-id="@user.Id" method="post" id="delete-form-@user.Id" class="d-none">
+                                        @Html.AntiForgeryToken()
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card-footer border-dark py-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="text-secondary small">
+                    <i class="fas fa-info-circle me-1"></i> Showing 1 to @Model.Count of @Model.TotalItemCount entries
+                </div>
+                <div>
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchTerm = ViewBag.SearchTerm, statusFilter = ViewBag.StatusFilter, sortBy = ViewBag.SortBy, ascending = ViewBag.SortAscending, pageSize = ViewBag.PageSize }),
+                        PagedListAdapter.GetStandardOptions())
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/table-utils.js"></script>
+    <script src="~/js/sweetalert-utils.js"></script>
+    <script>
+        // Helper function to update URL parameters
+        function updateUrlParameter(url, key, value) {
+            var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+            var separator = url.indexOf('?') !== -1 ? "&" : "?";
+            
+            if (url.match(re)) {
+                return url.replace(re, '$1' + key + "=" + value + '$2');
+            } else {
+                return url + separator + key + "=" + value;
+            }
+        }
+        
+        $(document).ready(function () {
+            // Initialize table sorting
+            new TableUtils('.data-table');
+
+            // Initialize filters with server-side filtering
+            initializeTableFilters('.category-filters', '.data-table-row', {
+                serverSide: true,
+                filterParam: 'statusFilter',
+                urlParams: {
+                    searchTerm: '@ViewBag.SearchTerm',
+                    sortBy: '@ViewBag.SortBy',
+                    ascending: '@ViewBag.SortAscending?.ToString().ToLower()',
+                    pageSize: '@ViewBag.PageSize'
+                }
+            });
+
+            // Initialize entries dropdown
+            initializeEntriesDropdown('#entriesSelect');
+
+            // Initialize search clear
+            $('#clearSearch').click(function() {
+                window.location.href = '@Url.Action("Index", new { pageSize = ViewBag.PageSize })';
+            });
+            
+            // Initialize delete confirmations for users
+            initDeleteConfirmations({
+                selector: '.delete-user',
+                entityIdAttr: 'data-user-id',
+                entityNameAttr: 'data-user-name',
+                formIdPrefix: 'delete-form-',
+                entityType: 'user'
+            });
+            
+            // Handle filter button clicks - replicating the behavior of direct links
+            $('.category-filters .filter-btn').click(function() {
+                var filter = $(this).data('filter');
+                var statusFilter = filter === 'all' ? '' : filter;
+                var url = '@Url.Action("Index")';
+                
+                url = updateUrlParameter(url, 'statusFilter', statusFilter);
+                url = updateUrlParameter(url, 'searchTerm', '@ViewBag.SearchTerm');
+                url = updateUrlParameter(url, 'pageSize', '@ViewBag.PageSize');
+                
+                window.location.href = url;
+            });
+        });
+    </script>
+} 

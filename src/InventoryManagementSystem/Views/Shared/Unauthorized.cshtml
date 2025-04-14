@@ -6,26 +6,42 @@
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-8 offset-md-2 text-center">
-            <div class="card border-danger">
+            <div class="card border-danger shadow">
                 <div class="card-header bg-danger text-white">
                     <h4 class="mb-0">401 - Unauthorized</h4>
                 </div>
                 <div class="card-body">
                     <div class="mb-4">
-                        <i class="bi bi-key" style="font-size: 4rem;"></i>
+                        <i class="bi bi-key" style="font-size: 4.5rem; color: #dc3545;"></i>
                     </div>
                     
-                    <h5 class="card-title mb-3">@Model.Message</h5>
-                    <p class="text-muted">You need to sign in to access this resource.</p>
+                    <h5 class="card-title mb-3">@(string.IsNullOrEmpty(Model.Message) ? "Authentication Required" : Model.Message)</h5>
+                    <p class="text-muted mb-4">You need to sign in to access this resource. Please log in with an account that has permission to access this page.</p>
                     
                     <p class="text-muted small">
-                        <strong>Request ID:</strong> <code>@Model.RequestId</code><br/>
-                        <strong>Correlation ID:</strong> <code>@Model.CorrelationId</code>
+                        @if (!string.IsNullOrEmpty(Model.RequestId))
+                        {
+                            <strong>Request ID:</strong> <code>@Model.RequestId</code><br/>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.CorrelationId))
+                        {
+                            <strong>Correlation ID:</strong> <code>@Model.CorrelationId</code>
+                        }
                     </p>
                     
                     <div class="mt-4">
-                        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary">Sign In</a>
-                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary ml-2">Return to Home</a>
+                        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right"></i> Sign In
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary ms-2">
+                            <i class="bi bi-house-door"></i> Return to Home
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-muted small">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Request Time: @DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                        <span>Path: @Context.Request.Path</span>
                     </div>
                 </div>
             </div>

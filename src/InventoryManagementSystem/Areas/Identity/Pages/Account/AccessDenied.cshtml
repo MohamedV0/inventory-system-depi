@@ -1,0 +1,105 @@
+@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container-fluid px-3 py-2">
+    <!-- Page Header -->
+    @{
+        var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+            .Create("Access Denied", "fas fa-exclamation-circle")
+            .WithPrimaryButton("Return to Dashboard", Url.Action("Index", "Home"), "fas fa-home");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <div class="row g-3">
+        <div class="col-lg-8 mx-auto">
+            <!-- Main Error Card -->
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3 bg-danger">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-danger-subtle me-2">
+                            <i class="fas fa-shield-alt text-danger"></i>
+                        </span>
+                        403 - Access Denied
+                    </h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <div class="mb-4">
+                        <div class="icon-circle icon-circle-xl bg-danger-subtle mx-auto">
+                            <i class="fas fa-lock text-danger" style="font-size: 3rem;"></i>
+                        </div>
+                    </div>
+                    
+                    <h4 class="card-title mb-3">You do not have permission to access this resource</h4>
+                    <p class="mb-4">You don't have the necessary permissions to view this page. If you believe this is an error, please contact your administrator.</p>
+                    
+                    <div class="mt-4 d-flex justify-content-center gap-3">
+                        <a href="javascript:history.back()" class="btn btn-outline-light">
+                            <i class="fas fa-arrow-left me-2"></i> Go Back
+                        </a>
+                        <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i> Return to Dashboard
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer border-dark py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-secondary small">
+                            <i class="fas fa-clock me-1"></i> Request Time: @DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                        </span>
+                        <span class="text-secondary small">
+                            <i class="fas fa-link me-1"></i> Return URL: @Model.ReturnUrl
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Help Card -->
+            <div class="card content-card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-info-circle text-primary"></i>
+                        </span>
+                        Need Help?
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="tip-item p-2 rounded bg-primary-subtle mb-3">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-question-circle me-2"></i> Why am I seeing this page?
+                        </h6>
+                        <p class="small mb-0">This error occurs when you try to access a resource you don't have permission to view. This could be due to your user role or account restrictions.</p>
+                    </div>
+                    
+                    <div class="tip-item p-2 rounded bg-warning-subtle">
+                        <h6 class="d-flex align-items-center mb-2">
+                            <i class="fas fa-lightbulb me-2"></i> What can I do next?
+                        </h6>
+                        <ul class="mb-0 ps-3 small">
+                            <li>Return to the previous page</li>
+                            <li>Navigate to the dashboard</li>
+                            <li>Contact your system administrator</li>
+                            <li>Check if you're logged in with the correct account</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .icon-circle-xl {
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+    </style>
+} 

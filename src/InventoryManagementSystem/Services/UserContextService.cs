@@ -1,6 +1,7 @@
 using InventoryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace InventoryManagementSystem.Services
 {
@@ -48,6 +49,18 @@ namespace InventoryManagementSystem.Services
 
             // Return a default system user ID if no authenticated user is found
             return "system";
+        }
+        
+        public async Task<string> GetCurrentUserIdAsync()
+        {
+            // Simply delegate to synchronous method since HttpContext is directly accessible
+            return GetCurrentUserId();
+        }
+        
+        public async Task<string> GetCurrentUserNameAsync()
+        {
+            // Simply delegate to CurrentUser property since HttpContext is directly accessible
+            return CurrentUser;
         }
     }
 } 

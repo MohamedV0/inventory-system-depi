@@ -1,0 +1,215 @@
+@model EditUserViewModel
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<!-- Use a more compact container with consistent padding -->
+<div class="container-fluid px-3 py-2">
+    <!-- Use the existing PageHeader partial with fluent API -->
+    @{
+        var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+            .Create("Edit User", "fas fa-user-edit")
+            .WithPrimaryButton("Back to Users", Url.Action("Index"), "fas fa-arrow-left");
+    }
+    <partial name="_PageHeader" model="headerModel" />
+
+    <div class="row g-3">
+        <!-- Main Form Card -->
+        <div class="col-lg-8">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 p-3 border rounded bg-danger-subtle"></div>
+                
+                <!-- User Information Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-user text-primary"></i>
+                            </span>
+                            User Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-4 mb-0">
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h6 class="section-title mb-3">
+                                        <i class="fas fa-info-circle text-primary me-2"></i>Basic Details
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="UserName" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-user-tag text-primary me-2"></i>Username
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="A unique username for this user account. This will be used for login."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                                        <span asp-validation-for="UserName" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="Email" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-envelope text-primary me-2"></i>Email Address
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The user's email address. This will be used for notifications and password recovery."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="Email" class="form-control" placeholder="Enter email address" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="FullName" class="form-label d-flex align-items-center">
+                                            <i class="fas fa-id-card text-primary me-2"></i>Full Name
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="The user's full name as it will appear in the system."><i class="fas fa-info"></i></span>
+                                        </label>
+                                        <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+                                        <span asp-validation-for="FullName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h6 class="section-title mb-3">
+                                        <i class="fas fa-shield-alt text-primary me-2"></i>Account Settings
+                                    </h6>
+                                    
+                                    <div class="form-check form-switch mb-4">
+                                        <input asp-for="IsActive" class="form-check-input" role="switch" />
+                                        <label asp-for="IsActive" class="form-check-label">
+                                            Active Account
+                                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="When active, this user can log in to the system. Inactive accounts are locked out but preserved in the database."><i class="fas fa-info"></i></span>
+                                        </label>
+                                    </div>
+                                    
+                                    @if (ViewBag.ShowPasswordFields ?? false)
+                                    {
+                                        <div class="mb-3">
+                                            <label asp-for="Password" class="form-label d-flex align-items-center">
+                                                <i class="fas fa-key text-primary me-2"></i>Password
+                                                <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                   title="Enter a new password for this user. Leave blank to keep the current password."><i class="fas fa-info"></i></span>
+                                            </label>
+                                            <input asp-for="Password" class="form-control" type="password" placeholder="Enter new password (optional)" />
+                                            <span asp-validation-for="Password" class="text-danger"></span>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label asp-for="ConfirmPassword" class="form-label d-flex align-items-center">
+                                                <i class="fas fa-check-double text-primary me-2"></i>Confirm Password
+                                            </label>
+                                            <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="Confirm new password" />
+                                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Role Assignment Card -->
+                <div class="card content-card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <span class="icon-circle bg-primary-subtle me-2">
+                                <i class="fas fa-id-badge text-primary"></i>
+                            </span>
+                            Role Assignment
+                            <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                               title="Assign roles to determine what actions this user can perform in the system."><i class="fas fa-info"></i></span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="border border-dark rounded p-3 mb-2" style="max-height: 250px; overflow-y: auto; background-color: rgba(0, 0, 0, 0.15);">
+                            @foreach (var role in Model.AvailableRoles)
+                            {
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="SelectedRoles"
+                                           value="@role.Value" id="role_@role.Value" 
+                                           @(Model.SelectedRoles?.Contains(role.Value) == true ? "checked" : "") />
+                                    <label class="form-check-label d-flex align-items-center" for="role_@role.Value">
+                                        <i class="fas fa-user-shield me-2 text-primary"></i>
+                                        <span>@role.Text</span>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                        <div class="form-text text-muted mt-2">
+                            <i class="fas fa-info-circle me-1"></i> You can assign multiple roles to a user. Each role provides specific permissions within the system.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-info-subtle me-2">
+                            <i class="fas fa-info text-info"></i>
+                        </span>
+                        Account Notes
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span>Changes to user roles take effect immediately after saving.</span>
+                    </div>
+                    
+                    @if (ViewBag.RecentActivity != null)
+                    {
+                        <div class="mt-3">
+                            <h6 class="fw-bold">Recent Activity</h6>
+                            <ul class="list-group list-group-flush small">
+                                @foreach (var activity in ViewBag.RecentActivity)
+                                {
+                                    <li class="list-group-item px-0 py-2 border-dashed">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-history text-muted"></i>
+                                            </div>
+                                            <div class="ms-2">
+                                                <span>@activity.Description</span>
+                                                <div class="text-muted small">@activity.Timestamp.ToString("MMM d, yyyy h:mm tt")</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+    </script>
+} 
