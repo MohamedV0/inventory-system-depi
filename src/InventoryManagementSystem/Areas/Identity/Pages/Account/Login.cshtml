@@ -8,6 +8,37 @@
 <div class="container-fluid p-0">
     <div class="row g-0 justify-content-center">
         <div class="col-md-8 col-lg-6">
+            <!-- Demo Credentials Info Box -->
+            <div class="card content-card shadow-sm mb-2">
+                <div class="card-body p-2">
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center text-info me-2">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-dark border-dark text-secondary px-2">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                            <input type="text" class="form-control form-control-sm bg-dark border-dark text-info" 
+                                   value="admin@inventory.com" readonly style="cursor: text;" />
+                            <button class="btn btn-sm btn-dark border-dark" type="button" 
+                                    onclick="copyToClipboard('admin@inventory.com')" title="Copy email">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span class="input-group-text bg-dark border-dark border-start-0 text-secondary px-2">
+                                <i class="fas fa-key"></i>
+                            </span>
+                            <input type="text" class="form-control form-control-sm bg-dark border-dark text-info" 
+                                   value="Admin123!" readonly style="cursor: text;" />
+                            <button class="btn btn-sm btn-dark border-dark" type="button" 
+                                    onclick="copyToClipboard('Admin123!')" title="Copy password">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card content-card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center py-2">
                     <h5 class="mb-0 d-flex align-items-center">
@@ -150,6 +181,50 @@
                 $('.password-input').attr('type', 'password');
                 $('.toggle-icon').removeClass('fa-eye-slash').addClass('fa-eye');
             });
+
+            // Improved copy to clipboard functionality with fallback
+            window.copyToClipboard = function(text) {
+                // Create a temporary textarea element
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';  // Prevent scrolling to bottom
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                
+                try {
+                    // Try using the Clipboard API first
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(text).then(function() {
+                            toastr.success('Copied to clipboard!');
+                        }).catch(function() {
+                            // Fallback to legacy method if Clipboard API fails
+                            legacyCopy();
+                        });
+                    } else {
+                        // Use legacy method if Clipboard API is not available
+                        legacyCopy();
+                    }
+                } catch (err) {
+                    // Final fallback
+                    legacyCopy();
+                }
+
+                // Legacy copy method using select/execCommand
+                function legacyCopy() {
+                    try {
+                        textarea.select();
+                        textarea.setSelectionRange(0, 99999); // For mobile devices
+                        document.execCommand('copy');
+                        toastr.success('Copied to clipboard!');
+                    } catch (err) {
+                        toastr.error('Failed to copy text');
+                        console.error('Copy failed:', err);
+                    }
+                }
+
+                // Clean up
+                document.body.removeChild(textarea);
+            }
         });
     </script>
 }

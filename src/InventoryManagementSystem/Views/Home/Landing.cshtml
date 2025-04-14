@@ -15,39 +15,44 @@
                 <div class="hero-bg-pattern"></div>
                 <div class="hero-particles"></div>
                 <div class="row g-0">
-                    <div class="col-lg-7 p-5">
+                    <div class="col-lg-7 p-4 p-lg-5">
                         <div class="hero-content">
                             <div class="badge bg-primary-subtle text-primary mb-3 py-2 px-3 rounded-pill">
                                 <i class="fas fa-rocket me-2"></i>Smart Inventory Management
                             </div>
                             <h1 class="display-4 fw-bold mb-1 text-gradient">Welcome to</h1>
                             <h1 class="display-3 fw-bold mb-3 text-primary">Inventory System</h1>
-                            <p class="lead mb-4 text-secondary animate__animated animate__fadeIn">
+                            <!-- Desktop version of lead text -->
+                            <p class="lead mb-4 text-secondary animate__animated animate__fadeIn d-none d-md-block">
                                 Manage your <span class="text-gradient">inventory</span>, <span class="text-gradient">products</span>, and <span class="text-gradient">suppliers</span><br>
                                 with real-time <span class="text-gradient">insights</span> and <span class="text-gradient">analytics</span>.
                             </p>
+                            <!-- Mobile version of lead text -->
+                            <p class="lead mb-4 text-secondary animate__animated animate__fadeIn d-md-none">
+                                Smart inventory management with real-time <span class="text-gradient">insights</span>.
+                            </p>
                             
-                            <!-- Added Hero Stats Section -->
-                            <div class="hero-stats d-flex flex-wrap gap-4 mb-4">
-                                <div class="hero-stat">
-                                    <div class="hero-stat-value"><span class="counter" data-value="1500">0</span>+</div>
+                            <!-- Hero Stats Section with improved mobile layout -->
+                            <div class="hero-stats d-flex flex-wrap gap-3 gap-md-4 mb-4">
+                                <div class="hero-stat text-center text-md-start">
+                                    <div class="hero-stat-value"><span class="counter" data-value="900">0</span>+</div>
                                     <div class="hero-stat-label">Active Users</div>
                                 </div>
-                                <div class="hero-stat">
-                                    <div class="hero-stat-value"><span class="counter" data-value="25000">0</span>+</div>
+                                <div class="hero-stat text-center text-md-start">
+                                    <div class="hero-stat-value"><span class="counter" data-value="5000">0</span>+</div>
                                     <div class="hero-stat-label">Items Tracked</div>
                                 </div>
-                                <div class="hero-stat">
+                                <div class="hero-stat text-center text-md-start">
                                     <div class="hero-stat-value"><span class="counter" data-value="98">0</span>%</div>
                                     <div class="hero-stat-label">Accuracy Rate</div>
                                 </div>
                             </div>
                             
-                            <div class="d-flex flex-wrap gap-3 mb-2 action-buttons">
-                                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn-lg shadow-sm">
+                            <div class="d-flex flex-column flex-sm-row gap-3 mb-2 action-buttons">
+                                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn-lg shadow-sm w-100 w-sm-auto">
                                     <i class="fas fa-sign-in-alt me-2"></i> Sign In
                                 </a>
-                                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-primary btn-lg">
+                                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-primary btn-lg w-100 w-sm-auto">
                                     <i class="fas fa-user-plus me-2"></i> Create Account
                                 </a>
                             </div>
@@ -135,52 +140,56 @@
         <span>Why Choose Us</span>
         <span class="section-line"></span>
     </h2>
-    <div class="content-card shadow-sm">
-        <div class="card-body p-4">
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="d-flex mb-4 hover-card">
-                        <div class="icon-circle bg-primary-subtle me-3">
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-primary-subtle me-3 scale-on-hover">
                             <i class="fas fa-shield-alt text-primary"></i>
                         </div>
-                        <div>
-                            <h4 class="mb-2">Secure & Reliable</h4>
-                            <p class="text-secondary mb-0">Your data is protected with industry-standard security measures.</p>
-                        </div>
+                        <h3 class="mb-0 fs-4">Secure & Reliable</h3>
                     </div>
+                    <p class="text-secondary">Your data is protected with industry-standard security measures.</p>
                 </div>
-                <div class="col-md-6">
-                    <div class="d-flex mb-4 hover-card">
-                        <div class="icon-circle bg-success-subtle me-3">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-success-subtle me-3 scale-on-hover">
                             <i class="fas fa-sync text-success"></i>
                         </div>
-                        <div>
-                            <h4 class="mb-2">Real-time Updates</h4>
-                            <p class="text-secondary mb-0">Stay synchronized with instant updates across your inventory.</p>
-                        </div>
+                        <h3 class="mb-0 fs-4">Real-time Updates</h3>
                     </div>
+                    <p class="text-secondary">Stay synchronized with instant updates across your inventory.</p>
                 </div>
-                <div class="col-md-6">
-                    <div class="d-flex mb-4 hover-card">
-                        <div class="icon-circle bg-warning-subtle me-3">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-warning-subtle me-3 scale-on-hover">
                             <i class="fas fa-chart-bar text-warning"></i>
                         </div>
-                        <div>
-                            <h4 class="mb-2">Advanced Analytics</h4>
-                            <p class="text-secondary mb-0">Make data-driven decisions with powerful reporting tools.</p>
-                        </div>
+                        <h3 class="mb-0 fs-4">Advanced Analytics</h3>
                     </div>
+                    <p class="text-secondary">Make data-driven decisions with powerful reporting tools.</p>
                 </div>
-                <div class="col-md-6">
-                    <div class="d-flex mb-4 hover-card">
-                        <div class="icon-circle bg-info-subtle me-3">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="content-card h-100 shadow-sm card-hover">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-info-subtle me-3 scale-on-hover">
                             <i class="fas fa-users text-info"></i>
                         </div>
-                        <div>
-                            <h4 class="mb-2">Team Collaboration</h4>
-                            <p class="text-secondary mb-0">Work together seamlessly with role-based access control.</p>
-                        </div>
+                        <h3 class="mb-0 fs-4">Team Collaboration</h3>
                     </div>
+                    <p class="text-secondary">Work together seamlessly with role-based access control.</p>
                 </div>
             </div>
         </div>
