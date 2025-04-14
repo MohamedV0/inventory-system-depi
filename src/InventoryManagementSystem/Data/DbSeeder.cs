@@ -254,9 +254,9 @@ namespace InventoryManagementSystem.Data
             }
 
             // Constants for data generation
-            const int CATEGORY_COUNT = 200;
-            const int SUPPLIER_COUNT = 100;
-            const int PRODUCT_COUNT = 1000;
+            const int CATEGORY_COUNT = 100;
+            const int SUPPLIER_COUNT = 50;
+            const int PRODUCT_COUNT = 700;
             const int MIN_SUPPLIERS_PER_PRODUCT = 0;  // Some products may have no suppliers
             const int MAX_SUPPLIERS_PER_PRODUCT = 4;
             const int MIN_STOCK_HISTORY_PER_PRODUCT = 50;  // Increased for more data points

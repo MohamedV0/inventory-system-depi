@@ -241,6 +241,106 @@ namespace InventoryManagementSystem.Data.Specifications
     }
     
     /// <summary>
+    /// Gets products by a list of IDs
+    /// </summary>
+    public class ProductByIdsSpecification : BaseProductSpecification
+    {
+        public ProductByIdsSpecification(IEnumerable<int> ids) 
+            : base()
+        {
+            var idList = ids.ToList();
+            base.Criteria = base.Criteria.And(p => idList.Contains(p.Id));
+        }
+    }
+    
+    /// <summary>
+    /// Gets products by supplier ID
+    /// </summary>
+    public class ProductBySupplierSpecification : BaseProductSpecification
+    {
+        public ProductBySupplierSpecification(int supplierId)
+            : base()
+        {
+            base.Criteria = base.Criteria.And(p => 
+                p.ProductSuppliers.Any(ps => ps.SupplierId == supplierId));
+        }
+    }
+    
+    /// <summary>
+    /// Gets only active products
+    /// </summary>
+    public class ActiveProductsSpecification : BaseProductSpecification
+    {
+        public ActiveProductsSpecification()
+            : base()
+        {
+            base.Criteria = base.Criteria.And(p => p.IsActive);
+        }
+    }
+    
+    /// <summary>
+    /// Gets products updated or created within a date range
+    /// </summary>
+    public class ProductsByDateRangeSpecification : BaseProductSpecification
+    {
+        public ProductsByDateRangeSpecification(DateTime startDate, DateTime endDate)
+            : base()
+        {
+            base.Criteria = base.Criteria.And(p => 
+                (p.UpdatedAt != null && p.UpdatedAt >= startDate && p.UpdatedAt <= endDate) ||
+                (p.CreatedAt != null && p.CreatedAt >= startDate && p.CreatedAt <= endDate));
+        }
+    }
+    
+    /// <summary>
+    /// Combines two product specifications
+    /// </summary>
+    public class CombinedProductSpecification : BaseProductSpecification
+    {
+        public CombinedProductSpecification(
+            BaseProductSpecification spec1,
+            BaseProductSpecification spec2)
+            : base()
+        {
+            base.Criteria = base.Criteria.And(spec1.Criteria).And(spec2.Criteria);
+
+            // Combine includes from both specifications
+            foreach (var include in spec1.Includes)
+            {
+                if (!base.Includes.Contains(include))
+                {
+                    base.Includes.Add(include);
+                }
+            }
+
+            foreach (var include in spec2.Includes)
+            {
+                if (!base.Includes.Contains(include))
+                {
+                    base.Includes.Add(include);
+                }
+            }
+
+            // Combine include strings from both specifications
+            foreach (var includeString in spec1.IncludeStrings)
+            {
+                if (!base.IncludeStrings.Contains(includeString))
+                {
+                    base.IncludeStrings.Add(includeString);
+                }
+            }
+
+            foreach (var includeString in spec2.IncludeStrings)
+            {
+                if (!base.IncludeStrings.Contains(includeString))
+                {
+                    base.IncludeStrings.Add(includeString);
+                }
+            }
+        }
+    }
+    
+    /// <summary>
     /// Extension methods for combining expressions
     /// </summary>
     public static class ExpressionExtensions
