@@ -2705,3 +2705,23 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator:hover {
     background-color: rgba(59, 130, 246, 0.1);
     color: var(--accent-secondary);
 }
+
+/* Enhanced Text Styles */
+.text-gradient {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+    to {
+        text-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+    }
+}

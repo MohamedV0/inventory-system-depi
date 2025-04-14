@@ -69,6 +69,16 @@ The Inventory Management System (IMS) is a comprehensive web-based solution deve
 
 </div>
 
+## 💫 Interface Preview
+
+<div align="center">
+
+![Hero Image](docs/ui-screenshots/Hero.png)
+
+**[🎯 View all system screenshots](docs/ui-screenshots)**
+
+</div>
+
 ## 🏗️ Repository Structure
 
 ```
@@ -89,8 +99,6 @@ For detailed information about the application structure, please refer to the [P
 
 **Initiative**: Digital Egypt Pioneers Initiative (DEPI)<br>
 **Track**: Full Stack .NET Developer | **Cohort**: 2024-2025<br>
-
-</div>
 
 ## 🚀 Getting Started
 
