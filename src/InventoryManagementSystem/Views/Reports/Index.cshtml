@@ -71,7 +71,7 @@
                                 <label class="form-label d-flex align-items-center">
                                     <i class="fas fa-calendar-alt text-primary me-2"></i>From
                                     <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
-                                          title="Select the start date for your report">
+                                          title="Select the start date to analyze transactions and stock movements from this date. This will show all inventory changes, performance metrics, and stock levels from this point forward.">
                                         <i class="fas fa-info"></i>
                                     </span>
                                 </label>
@@ -90,7 +90,7 @@
                                 <label class="form-label d-flex align-items-center">
                                     <i class="fas fa-calendar-alt text-primary me-2"></i>To
                                     <span class="tooltip-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
-                                          title="Select the end date for your report">
+                                          title="Select the end date to analyze transactions and stock movements up to this date. The report will include all inventory activities, performance metrics, and stock levels up to this point.">
                                         <i class="fas fa-info"></i>
                                     </span>
                                 </label>
@@ -262,57 +262,230 @@
                 }
             });
 
+            // Initialize date pickers
+            function initializeDatePickers() {
+                // Set default dates
+                const today = new Date();
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(today.getDate() - 30);
+
+                // Format dates for input fields (YYYY-MM-DD)
+                const formatDate = (date) => date.toISOString().split('T')[0];
+
+                // Set default values if not already set
+                if (!$('#startDate').val()) {
+                    $('#startDate').val(formatDate(thirtyDaysAgo));
+                }
+                if (!$('#endDate').val()) {
+                    $('#endDate').val(formatDate(today));
+                }
+
+                // Add event listeners for date validation
+                $('#startDate, #endDate').on('change', function() {
+                    const startDate = new Date($('#startDate').val());
+                    const endDate = new Date($('#endDate').val());
+
+                    if (startDate > endDate) {
+                        toastr.warning('Start date cannot be later than end date');
+                        // Reset to previous valid dates
+                        $('#startDate').val(formatDate(thirtyDaysAgo));
+                        $('#endDate').val(formatDate(today));
+                    }
+                });
+
+                // Set max date for both inputs to today
+                const maxDate = formatDate(today);
+                $('#startDate, #endDate').attr('max', maxDate);
+            }
+
+            // Update report description when type changes
+            function updateReportDescription() {
+                const selectedOption = $('#reportType option:selected');
+                const description = selectedOption.data('description') || '';
+                $('#reportDescription').text(description);
+            }
+
+            // Handle report type change
+            $('#reportType').on('change', updateReportDescription);
+
             // Handle form submission
             $('#reportForm').on('submit', function(e) {
                 e.preventDefault();
                 if ($(this).valid()) {
+                    // Show loading indicator
+                    const loadingHtml = `
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div class="mt-2">Generating Report...</div>
+                        </div>
+                    `;
+                    $('#reportContainer').html(loadingHtml);
+
                     $.ajax({
                         url: $(this).attr('action'),
                         method: 'POST',
                         data: $(this).serialize(),
-                        success: function(response, status, xhr) {
-                            if (xhr.status === 200) {
-                                $('#reportContainer').html(response);
-                                // Initialize table utils after loading report
-                                if ($('.data-table').length) {
-                                    new TableUtils('.data-table');
-                                }
-                                // Show success toast
-                                toastr.success('Report generated successfully');
+                        success: function(response) {
+                            if (response.success) {
+                                // Render the report data
+                                renderReport(response.data);
+                                toastr.success(response.message);
                             } else {
-                                // If we got a partial view with validation errors
-                                $('#reportForm').html(response);
-                                // Re-initialize form elements
-                                initializeFormElements();
-                                // Show warning toast for validation issues
-                                toastr.warning('Please check the form for errors');
+                                toastr.error(response.message || 'Failed to generate report');
                             }
                         },
                         error: function(xhr) {
-                            if (xhr.status === 400) {
-                                // Validation errors - replace form with updated version
-                                $('#reportForm').html(xhr.responseText);
-                                // Re-initialize form elements
-                                initializeFormElements();
-                                // Show warning toast for validation issues
-                                toastr.warning('Please check the form for errors');
-                            } else {
-                                // Show error toast for other errors
-                                toastr.error('An error occurred while generating the report. Please try again.');
-                            }
+                            let errorMessage = 'An error occurred while generating the report';
+                            try {
+                                const response = JSON.parse(xhr.responseText);
+                                errorMessage = response.message || errorMessage;
+                            } catch (e) {}
+                            toastr.error(errorMessage);
+                            $('#reportContainer').empty();
                         }
                     });
                 }
             });
 
-            function initializeFormElements() {
-                // Re-initialize tooltips
-                $('[data-bs-toggle="tooltip"]').tooltip();
-                // Re-initialize validation
-                $('#reportForm').validate();
-                // Re-initialize any other form-specific elements
-                initializeDatePickers();
-                updateReportDescription();
+            function renderReport(reportData) {
+                const reportHtml = `
+                    <div class="card shadow-sm mb-4 bg-card">
+                        <div class="card-header bg-card">
+                            <div class="d-flex justify-content-between align-items-center py-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-chart-bar text-primary me-2"></i>
+                                    <span class="fw-semibold text-white">${reportData.reportType} Report</span>
+                                    <span class="badge bg-primary ms-2">
+                                        <i class="far fa-clock me-1"></i>
+                                        ${new Date(reportData.generatedDate).toLocaleString()}
+                                    </span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-action btn-info" onclick="window.print()" data-bs-toggle="tooltip" title="Print Report">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary Section -->
+                        <div class="card-body py-2 border-bottom border-dark">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-circle bg-primary-subtle me-2">
+                                            <i class="fas fa-boxes text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-secondary small">Total Items</div>
+                                            <div class="fw-semibold">${reportData.summary.totalItems}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-circle bg-success-subtle me-2">
+                                            <i class="fas fa-dollar-sign text-success"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-secondary small">Total Value</div>
+                                            <div class="fw-semibold">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(reportData.summary.totalValue)}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-circle bg-warning-subtle me-2">
+                                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-secondary small">Low Stock Items</div>
+                                            <div class="fw-semibold">${reportData.summary.lowStockItems}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-circle bg-danger-subtle me-2">
+                                            <i class="fas fa-times-circle text-danger"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-secondary small">Out of Stock</div>
+                                            <div class="fw-semibold">${reportData.summary.outOfStockItems}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table m-0 data-table">
+                                <thead>
+                                    <tr>
+                                        <th width="30%" class="sortable" data-sort="name">
+                                            <div class="d-flex align-items-center">
+                                                NAME <i class="fas fa-sort ms-1 text-muted"></i>
+                                            </div>
+                                        </th>
+                                        <th width="15%" class="sortable" data-sort="category">
+                                            <div class="d-flex align-items-center">
+                                                CATEGORY <i class="fas fa-sort ms-1 text-muted"></i>
+                                            </div>
+                                        </th>
+                                        <th width="15%" class="sortable text-end" data-sort="quantity">
+                                            <div class="d-flex align-items-center justify-content-end">
+                                                QUANTITY <i class="fas fa-sort ms-1 text-muted"></i>
+                                            </div>
+                                        </th>
+                                        <th width="15%" class="sortable text-end" data-sort="unitPrice">
+                                            <div class="d-flex align-items-center justify-content-end">
+                                                UNIT PRICE <i class="fas fa-sort ms-1 text-muted"></i>
+                                            </div>
+                                        </th>
+                                        <th width="15%" class="sortable text-end" data-sort="totalValue">
+                                            <div class="d-flex align-items-center justify-content-end">
+                                                TOTAL VALUE <i class="fas fa-sort ms-1 text-muted"></i>
+                                            </div>
+                                        </th>
+                                        <th width="10%" class="sortable text-end" data-sort="lastUpdated">
+                                            <div class="d-flex align-items-center justify-content-end">
+                                                LAST UPDATED <i class="fas fa-sort ms-1 text-muted"></i>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${reportData.items.map(item => `
+                                        <tr class="data-table-row">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-box text-primary me-2"></i>
+                                                    <span class="fw-medium">${item.name}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge category-badge">${item.category}</span>
+                                            </td>
+                                            <td class="text-end ${item.quantity <= 0 ? 'text-danger' : item.quantity <= 10 ? 'text-warning' : ''}">${item.quantity}</td>
+                                            <td class="text-end">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.unitPrice)}</td>
+                                            <td class="text-end">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.totalValue)}</td>
+                                            <td class="text-end">${new Date(item.lastUpdated).toLocaleString()}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+
+                $('#reportContainer').html(reportHtml);
+
+                // Initialize table utils after loading report
+                if ($('.data-table').length) {
+                    new TableUtils('.data-table');
+                }
             }
 
             // Export functionality
@@ -386,7 +559,8 @@
             };
 
             // Initialize form elements on page load
-            initializeFormElements();
+            initializeDatePickers();
+            updateReportDescription();
         });
     </script>
 } 

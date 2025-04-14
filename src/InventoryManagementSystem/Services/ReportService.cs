@@ -135,46 +135,283 @@ namespace InventoryManagementSystem.Services
             ReportParameters parameters,
             CancellationToken cancellationToken)
         {
-            // Use BaseProductSpecification to ensure Category is included
+            var startDate = parameters.StartDate ?? DateTime.UtcNow.AddMonths(-1);
+            var endDate = parameters.EndDate ?? DateTime.UtcNow;
+
+            // Create base specification for active products
             var specification = new BaseProductSpecification();
-            var productsResult = await _unitOfWork.Products.FindAsync(specification, cancellationToken);
+            
+            // Create a list of specifications to combine
+            var specifications = new List<BaseProductSpecification>();
+            
+            // Add category filter if specified
+            if (parameters.CategoryId.HasValue)
+            {
+                specifications.Add(new ProductsByCategorySpecification(parameters.CategoryId.Value));
+            }
+            
+            // Add supplier filter if specified
+            if (parameters.SupplierId.HasValue)
+            {
+                specifications.Add(new ProductBySupplierSpecification(parameters.SupplierId.Value));
+            }
+            
+            // Add active/inactive filter
+            if (!parameters.IncludeInactive)
+            {
+                specifications.Add(new ActiveProductsSpecification());
+            }
+            
+            // Combine all specifications
+            var combinedSpecification = specification;
+            
+            // Only combine if we have additional specifications
+            if (specifications.Any())
+            {
+                combinedSpecification = specifications.Aggregate((current, next) => 
+                    new CombinedProductSpecification(current, next));
+            }
+
+            var productsResult = await _unitOfWork.Products.FindAsync(combinedSpecification, cancellationToken);
 
             if (!productsResult.IsSuccess)
                 throw new InvalidOperationException(productsResult.Message);
 
             var products = productsResult.Value;
-            var items = products.Select(p => new ReportItemDTO
+
+            // Get stock history for analysis
+            var stockHistorySpec = new StockHistoryByDateRangeSpecification(startDate, endDate);
+            var stockHistoryResult = await _unitOfWork.StockHistories.FindAsync(stockHistorySpec, cancellationToken);
+
+            if (!stockHistoryResult.IsSuccess)
+                throw new InvalidOperationException(stockHistoryResult.Message);
+
+            var stockHistory = stockHistoryResult.Value;
+
+            // Data validation and normalization
+            var items = products.Select(p =>
             {
-                Name = p.Name,
-                Category = p.Category?.Name ?? "Uncategorized",
-                Quantity = p.CurrentStock,
-                UnitPrice = p.Price,
-                TotalValue = p.CurrentStock * p.Price,
-                LastUpdated = p.UpdatedAt ?? p.CreatedAt
+                // Get product's stock history
+                var productHistory = stockHistory.Where(h => h.ProductId == p.Id).ToList();
+                
+                // Calculate stock metrics
+                var stockIn = productHistory.Where(h => h.Type == TransactionType.StockIn)
+                    .Sum(h => h.QuantityChange);
+                var stockOut = Math.Abs(productHistory.Where(h => h.Type == TransactionType.StockOut)
+                    .Sum(h => h.QuantityChange));
+                var avgStock = productHistory.Any() 
+                    ? (decimal)productHistory.Average(h => h.NewStock)
+                    : p.CurrentStock;
+                
+                // Calculate stock velocity (units per day)
+                var periodDays = (decimal)(endDate - startDate).TotalDays;
+                var stockVelocity = periodDays > 0 ? stockOut / periodDays : 0;
+                
+                // Calculate days of inventory
+                var daysOfInventory = stockVelocity > 0 
+                    ? p.CurrentStock / stockVelocity
+                    : (p.CurrentStock > 0 ? 999m : 0m);
+                
+                // Calculate inventory efficiency
+                var inventoryEfficiency = CalculateInventoryEfficiency(p);
+                
+                // Calculate stock turnover
+                var turnoverRate = avgStock > 0 ? stockOut / avgStock : 0;
+                
+                // Validate and normalize price
+                var normalizedPrice = ValidatePrice(p.Price);
+                var normalizedCost = ValidatePrice(p.Cost);
+                
+                return new ReportItemDTO
+                {
+                    Name = p.Name,
+                    Category = p.Category?.Name ?? "Uncategorized",
+                    Quantity = p.CurrentStock,
+                    UnitPrice = normalizedPrice,
+                    TotalValue = p.CurrentStock * normalizedPrice,
+                    LastUpdated = p.UpdatedAt ?? p.CreatedAt,
+                    AdditionalFields = new Dictionary<string, string>
+                    {
+                        ["SKU"] = p.SKU,
+                        ["Status"] = GetStockStatus(p),
+                        ["Supplier"] = p.ProductSuppliers?.FirstOrDefault()?.Supplier?.Name ?? "Not Specified",
+                        ["LastRestockDate"] = productHistory
+                            .Where(h => h.Type == TransactionType.StockIn)
+                            .OrderByDescending(h => h.Date)
+                            .FirstOrDefault()?.Date.ToString("yyyy-MM-dd") ?? "N/A"
+                    },
+                    Metrics = new Dictionary<string, decimal>
+                    {
+                        ["StockIn"] = stockIn,
+                        ["StockOut"] = stockOut,
+                        ["AverageStock"] = avgStock,
+                        ["StockVelocity"] = stockVelocity,
+                        ["DaysOfInventory"] = daysOfInventory,
+                        ["InventoryEfficiency"] = inventoryEfficiency,
+                        ["TurnoverRate"] = turnoverRate,
+                        ["StockoutRate"] = CalculateStockoutRate(p),
+                        ["ProfitMargin"] = normalizedPrice > 0 
+                            ? ((normalizedPrice - normalizedCost) / normalizedPrice) * 100 
+                            : 0,
+                        ["InventoryValue"] = p.CurrentStock * normalizedPrice,
+                        ["StockHealthScore"] = CalculateStockHealthScore(p, stockVelocity, daysOfInventory)
+                    }
+                };
             }).ToList();
+
+            // Calculate summary metrics
+            var totalInventoryValue = items.Sum(i => i.Metrics["InventoryValue"]);
+            var averageStockHealth = items.Any() ? items.Average(i => i.Metrics["StockHealthScore"]) : 0;
+            var averageTurnover = items.Any() ? items.Average(i => i.Metrics["TurnoverRate"]) : 0;
 
             return new ReportDTO
             {
-                ReportType = "Stock Levels",
+                ReportType = "Inventory Overview",
                 GeneratedDate = DateTime.UtcNow,
+                StartDate = startDate,
+                EndDate = endDate,
                 Items = items,
                 Summary = new ReportSummaryDTO
                 {
                     TotalItems = items.Sum(i => i.Quantity),
-                    TotalValue = items.Sum(i => i.TotalValue),
-                    LowStockItems = items.Count(i => i.Quantity <= 10),
-                    OutOfStockItems = items.Count(i => i.Quantity <= 0)
+                    TotalValue = totalInventoryValue,
+                    LowStockItems = items.Count(i => i.AdditionalFields["Status"].Contains("Low")),
+                    OutOfStockItems = items.Count(i => i.Quantity <= 0),
+                    AdditionalMetrics = new Dictionary<string, decimal>
+                    {
+                        ["AverageStockHealthScore"] = averageStockHealth,
+                        ["AverageTurnoverRate"] = averageTurnover,
+                        ["TotalStockIn"] = items.Sum(i => i.Metrics["StockIn"]),
+                        ["TotalStockOut"] = items.Sum(i => i.Metrics["StockOut"]),
+                        ["AverageInventoryEfficiency"] = items.Any() ? items.Average(i => i.Metrics["InventoryEfficiency"]) : 0,
+                        ["AverageDaysOfInventory"] = items.Any() ? items.Average(i => i.Metrics["DaysOfInventory"]) : 0,
+                        ["OverallStockoutRate"] = items.Any() ? items.Average(i => i.Metrics["StockoutRate"]) : 0,
+                        ["AverageProfitMargin"] = items.Any() ? items.Average(i => i.Metrics["ProfitMargin"]) : 0
+                    }
                 }
             };
+        }
+
+        private decimal CalculateStockHealthScore(Product product, decimal stockVelocity, decimal daysOfInventory)
+        {
+            // Stock health score (0-100) based on multiple factors
+            decimal score = 100;
+
+            // Deduct points for being below reorder level
+            if (product.CurrentStock <= product.ReorderLevel)
+                score -= 30;
+
+            // Deduct points for being below minimum stock
+            if (product.CurrentStock <= product.MinimumStockLevel)
+                score -= 20;
+
+            // Deduct points for being out of stock
+            if (product.CurrentStock <= 0)
+                score -= 50;
+
+            // Deduct points for being overstocked
+            if (product.CurrentStock >= product.MaximumStockLevel)
+                score -= 15;
+
+            // Add points for good stock velocity
+            if (stockVelocity > 0)
+                score += 10;
+
+            // Add points for healthy days of inventory (between 15 and 60 days)
+            if (daysOfInventory >= 15 && daysOfInventory <= 60)
+                score += 10;
+
+            // Ensure score stays within 0-100 range
+            return Math.Max(0, Math.Min(100, score));
+        }
+
+        private decimal ValidatePrice(decimal price)
+        {
+            // Maximum reasonable price threshold (configurable)
+            const decimal maxReasonablePrice = 10000m;
+            
+            if (price < 0)
+                return 0;
+            
+            if (price > maxReasonablePrice)
+            {
+                _logger.LogWarning("Unusually high price detected: {Price}", price);
+                // Could implement more sophisticated price validation here
+                // For now, cap at maximum reasonable price
+                return maxReasonablePrice;
+            }
+            
+            return price;
+        }
+
+        private string GetStockStatus(Product product)
+        {
+            if (product.CurrentStock <= 0)
+                return "Out of Stock";
+            if (product.CurrentStock <= product.MinimumStockLevel)
+                return "Critically Low";
+            if (product.CurrentStock <= product.ReorderLevel)
+                return "Low Stock";
+            if (product.CurrentStock >= product.MaximumStockLevel)
+                return "Overstocked";
+            if (product.CurrentStock >= product.ReorderLevel * 2)
+                return "Well Stocked";
+            return "Adequate";
+        }
+
+        private decimal CalculateMedianPrice(List<ReportItemDTO> items)
+        {
+            if (!items.Any())
+                return 0;
+
+            var sortedPrices = items.Select(i => i.UnitPrice).OrderBy(p => p).ToList();
+            var mid = sortedPrices.Count / 2;
+
+            if (sortedPrices.Count % 2 == 0)
+                return (sortedPrices[mid - 1] + sortedPrices[mid]) / 2;
+            
+            return sortedPrices[mid];
         }
 
         private async Task<ReportDTO> GenerateProductsReportAsync(
             ReportParameters parameters,
             CancellationToken cancellationToken)
         {
-            // Use BaseProductSpecification to ensure Category is included
+            // Create base specification for active products
             var specification = new BaseProductSpecification();
-            var productsResult = await _unitOfWork.Products.FindAsync(specification, cancellationToken);
+            
+            // Create a list of specifications to combine
+            var specifications = new List<BaseProductSpecification>();
+            
+            // Add category filter if specified
+            if (parameters.CategoryId.HasValue)
+            {
+                specifications.Add(new ProductsByCategorySpecification(parameters.CategoryId.Value));
+            }
+            
+            // Add supplier filter if specified
+            if (parameters.SupplierId.HasValue)
+            {
+                specifications.Add(new ProductBySupplierSpecification(parameters.SupplierId.Value));
+            }
+            
+            // Add active/inactive filter
+            if (!parameters.IncludeInactive)
+            {
+                specifications.Add(new ActiveProductsSpecification());
+            }
+            
+            // Combine all specifications
+            var combinedSpecification = specification;
+            
+            // Only combine if we have additional specifications
+            if (specifications.Any())
+            {
+                combinedSpecification = specifications.Aggregate((current, next) => 
+                    new CombinedProductSpecification(current, next));
+            }
+
+            var productsResult = await _unitOfWork.Products.FindAsync(combinedSpecification, cancellationToken);
 
             if (!productsResult.IsSuccess)
                 throw new InvalidOperationException(productsResult.Message);
@@ -353,9 +590,26 @@ namespace InventoryManagementSystem.Services
             ReportParameters parameters,
             CancellationToken cancellationToken)
         {
-            // Use BaseProductSpecification to ensure Category is included
+            var startDate = parameters.StartDate ?? DateTime.UtcNow.AddMonths(-1);
+            var endDate = parameters.EndDate ?? DateTime.UtcNow;
+
+            // Get stock history for the date range
+            var stockHistorySpec = new StockHistoryByDateRangeSpecification(startDate, endDate);
+            var stockHistoryResult = await _unitOfWork.StockHistories.FindAsync(stockHistorySpec, cancellationToken);
+
+            if (!stockHistoryResult.IsSuccess)
+                throw new InvalidOperationException(stockHistoryResult.Message);
+
+            var stockHistory = stockHistoryResult.Value;
+
+            // Get products that had transactions in this period
+            var productIds = stockHistory.Select(sh => sh.ProductId).Distinct().ToList();
+            
+            // Create a new specification for products with transactions
             var specification = new BaseProductSpecification();
-            var productsResult = await _unitOfWork.Products.FindAsync(specification, cancellationToken);
+            var productSpec = new ProductByIdsSpecification(productIds);
+            
+            var productsResult = await _unitOfWork.Products.FindAsync(productSpec, cancellationToken);
 
             if (!productsResult.IsSuccess)
                 throw new InvalidOperationException(productsResult.Message);
@@ -365,17 +619,41 @@ namespace InventoryManagementSystem.Services
 
             foreach (var product in products)
             {
-                var stockHistory = await GetTransactionHistoryAsync(product.Id, parameters, cancellationToken);
+                var productHistory = stockHistory.Where(h => h.ProductId == product.Id).ToList();
+                
+                // Calculate metrics first
+                var stockIn = productHistory.Where(h => h.Type == TransactionType.StockIn).Sum(h => h.QuantityChange);
+                var stockOut = Math.Abs(productHistory.Where(h => h.Type == TransactionType.StockOut).Sum(h => h.QuantityChange));
+                var avgStock = (decimal)productHistory.Average(h => h.NewStock);
+                var turnoverRate = avgStock > 0 ? (stockOut / avgStock) : 0;
+                var stockVelocity = (decimal)(endDate - startDate).TotalDays > 0 
+                    ? stockOut / (decimal)(endDate - startDate).TotalDays 
+                    : 0;
                 
                 items.Add(new ReportItemDTO
                 {
                     Name = product.Name,
                     Category = product.Category?.Name ?? "Uncategorized",
                     Quantity = product.CurrentStock,
-                    UnitPrice = product.ProductSuppliers?.OrderBy(ps => ps.UnitPrice).FirstOrDefault()?.UnitPrice ?? product.Price,
-                    TotalValue = product.CurrentStock * (product.ProductSuppliers?.OrderBy(ps => ps.UnitPrice).FirstOrDefault()?.UnitPrice ?? product.Price),
+                    UnitPrice = product.Price,
+                    TotalValue = product.CurrentStock * product.Price,
                     LastUpdated = product.UpdatedAt ?? product.CreatedAt,
-                    TransactionHistory = stockHistory.ToList()
+                    TransactionHistory = productHistory.Select(h => new TransactionHistoryDTO
+                    {
+                        Date = h.Date,
+                        TransactionType = h.Type.ToDisplayString(),
+                        Quantity = h.QuantityChange,
+                        UnitPrice = h.UnitPrice ?? 0m,
+                        ReferenceNumber = h.ReferenceNumber,
+                        CreatedBy = h.CreatedBy
+                    }).ToList(),
+                    Metrics = new Dictionary<string, decimal>
+                    {
+                        ["TurnoverRate"] = turnoverRate,
+                        ["StockVelocity"] = stockVelocity,
+                        ["StockIn"] = stockIn,
+                        ["StockOut"] = stockOut
+                    }
                 });
             }
 
@@ -383,15 +661,22 @@ namespace InventoryManagementSystem.Services
             {
                 ReportType = "Inventory",
                 GeneratedDate = DateTime.UtcNow,
-                StartDate = parameters.StartDate,
-                EndDate = parameters.EndDate,
+                StartDate = startDate,
+                EndDate = endDate,
                 Items = items,
                 Summary = new ReportSummaryDTO
                 {
                     TotalItems = items.Sum(i => i.Quantity),
                     TotalValue = items.Sum(i => i.TotalValue),
                     LowStockItems = items.Count(i => i.Quantity <= 10),
-                    OutOfStockItems = items.Count(i => i.Quantity <= 0)
+                    OutOfStockItems = items.Count(i => i.Quantity <= 0),
+                    AdditionalMetrics = new Dictionary<string, decimal>
+                    {
+                        ["AverageTurnoverRate"] = items.Any() ? items.Average(i => i.Metrics["TurnoverRate"]) : 0,
+                        ["AverageStockVelocity"] = items.Any() ? items.Average(i => i.Metrics["StockVelocity"]) : 0,
+                        ["TotalStockIn"] = items.Sum(i => i.Metrics["StockIn"]),
+                        ["TotalStockOut"] = items.Sum(i => i.Metrics["StockOut"])
+                    }
                 }
             };
         }
@@ -440,6 +725,48 @@ namespace InventoryManagementSystem.Services
             ReportParameters parameters,
             CancellationToken cancellationToken)
         {
+            // Create base specification for active products
+            var specification = new BaseProductSpecification();
+            
+            // Create a list of specifications to combine
+            var specifications = new List<BaseProductSpecification>();
+            
+            // Add category filter if specified
+            if (parameters.CategoryId.HasValue)
+            {
+                specifications.Add(new ProductsByCategorySpecification(parameters.CategoryId.Value));
+            }
+            
+            // Add supplier filter if specified
+            if (parameters.SupplierId.HasValue)
+            {
+                specifications.Add(new ProductBySupplierSpecification(parameters.SupplierId.Value));
+            }
+            
+            // Add active/inactive filter
+            if (!parameters.IncludeInactive)
+            {
+                specifications.Add(new ActiveProductsSpecification());
+            }
+            
+            // Combine all specifications
+            var combinedSpecification = specification;
+            
+            // Only combine if we have additional specifications
+            if (specifications.Any())
+            {
+                combinedSpecification = specifications.Aggregate((current, next) => 
+                    new CombinedProductSpecification(current, next));
+            }
+
+            var productsResult = await _unitOfWork.Products.FindAsync(combinedSpecification, cancellationToken);
+
+            if (!productsResult.IsSuccess)
+                throw new InvalidOperationException(productsResult.Message);
+
+            var products = productsResult.Value;
+
+            // Get stock history for the date range
             var stockHistoryResult = await _unitOfWork.StockHistories
                 .FindAsync(new StockHistoryByDateRangeSpecification(
                     parameters.StartDate ?? DateTime.UtcNow.AddMonths(-1),
@@ -450,31 +777,36 @@ namespace InventoryManagementSystem.Services
                 throw new InvalidOperationException(stockHistoryResult.Message);
 
             var stockHistory = stockHistoryResult.Value;
-            var items = stockHistory
-                .GroupBy(h => h.Product)
-                .Select(g => new ReportItemDTO
+            var items = products
+                .Select(p =>
                 {
-                    Name = g.Key.Name,
-                    Category = g.Key.Category?.Name ?? "Uncategorized",
-                    Quantity = g.Key.CurrentStock,
-                    UnitPrice = g.Key.ProductSuppliers?.OrderBy(ps => ps.UnitPrice).FirstOrDefault()?.UnitPrice ?? g.Key.Price,
-                    TotalValue = g.Key.CurrentStock * (g.Key.ProductSuppliers?.OrderBy(ps => ps.UnitPrice).FirstOrDefault()?.UnitPrice ?? g.Key.Price),
-                    LastUpdated = g.Key.UpdatedAt ?? g.Key.CreatedAt,
-                    TransactionHistory = g.Select(h => new TransactionHistoryDTO
+                    var productHistory = stockHistory.Where(h => h.ProductId == p.Id).ToList();
+                    return new ReportItemDTO
                     {
-                        Date = h.Date,
-                        TransactionType = h.Type.ToString(),
-                        Quantity = h.QuantityChange,
-                        UnitPrice = h.UnitPrice ?? 0,
-                        ReferenceNumber = h.ReferenceNumber
-                    }).OrderByDescending(h => h.Date).ToList(),
-                    Metrics = new Dictionary<string, decimal>
-                    {
-                        ["StockTurnover"] = CalculateStockTurnover(g.ToList()),
-                        ["StockoutFrequency"] = CalculateStockoutFrequency(g.ToList()),
-                        ["AverageDailyUsage"] = CalculateAverageDailyUsage(g.ToList())
-                    }
-                }).ToList();
+                        Name = p.Name,
+                        Category = p.Category?.Name ?? "Uncategorized",
+                        Quantity = p.CurrentStock,
+                        UnitPrice = p.ProductSuppliers?.OrderBy(ps => ps.UnitPrice).FirstOrDefault()?.UnitPrice ?? p.Price,
+                        TotalValue = p.CurrentStock * (p.ProductSuppliers?.OrderBy(ps => ps.UnitPrice).FirstOrDefault()?.UnitPrice ?? p.Price),
+                        LastUpdated = p.UpdatedAt ?? p.CreatedAt,
+                        TransactionHistory = productHistory.Select(h => new TransactionHistoryDTO
+                        {
+                            Date = h.Date,
+                            TransactionType = h.Type.ToString(),
+                            Quantity = h.QuantityChange,
+                            UnitPrice = h.UnitPrice ?? 0,
+                            ReferenceNumber = h.ReferenceNumber
+                        }).OrderByDescending(h => h.Date).ToList(),
+                        Metrics = new Dictionary<string, decimal>
+                        {
+                            ["StockTurnover"] = CalculateStockTurnover(productHistory),
+                            ["StockoutFrequency"] = CalculateStockoutFrequency(productHistory),
+                            ["AverageDailyUsage"] = CalculateAverageDailyUsage(productHistory)
+                        }
+                    };
+                })
+                .Where(item => item.TransactionHistory.Any()) // Only include products with transactions
+                .ToList();
 
             return new ReportDTO
             {
@@ -491,7 +823,7 @@ namespace InventoryManagementSystem.Services
                     OutOfStockItems = items.Count(i => i.Quantity <= 0),
                     AdditionalMetrics = new Dictionary<string, decimal>
                     {
-                        ["AverageStockTurnover"] = items.Average(i => i.Metrics["StockTurnover"]),
+                        ["AverageStockTurnover"] = items.Any() ? items.Average(i => i.Metrics["StockTurnover"]) : 0,
                         ["TotalStockouts"] = items.Sum(i => i.Metrics["StockoutFrequency"])
                     }
                 }
@@ -502,8 +834,41 @@ namespace InventoryManagementSystem.Services
             ReportParameters parameters,
             CancellationToken cancellationToken)
         {
-            var productsResult = await _unitOfWork.Products
-                .GetAllAsync(cancellationToken: cancellationToken);
+            // Create base specification for active products
+            var specification = new BaseProductSpecification();
+            
+            // Create a list of specifications to combine
+            var specifications = new List<BaseProductSpecification>();
+            
+            // Add category filter if specified
+            if (parameters.CategoryId.HasValue)
+            {
+                specifications.Add(new ProductsByCategorySpecification(parameters.CategoryId.Value));
+            }
+            
+            // Add supplier filter if specified
+            if (parameters.SupplierId.HasValue)
+            {
+                specifications.Add(new ProductBySupplierSpecification(parameters.SupplierId.Value));
+            }
+            
+            // Add active/inactive filter
+            if (!parameters.IncludeInactive)
+            {
+                specifications.Add(new ActiveProductsSpecification());
+            }
+            
+            // Combine all specifications
+            var combinedSpecification = specification;
+            
+            // Only combine if we have additional specifications
+            if (specifications.Any())
+            {
+                combinedSpecification = specifications.Aggregate((current, next) => 
+                    new CombinedProductSpecification(current, next));
+            }
+
+            var productsResult = await _unitOfWork.Products.FindAsync(combinedSpecification, cancellationToken);
 
             if (!productsResult.IsSuccess)
                 throw new InvalidOperationException(productsResult.Message);
@@ -551,46 +916,112 @@ namespace InventoryManagementSystem.Services
             ReportParameters parameters,
             CancellationToken cancellationToken)
         {
-            var productsResult = await _unitOfWork.Products
-                .GetAllAsync(cancellationToken: cancellationToken);
+            var startDate = parameters.StartDate ?? DateTime.UtcNow.AddMonths(-1);
+            var endDate = parameters.EndDate ?? DateTime.UtcNow;
+
+            // Create base specification for active products
+            var specification = new BaseProductSpecification();
+            
+            // Create a list of specifications to combine
+            var specifications = new List<BaseProductSpecification>();
+            
+            // Add category filter if specified
+            if (parameters.CategoryId.HasValue)
+            {
+                specifications.Add(new ProductsByCategorySpecification(parameters.CategoryId.Value));
+            }
+            
+            // Add supplier filter if specified
+            if (parameters.SupplierId.HasValue)
+            {
+                specifications.Add(new ProductBySupplierSpecification(parameters.SupplierId.Value));
+            }
+            
+            // Add active/inactive filter
+            if (!parameters.IncludeInactive)
+            {
+                specifications.Add(new ActiveProductsSpecification());
+            }
+            
+            // Combine all specifications
+            var combinedSpecification = specification;
+            
+            // Only combine if we have additional specifications
+            if (specifications.Any())
+            {
+                combinedSpecification = specifications.Aggregate((current, next) => 
+                    new CombinedProductSpecification(current, next));
+            }
+
+            var productsResult = await _unitOfWork.Products.FindAsync(combinedSpecification, cancellationToken);
 
             if (!productsResult.IsSuccess)
                 throw new InvalidOperationException(productsResult.Message);
 
             var products = productsResult.Value;
-            var items = products.Select(p => new ReportItemDTO
+
+            // Get stock history for the date range
+            var stockHistorySpec = new StockHistoryByDateRangeSpecification(startDate, endDate);
+            var stockHistoryResult = await _unitOfWork.StockHistories.FindAsync(stockHistorySpec, cancellationToken);
+
+            if (!stockHistoryResult.IsSuccess)
+                throw new InvalidOperationException(stockHistoryResult.Message);
+
+            var stockHistory = stockHistoryResult.Value;
+            var items = new List<ReportItemDTO>();
+
+            foreach (var product in products)
             {
-                Name = p.Name,
-                Category = p.Category?.Name ?? "Uncategorized",
-                Quantity = p.CurrentStock,
-                UnitPrice = p.ProductSuppliers?.OrderBy(ps => ps.UnitPrice).FirstOrDefault()?.UnitPrice ?? p.Price,
-                TotalValue = p.CurrentStock * (p.ProductSuppliers?.OrderBy(ps => ps.UnitPrice).FirstOrDefault()?.UnitPrice ?? p.Price),
-                LastUpdated = p.UpdatedAt ?? p.CreatedAt,
-                Metrics = new Dictionary<string, decimal>
+                // Filter stock history for this product within date range
+                var productHistory = stockHistory.Where(h => h.ProductId == product.Id).ToList();
+                
+                // Only include products that had transactions in this period
+                if (productHistory.Any())
                 {
-                    ["StockTurnover"] = CalculateStockTurnover(p.StockHistory?.ToList()),
-                    ["InventoryEfficiency"] = CalculateInventoryEfficiency(p),
-                    ["StockoutRate"] = CalculateStockoutRate(p),
-                    ["AverageDailyDemand"] = CalculateAverageDailyDemand(p)
+                    var stockIn = productHistory.Where(h => h.Type == TransactionType.StockIn).Sum(h => h.QuantityChange);
+                    var stockOut = Math.Abs(productHistory.Where(h => h.Type == TransactionType.StockOut).Sum(h => h.QuantityChange));
+                    var avgStock = (decimal)productHistory.Average(h => h.NewStock);
+                    
+                    items.Add(new ReportItemDTO
+                    {
+                        Name = product.Name,
+                        Category = product.Category?.Name ?? "Uncategorized",
+                        Quantity = product.CurrentStock,
+                        UnitPrice = product.Price,
+                        TotalValue = product.CurrentStock * product.Price,
+                        LastUpdated = product.UpdatedAt ?? product.CreatedAt,
+                        Metrics = new Dictionary<string, decimal>
+                        {
+                            ["StockIn"] = stockIn,
+                            ["StockOut"] = stockOut,
+                            ["TurnoverRate"] = avgStock > 0 ? (stockOut / avgStock) : 0,
+                            ["StockVelocity"] = (decimal)(endDate - startDate).TotalDays > 0 
+                                ? stockOut / (decimal)(endDate - startDate).TotalDays 
+                                : 0
+                        }
+                    });
                 }
-            }).ToList();
+            }
 
             return new ReportDTO
             {
-                ReportType = "Performance Metrics",
+                ReportType = "Performance",
                 GeneratedDate = DateTime.UtcNow,
-                StartDate = parameters.StartDate,
-                EndDate = parameters.EndDate,
+                StartDate = startDate,
+                EndDate = endDate,
                 Items = items,
                 Summary = new ReportSummaryDTO
                 {
                     TotalItems = items.Count,
                     TotalValue = items.Sum(i => i.TotalValue),
+                    LowStockItems = items.Count(i => i.Quantity <= 10),
+                    OutOfStockItems = items.Count(i => i.Quantity <= 0),
                     AdditionalMetrics = new Dictionary<string, decimal>
                     {
-                        ["AverageStockTurnover"] = items.Average(i => i.Metrics["StockTurnover"]),
-                        ["AverageInventoryEfficiency"] = items.Average(i => i.Metrics["InventoryEfficiency"]),
-                        ["OverallStockoutRate"] = items.Average(i => i.Metrics["StockoutRate"])
+                        ["AverageTurnoverRate"] = items.Any() ? items.Average(i => i.Metrics["TurnoverRate"]) : 0,
+                        ["AverageStockVelocity"] = items.Any() ? items.Average(i => i.Metrics["StockVelocity"]) : 0,
+                        ["TotalStockIn"] = items.Sum(i => i.Metrics["StockIn"]),
+                        ["TotalStockOut"] = items.Sum(i => i.Metrics["StockOut"])
                     }
                 }
             };

@@ -108,18 +108,20 @@ namespace InventoryManagementSystem.Controllers
                     return PartialView("_ReportForm", parameters);
                 }
 
-                // Store report in TempData for the view
-                TempData["Report"] = System.Text.Json.JsonSerializer.Serialize(result.Value);
-                
-                // Return the report display partial view
-                return PartialView("_ReportDisplay", result.Value);
+                // Return the report data directly without storing in TempData
+                return Json(new { 
+                    success = true, 
+                    data = result.Value,
+                    message = "Report generated successfully"
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error generating report");
-                ModelState.AddModelError("", "Error generating report. Please try again.");
-                Response.StatusCode = StatusCodes.Status500InternalServerError;
-                return PartialView("_ReportForm", parameters);
+                return Json(new { 
+                    success = false, 
+                    message = "Error generating report. Please try again."
+                });
             }
         }
 
@@ -170,7 +172,11 @@ namespace InventoryManagementSystem.Controllers
                 };
 
                 var fileName = $"{parameters.ReportType}Report_{DateTime.Now:yyyyMMdd}.{fileExtension}";
-                return File(result.Value, contentType, fileName);
+                
+                // Set the content disposition header to force download with the correct filename
+                Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+                
+                return File(result.Value, contentType);
             }
             catch (Exception ex)
             {
