@@ -18,21 +18,72 @@ namespace InventoryManagementSystem.Models.Validation
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("Category name is required")
                 .MaximumLength(100).WithMessage("Category name cannot exceed 100 characters")
-                .MustAsync(BeUniqueName).WithMessage("Category name already exists");
+                .MustAsync(BeUniqueNameExceptSelf).WithMessage("Category name already exists");
 
             RuleFor(x => x.Description)
                 .MaximumLength(500).WithMessage("Description cannot exceed 500 characters");
+                
+            // Add a rule to ensure at least one field has changed during update
+            RuleFor(x => x)
+                .MustAsync(AtLeastOneFieldChanged)
+                .WithMessage("No changes detected. Please modify at least one field before saving.")
+                .When(x => x.Id > 0); // Only apply this rule for updates, not for new categories
         }
 
-        private async Task<bool> BeUniqueName(string name, CancellationToken cancellationToken)
+        private async Task<bool> BeUniqueNameExceptSelf(CategoryViewModel model, string name, CancellationToken cancellationToken)
         {
+            // If this is an existing category (edit operation)
+            if (model.Id > 0)
+            {
+                // Get the category to see if the name has changed
+                var existingCategory = await _categoryRepository.GetByIdAsync(model.Id, cancellationToken);
+                if (existingCategory.IsSuccess && 
+                    existingCategory.Value.Name.Trim().Equals(name.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    // Name hasn't changed, so it's valid
+                    return true;
+                }
+            }
+            
+            // Check if another category has this name
             var result = await _categoryRepository.CategoryNameExistsAsync(name);
             return !result.Value;
         }
-
-        public new async Task<FluentValidation.Results.ValidationResult> ValidateAsync(CategoryViewModel category, CancellationToken cancellationToken = default)
+        
+        private async Task<bool> AtLeastOneFieldChanged(CategoryViewModel model, CancellationToken cancellationToken)
         {
-            return await base.ValidateAsync(category, cancellationToken);
+            // Only applicable for updates
+            if (model.Id <= 0)
+                return true;
+                
+            // Get the existing category to compare
+            var existingResult = await _categoryRepository.GetByIdAsync(model.Id, cancellationToken);
+            if (!existingResult.IsSuccess)
+                return false;
+                
+            var existing = existingResult.Value;
+            
+            // Check if any field has changed
+            if (!existing.Name.Trim().Equals(model.Name.Trim(), StringComparison.OrdinalIgnoreCase))
+                return true; // Name changed
+                
+            bool descriptionChanged = false;
+            if (string.IsNullOrEmpty(existing.Description) && !string.IsNullOrEmpty(model.Description))
+                descriptionChanged = true;
+            else if (!string.IsNullOrEmpty(existing.Description) && string.IsNullOrEmpty(model.Description))
+                descriptionChanged = true;
+            else if (!string.IsNullOrEmpty(existing.Description) && !string.IsNullOrEmpty(model.Description) && 
+                    !existing.Description.Trim().Equals(model.Description.Trim(), StringComparison.OrdinalIgnoreCase))
+                descriptionChanged = true;
+                
+            if (descriptionChanged)
+                return true; // Description changed
+                
+            if (existing.IsActive != model.IsActive)
+                return true; // Status changed
+                
+            // No changes detected
+            return false;
         }
 
         public (bool IsValid, List<string> Errors) ValidateCategory(Category category)
