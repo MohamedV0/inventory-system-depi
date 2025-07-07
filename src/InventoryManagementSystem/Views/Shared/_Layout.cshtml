@@ -155,14 +155,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Product" ? "active" : "")" 
-                               asp-area="" asp-controller="Product" asp-action="Index">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "active" : "")" 
+                               asp-area="" asp-controller="Products" asp-action="Index">
                                 <i class="fas fa-box me-1"></i> Products
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Category" ? "active" : "")" 
-                               asp-area="" asp-controller="Category" asp-action="Index">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Categories" ? "active" : "")" 
+                               asp-area="" asp-controller="Categories" asp-action="Index">
                                 <i class="fas fa-tags me-1"></i> Categories
                             </a>
                         </li>
@@ -173,8 +173,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Stock" ? "active" : "")" 
-                               asp-area="" asp-controller="Stock" asp-action="Dashboard">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Stocks" ? "active" : "")" 
+                               asp-area="" asp-controller="Stocks" asp-action="Dashboard">
                                 <i class="fas fa-warehouse me-1"></i> Inventory
                             </a>
                         </li>

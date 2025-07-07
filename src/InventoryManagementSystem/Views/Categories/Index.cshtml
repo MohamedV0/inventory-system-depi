@@ -33,7 +33,7 @@
                     </div>
                     <span class="text-secondary small">entries</span>
                 </div>
-                <form asp-controller="Category" asp-action="Index" method="get" class="d-flex search-form">
+                <form asp-controller="Categories" asp-action="Index" method="get" class="d-flex search-form">
                     <input type="hidden" name="page" value="1" />
                     <div class="d-flex align-items-center">
                         <div class="input-group search-group">
@@ -141,11 +141,11 @@
                             </td>
                             <td class="text-end">
                                 <div class="actions-container d-flex justify-content-end">
-                                    <a asp-controller="Category" asp-action="Details" asp-route-id="@category.Id" 
+                                    <a asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id" 
                                        class="btn btn-action btn-info me-1" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.Id" 
+                                    <a asp-controller="Categories" asp-action="Edit" asp-route-id="@category.Id" 
                                        class="btn btn-action btn-primary me-1" title="Edit Category">
                                         <i class="fas fa-pen"></i>
                                     </a>

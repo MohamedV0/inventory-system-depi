@@ -15,16 +15,16 @@ using Microsoft.AspNetCore.Authorization;
 namespace InventoryManagementSystem.Controllers
 {
     [Authorize]
-    public class StockController : Controller
+    public class StocksController : Controller
     {
         private readonly IStockService _stockService;
         private readonly IProductService _productService;
-        private readonly ILogger<StockController> _logger;
+        private readonly ILogger<StocksController> _logger;
 
-        public StockController(
+        public StocksController(
             IStockService stockService,
             IProductService productService,
-            ILogger<StockController> logger)
+            ILogger<StocksController> logger)
         {
             _stockService = stockService;
             _productService = productService;
@@ -337,8 +337,8 @@ namespace InventoryManagementSystem.Controllers
 
         public async Task<IActionResult> LowStock(int page = 1, int pageSize = 10)
         {
-            // Redirect to the consolidated low stock view in ProductController
-            return RedirectToAction("LowStock", "Product", new { page, pageSize });
+            // Redirect to the consolidated low stock view in ProductsController
+            return RedirectToAction("LowStock", "Products", new { page, pageSize });
         }
 
         [HttpGet]

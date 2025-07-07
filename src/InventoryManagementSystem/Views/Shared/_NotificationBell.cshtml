@@ -37,7 +37,7 @@
                     <p class="mb-1 small text-truncate">@notification.Message</p>
                     @if (notification.ProductId.HasValue)
                     {
-                        <a class="small text-primary" asp-controller="Product" asp-action="Details" asp-route-id="@notification.ProductId">
+                        <a class="small text-primary" asp-controller="Products" asp-action="Details" asp-route-id="@notification.ProductId">
                             View Product <i class="fas fa-chevron-right ms-1" style="font-size: 0.7rem;"></i>
                         </a>
                     }

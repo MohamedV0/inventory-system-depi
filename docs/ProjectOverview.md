@@ -323,18 +323,6 @@ The project is documented across multiple files, each with a specific focus:
 - **[SystemDesign.md](SystemDesign.md)**: Technical architecture, database design, security implementation
 - **[ProjectStructure.md](ProjectStructure.md)**: Code organization, component details, design patterns
 
-## 👥 Development Team
-
-<div align="center">
-
-| Role | Member | Responsibilities | Scholar ID |
-|:-----|:------:|:----------------|:--------:|
-| **Full Stack Dev** | Mohamed Ashraf ElSayed | Backend & Frontend Development | ![ID](https://img.shields.io/badge/DEPI_Scholar-2025-blue) |
-| **Full Stack Dev** | Lamis Ahmed Ebrahim | Backend & Frontend Development | ![ID](https://img.shields.io/badge/DEPI_Scholar-2025-blue) |
-| **Full Stack Dev** | Shaimaa Abo Hashem Ibrahim | Backend & Frontend Development | ![ID](https://img.shields.io/badge/DEPI_Scholar-2025-blue) |
-
-</div>
-
 ## 🚀 Future Enhancements
 
 ### Planned Features

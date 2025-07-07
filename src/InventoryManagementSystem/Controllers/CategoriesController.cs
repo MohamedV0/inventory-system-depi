@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 namespace InventoryManagementSystem.Controllers
 {
     [Authorize]
-    public class CategoryController : Controller
+    public class CategoriesController : Controller
     {
         private readonly ICategoryService _categoryService;
-        private readonly ILogger<CategoryController> _logger;
+        private readonly ILogger<CategoriesController> _logger;
 
-        public CategoryController(
+        public CategoriesController(
             ICategoryService categoryService,
-            ILogger<CategoryController> logger)
+            ILogger<CategoriesController> logger)
         {
             _categoryService = categoryService;
             _logger = logger;

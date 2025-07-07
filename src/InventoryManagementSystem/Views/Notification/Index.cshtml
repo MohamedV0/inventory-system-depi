@@ -43,10 +43,10 @@
                     {
                         string navigationUrl = notification.Type switch
                         {
-                            NotificationType.LowStock => notification.ProductId.HasValue ? $"/Product/Details/{notification.ProductId}" : "#",
-                            NotificationType.OutOfStock => notification.ProductId.HasValue ? $"/Product/Details/{notification.ProductId}" : "#",
-                            NotificationType.StockOut => notification.ProductId.HasValue ? $"/Product/Details/{notification.ProductId}" : "#",
-                            NotificationType.ExpiryWarning => notification.ProductId.HasValue ? $"/Product/Details/{notification.ProductId}" : "#",
+                            NotificationType.LowStock => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
+                            NotificationType.OutOfStock => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
+                            NotificationType.StockOut => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
+                            NotificationType.ExpiryWarning => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
                             _ => "#"
                         };
 

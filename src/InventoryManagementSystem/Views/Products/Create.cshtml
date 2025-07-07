@@ -15,7 +15,7 @@
     @{
         var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
             .Create("Create Product", "fas fa-plus-circle")
-            .WithPrimaryButton("Back to Products", Url.Action("Index", "Product"), "fas fa-arrow-left");
+            .WithPrimaryButton("Back to Products", Url.Action("Index", "Products"), "fas fa-arrow-left");
     }
     <partial name="_PageHeader" model="headerModel" />
 
@@ -30,7 +30,7 @@
                     <div class="alert alert-warning mb-3 d-flex align-items-center">
                         <i class="fas fa-exclamation-triangle me-3"></i>
                         <div>
-                            <strong>Warning:</strong> No categories are available. Please <a asp-controller="Category" asp-action="Create" class="alert-link">create a category</a> first before adding products.
+                            <strong>Warning:</strong> No categories are available. Please <a asp-controller="Categories" asp-action="Create" class="alert-link">create a category</a> first before adding products.
                         </div>
                     </div>
                 }

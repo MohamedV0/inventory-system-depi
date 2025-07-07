@@ -7,8 +7,8 @@
 }
 
 @await Html.PartialAsync("_PageHeader", PageHeaderViewModel.Create("Products", "fas fa-box")
-    .WithPrimaryButton("Add New Product", Url.Action("Create", "Product"), "fas fa-plus")
-    .WithSecondaryButton("Low Stock Products", Url.Action("LowStock", "Product"), "fas fa-exclamation-triangle"))
+    .WithPrimaryButton("Add New Product", Url.Action("Create", "Products"), "fas fa-plus")
+    .WithSecondaryButton("Low Stock Products", Url.Action("LowStock", "Products"), "fas fa-exclamation-triangle"))
 
 <div class="card shadow-sm mb-4">
     <div class="card-header">
@@ -34,7 +34,7 @@
                     </div>
                     <span class="text-secondary small">entries</span>
                 </div>
-                <form asp-controller="Product" asp-action="Index" method="get" class="d-flex search-form">
+                <form asp-controller="Products" asp-action="Index" method="get" class="d-flex search-form">
                     <input type="hidden" name="page" value="1" />
                     <div class="d-flex align-items-center">
                         <div class="input-group search-group">
@@ -204,11 +204,11 @@
                             </td>
                             <td class="text-end">
                                 <div class="actions-container d-flex justify-content-end">
-                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" 
+                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" 
                                        class="btn btn-action btn-info me-1" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a asp-controller="Product" asp-action="Edit" asp-route-id="@product.Id" 
+                                    <a asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id" 
                                        class="btn btn-action btn-primary me-1" title="Edit Product">
                                         <i class="fas fa-pen"></i>
                                     </a>

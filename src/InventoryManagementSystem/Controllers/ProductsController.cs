@@ -16,20 +16,20 @@ using InventoryManagementSystem.Extensions;
 namespace InventoryManagementSystem.Controllers
 {
     [Authorize]
-    public class ProductController : Controller
+    public class ProductsController : Controller
     {
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
         private readonly ISupplierService _supplierService;
         private readonly IProductSupplierService _productSupplierService;
-        private readonly ILogger<ProductController> _logger;
+        private readonly ILogger<ProductsController> _logger;
 
-        public ProductController(
+        public ProductsController(
             IProductService productService,
             ICategoryService categoryService,
             ISupplierService supplierService,
             IProductSupplierService productSupplierService,
-            ILogger<ProductController> logger)
+            ILogger<ProductsController> logger)
         {
             _productService = productService;
             _categoryService = categoryService;

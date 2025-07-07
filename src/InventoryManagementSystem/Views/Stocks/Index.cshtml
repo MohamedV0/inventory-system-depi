@@ -7,10 +7,10 @@
 }
 
 @await Html.PartialAsync("_PageHeader", PageHeaderViewModel.Create("Stock History", "fas fa-warehouse")
-    .WithPrimaryButton("Add Stock", Url.Action("AddStock", "Stock"), "fas fa-plus")
-    .WithSecondaryButton("Remove Stock", Url.Action("RemoveStock", "Stock"), "fas fa-minus")
-    .WithSecondaryButton("Adjust Stock", Url.Action("AdjustStock", "Stock"), "fas fa-balance-scale")
-    .WithSecondaryButton("Low Stock Items", Url.Action("LowStock", "Product"), "fas fa-exclamation-triangle"))
+    .WithPrimaryButton("Add Stock", Url.Action("AddStock", "Stocks"), "fas fa-plus")
+    .WithSecondaryButton("Remove Stock", Url.Action("RemoveStock", "Stocks"), "fas fa-minus")
+    .WithSecondaryButton("Adjust Stock", Url.Action("AdjustStock", "Stocks"), "fas fa-balance-scale")
+    .WithSecondaryButton("Low Stock Items", Url.Action("LowStock", "Products"), "fas fa-exclamation-triangle"))
 
 <div class="card shadow-sm mb-4">
     <div class="card-header">
@@ -36,7 +36,7 @@
                     </div>
                     <span class="text-secondary small">entries</span>
                 </div>
-                <form asp-controller="Stock" asp-action="Index" method="get" class="d-flex search-form">
+                <form asp-controller="Stocks" asp-action="Index" method="get" class="d-flex search-form">
                     <input type="hidden" name="page" value="1" />
                     <div class="d-flex align-items-center">
                         <div class="input-group search-group">
