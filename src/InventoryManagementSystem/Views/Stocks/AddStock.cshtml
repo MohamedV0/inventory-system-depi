@@ -9,7 +9,7 @@
     @{
         var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
             .Create("Add Stock", "fas fa-plus-circle")
-            .WithPrimaryButton("Back to Stock History", Url.Action("Index", "Stock"), "fas fa-arrow-left");
+            .WithPrimaryButton("Back to Stock History", Url.Action("Index", "Stocks"), "fas fa-arrow-left");
     }
     <partial name="_PageHeader" model="headerModel" />
 
@@ -479,7 +479,7 @@
                 width: '100%',
                 dropdownParent: $("#productSelect").parent(),
                 ajax: {
-                    url: '@Url.Action("SearchProducts", "Stock")',
+                    url: '@Url.Action("SearchProducts", "Stocks")',
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {

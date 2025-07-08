@@ -46,10 +46,10 @@
                                 </div>
                             </div>
                             <div class="d-flex flex-wrap gap-3 mb-2 action-buttons">
-                                <a href="/Dashboard" class="btn btn-primary btn-lg shadow-sm">
+                                <a href="@Url.Action("Index", "Dashboard")" class="btn btn-primary btn-lg shadow-sm">
                                     <i class="fas fa-chart-line me-2"></i> Go to Dashboard
                                 </a>
-                                <a href="/Products/LowStock" class="btn btn-outline-warning btn-lg low-stock-btn glow-effect">
+                                <a href="@Url.Action("LowStock", "Products")" class="btn btn-outline-warning btn-lg low-stock-btn glow-effect">
                                     <i class="fas fa-exclamation-triangle me-2"></i> Low Stock Items
                                 </a>
                             </div>
@@ -103,10 +103,10 @@
                     </div>
                     <p class="text-secondary mb-4">Manage your product catalog, edit details, and monitor stock levels.</p>
                     <div class="mt-auto d-flex gap-2">
-                        <a href="/Products" class="btn btn-primary btn-sm">
+                        <a href="@Url.Action("Index", "Products")" class="btn btn-primary btn-sm">
                             <i class="fas fa-list me-2"></i>View All
                         </a>
-                        <a href="/Products/Create" class="btn btn-outline-primary btn-sm">
+                        <a href="@Url.Action("Create", "Products")" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-plus me-2"></i>Add New
                         </a>
                     </div>
@@ -126,10 +126,10 @@
                     </div>
                     <p class="text-secondary mb-4">Manage your suppliers, contact information, and associated products.</p>
                     <div class="mt-auto d-flex gap-2">
-                        <a href="/Suppliers" class="btn btn-success btn-sm">
+                        <a href="@Url.Action("Index", "Suppliers")" class="btn btn-success btn-sm">
                             <i class="fas fa-list me-2"></i>View All
                         </a>
-                        <a href="/Suppliers/Create" class="btn btn-outline-success btn-sm">
+                        <a href="@Url.Action("Create", "Suppliers")" class="btn btn-outline-success btn-sm">
                             <i class="fas fa-plus me-2"></i>Add New
                         </a>
                     </div>
@@ -149,10 +149,10 @@
                     </div>
                     <p class="text-secondary mb-4">Organize your products with categories for better management.</p>
                     <div class="mt-auto d-flex gap-2">
-                        <a href="/Categories" class="btn btn-primary btn-sm">
+                        <a href="@Url.Action("Index", "Categories")" class="btn btn-primary btn-sm">
                             <i class="fas fa-list me-2"></i>View All
                         </a>
-                        <a href="/Categories/Create" class="btn btn-outline-primary btn-sm">
+                        <a href="@Url.Action("Create", "Categories")" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-plus me-2"></i>Add New
                         </a>
                     </div>
@@ -173,7 +173,7 @@
                     </div>
                     <p class="text-secondary mb-4">View and manage products that are running low and need attention.</p>
                     <div class="mt-auto">
-                        <a href="/Products/LowStock" class="btn btn-warning btn-sm">
+                        <a href="@Url.Action("LowStock", "Products")" class="btn btn-warning btn-sm">
                             <i class="fas fa-eye me-2"></i>View Low Stock
                         </a>
                     </div>
@@ -193,10 +193,10 @@
                     </div>
                     <p class="text-secondary mb-4">Generate inventory reports and export data for analysis.</p>
                     <div class="mt-auto d-flex gap-2">
-                        <a href="/Reports" class="btn btn-danger btn-sm">
+                        <a href="@Url.Action("Index", "Reports")" class="btn btn-danger btn-sm">
                             <i class="fas fa-file-alt me-2"></i>View Reports
                         </a>
-                        <a href="/Reports/Generate" class="btn btn-outline-danger btn-sm">
+                        <a href="@Url.Action("Generate", "Reports")" class="btn btn-outline-danger btn-sm">
                             <i class="fas fa-download me-2"></i>Generate
                         </a>
                     </div>
@@ -216,10 +216,10 @@
                     </div>
                     <p class="text-secondary mb-4">Add, remove, or adjust stock levels and view transaction history.</p>
                     <div class="mt-auto d-flex gap-2">
-                        <a href="/Stock/Dashboard" class="btn btn-info btn-sm">
+                        <a href="@Url.Action("Dashboard", "Stocks")" class="btn btn-info btn-sm">
                             <i class="fas fa-tachometer-alt me-2"></i>Dashboard
                         </a>
-                        <a href="/Stock" class="btn btn-outline-info btn-sm">
+                        <a href="@Url.Action("Index", "Stocks")" class="btn btn-outline-info btn-sm">
                             <i class="fas fa-history me-2"></i>Transactions
                         </a>
                     </div>
@@ -301,35 +301,35 @@
                     <div class="step-number bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">1</div>
                     <div>
                         <h5 class="mb-1">Create Categories</h5>
-                        <p class="mb-0 text-secondary">Organize your inventory by <a href="/Categories/Create" class="text-primary">creating categories</a> for your products.</p>
+                        <p class="mb-0 text-secondary">Organize your inventory by <a href="@Url.Action("Create", "Categories")" class="text-primary">creating categories</a> for your products.</p>
                     </div>
                 </div>
                 <div class="step d-flex align-items-start mb-4 hover-card">
                     <div class="step-number bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">2</div>
                     <div>
                         <h5 class="mb-1">Add Suppliers</h5>
-                        <p class="mb-0 text-secondary">Set up <a href="/Suppliers/Create" class="text-primary">supplier profiles</a> for each of your vendors.</p>
+                        <p class="mb-0 text-secondary">Set up <a href="@Url.Action("Create", "Suppliers")" class="text-primary">supplier profiles</a> for each of your vendors.</p>
                     </div>
                 </div>
                 <div class="step d-flex align-items-start mb-4 hover-card">
                     <div class="step-number bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">3</div>
                     <div>
                         <h5 class="mb-1">Add Products</h5>
-                        <p class="mb-0 text-secondary"><a href="/Products/Create" class="text-primary">Create product listings</a> with initial stock levels and detailed information.</p>
+                        <p class="mb-0 text-secondary"><a href="@Url.Action("Create", "Products")" class="text-primary">Create product listings</a> with initial stock levels and detailed information.</p>
                     </div>
                 </div>
                 <div class="step d-flex align-items-start mb-4 hover-card">
                     <div class="step-number bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">4</div>
                     <div>
                         <h5 class="mb-1">Manage Inventory</h5>
-                        <p class="mb-0 text-secondary">Use the <a href="/Stock/Dashboard" class="text-primary">inventory dashboard</a> for day-to-day stock management.</p>
+                        <p class="mb-0 text-secondary">Use the <a href="@Url.Action("Dashboard", "Stocks")" class="text-primary">inventory dashboard</a> for day-to-day stock management.</p>
                     </div>
                 </div>
                 <div class="step d-flex align-items-start hover-card">
                     <div class="step-number bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">5</div>
                     <div>
                         <h5 class="mb-1">Monitor Stock Levels</h5>
-                        <p class="mb-0 text-secondary">Check the <a href="/Products/LowStock" class="text-primary">low stock page</a> regularly to prevent stockouts.</p>
+                        <p class="mb-0 text-secondary">Check the <a href="@Url.Action("LowStock", "Products")" class="text-primary">low stock page</a> regularly to prevent stockouts.</p>
                     </div>
                 </div>
             </div>

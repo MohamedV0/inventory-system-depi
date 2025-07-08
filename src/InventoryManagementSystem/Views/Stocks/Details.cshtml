@@ -10,8 +10,8 @@
     @{
         var headerModel = PageHeaderViewModel
             .Create("Stock Movement Details", "fas fa-exchange-alt")
-            .WithSecondaryButton("Back to Stock History", Url.Action("Index", "Stock"), "fas fa-arrow-left")
-            .WithPrimaryButton("Product History", Url.Action("ProductHistory", "Stock", new { id = Model.ProductId }), "fas fa-history");
+            .WithSecondaryButton("Back to Stock History", Url.Action("Index", "Stocks"), "fas fa-arrow-left")
+            .WithPrimaryButton("Product History", Url.Action("ProductHistory", "Stocks", new { id = Model.ProductId }), "fas fa-history");
     }
     <partial name="_PageHeader" model="headerModel" />
 

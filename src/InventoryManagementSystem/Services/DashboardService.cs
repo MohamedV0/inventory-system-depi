@@ -183,7 +183,7 @@ namespace InventoryManagementSystem.Services
                     .GroupBy(h => h.ProductId)
                     .ToDictionary(g => g.Key, g => g.ToList());
 
-                // Count products with meaningful transactions (StockIn/StockOut with non-zero changes)
+                // Count products with meaningful transactions (StockIn/StocksOut with non-zero changes)
                 var productsWithMovement = activeProducts.Count(p => 
                     productHistoryMap.ContainsKey(p.Id) && 
                     productHistoryMap[p.Id].Any(h => 
@@ -221,7 +221,7 @@ namespace InventoryManagementSystem.Services
                     ? turnoverRate / productsWithTurnover 
                     : 0;
 
-                // Calculate dead stock percentage (products with no StockIn/StockOut movement)
+                // Calculate dead stock percentage (products with no StockIn/StocksOut movement)
                 var deadStockPercentage = activeProducts.Any() 
                     ? (decimal)(activeProducts.Count - productsWithMovement) / activeProducts.Count * 100
                     : 0;
@@ -680,7 +680,7 @@ namespace InventoryManagementSystem.Services
                     Severity = "Critical",
                     Icon = "fas fa-exclamation-circle",
                     SeverityClass = "alert-danger",
-                    ActionUrl = "/Stock/LowStock",
+                    ActionUrl = "/Stocks/LowStock",
                     ActionIcon = "fas fa-arrow-right"
                 });
             }
@@ -695,7 +695,7 @@ namespace InventoryManagementSystem.Services
                     Severity = "Warning",
                     Icon = "fas fa-box",
                     SeverityClass = "alert-warning",
-                    ActionUrl = "/Stock/DeadStock",
+                    ActionUrl = "/Stocks/DeadStock",
                     ActionIcon = "fas fa-arrow-right"
                 });
             }
@@ -710,7 +710,7 @@ namespace InventoryManagementSystem.Services
                     Severity = "Warning",
                     Icon = "fas fa-balance-scale",
                     SeverityClass = "alert-warning",
-                    ActionUrl = "/Stock/Audit",
+                    ActionUrl = "/Stocks/Audit",
                     ActionIcon = "fas fa-arrow-right"
                 });
             }
@@ -731,7 +731,7 @@ namespace InventoryManagementSystem.Services
                     Description = $"There are {dashboard.CriticalStockCount} items with low stock",
                     Priority = "High",
                     Icon = "fas fa-shopping-cart", 
-                    ActionUrl = "/Stock/AddStock",
+                    ActionUrl = "/Stocks/AddStock",
                     ActionText = "AddStock"
                 });
             }

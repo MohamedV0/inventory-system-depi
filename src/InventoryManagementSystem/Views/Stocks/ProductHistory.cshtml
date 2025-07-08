@@ -6,9 +6,9 @@
 }
 
 @await Html.PartialAsync("_PageHeader", PageHeaderViewModel.Create($"Stock History: {Model.ProductName}", "fas fa-history")
-    .WithSecondaryButton("Back to Stock History", Url.Action("Index", "Stock"), "fas fa-arrow-left")
-    .WithPrimaryButton("Add Stock", Url.Action("AddStock", "Stock", new { id = Model.ProductId }), "fas fa-plus")
-    .WithDangerButton("Remove Stock", Url.Action("RemoveStock", "Stock", new { id = Model.ProductId }), "fas fa-minus"))
+    .WithSecondaryButton("Back to Stock History", Url.Action("Index", "Stocks"), "fas fa-arrow-left")
+    .WithPrimaryButton("Add Stock", Url.Action("AddStock", "Stocks", new { id = Model.ProductId }), "fas fa-plus")
+    .WithDangerButton("Remove Stock", Url.Action("RemoveStock", "Stocks", new { id = Model.ProductId }), "fas fa-minus"))
 
 <div class="container-fluid p-0">
     <div class="row g-4">

@@ -306,9 +306,9 @@
                                     <small class="text-muted">@Model.LowStockCount products below reorder level</small>
                                 </div>
                                 <div class="alert-action">
-                                    <a href="/Products/LowStock" class="btn btn-sm btn-outline-warning">
-                                        <i class="fas fa-search"></i>
-                                    </a>
+                                    <a href="@Url.Action("LowStock", "Products")" class="btn btn-sm btn-outline-warning">
+                                <i class="fas fa-search"></i>
+                            </a>
                                 </div>
                             </div>
                         }
@@ -324,7 +324,7 @@
                                     <small class="text-muted">@Model.CriticalStockCount products out of stock</small>
                                 </div>
                                 <div class="alert-action">
-                                    <a href="@Url.Action("Index", "Stock", new { page = 1, transactionType = 2 })" class="btn btn-sm btn-outline-danger">
+                                    <a href="@Url.Action("Index", "Stocks", new { page = 1, transactionType = 2 })" class="btn btn-sm btn-outline-danger">
                                         <i class="fas fa-search"></i>
                                     </a>
                                 </div>
