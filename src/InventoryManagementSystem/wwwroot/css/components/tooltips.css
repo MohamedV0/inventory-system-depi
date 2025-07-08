@@ -1,0 +1,76 @@
+/*--------------------------------------------------------------
+Tooltip Styles
+--------------------------------------------------------------*/
+
+/* Tooltip enhancements */
+.tooltip {
+    --bs-tooltip-bg: #1e293b;
+    --bs-tooltip-color: #f8fafc;
+    --bs-tooltip-opacity: 1;
+    --bs-tooltip-padding-x: 0.8rem;
+    --bs-tooltip-padding-y: 0.4rem;
+}
+
+.tooltip-inner {
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.01em;
+}
+
+/* Enhanced Modern Tooltips - Global Styling */
+/* Modern Tooltip - Minimal Design */
+.tooltip {
+    opacity: 1 !important;
+    z-index: 1080;
+    pointer-events: none;
+}
+
+.tooltip .tooltip-inner {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    color: #f8fafc;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    max-width: 270px;
+    border-radius: 6px;
+    line-height: 1.4;
+}
+
+/* Simple arrow styling */
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #334155;
+}
+
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+    border-bottom-color: #334155;
+}
+
+.tooltip.bs-tooltip-start .tooltip-arrow::before {
+    border-left-color: #334155;
+}
+
+.tooltip.bs-tooltip-end .tooltip-arrow::before {
+    border-right-color: #334155;
+}
+
+/* Simple info icon styling */
+.tooltip-icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #3b82f6;
+    color: white;
+    margin-left: 6px;
+    font-size: 9px;
+    transition: background-color 0.2s ease;
+    cursor: help;
+}
+
+/* Simple hover effect - just a color change */
+.tooltip-icon:hover {
+    background-color: #60a5fa;
+} 

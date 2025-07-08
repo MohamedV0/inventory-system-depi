@@ -1,0 +1,649 @@
+/*--------------------------------------------------------------
+7. Button Styles
+--------------------------------------------------------------*/
+.btn {
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    border-radius: var(--button-radius);
+    transition: var(--standard-transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+.btn i {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Primary button */
+.btn-primary {
+    background-color: var(--accent-primary);
+    color: white;
+}
+
+.btn-primary:hover, 
+.btn-primary:focus {
+    background-color: var(--accent-secondary);
+    color: white;
+}
+
+/* Success button */
+.btn-success {
+    background-color: var(--success);
+    border: none;
+}
+
+/* Danger button */
+.btn-danger {
+    background-color: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover, .btn-danger:focus {
+    background-color: #dc2626;
+    color: white;
+}
+
+/* Warning button */
+.btn-warning {
+    background-color: var(--warning);
+    color: var(--bg-dark);
+}
+
+.btn-warning:hover, 
+.btn-warning:focus {
+    background-color: #c79a06; /* A darker shade of the warning color */
+    color: var(--bg-dark);
+}
+
+/* View button */
+.btn-info {
+    background-color: #0ca5e9;
+    color: white;
+}
+
+.btn-info:hover, .btn-info:focus {
+    background-color: #0284c7;
+    color: white;
+}
+
+/* Action button (icon only) */
+.btn-action {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-action::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(0);
+    opacity: 0;
+    border-radius: inherit;
+    transition: transform 0.3s ease, opacity 0.2s ease;
+}
+
+.btn-action:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.btn-action:hover::before {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.btn-action:active {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Action button icon styling */
+.btn-action i {
+    font-size: 0.9rem;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-action:hover i {
+    transform: scale(1.1);
+}
+
+/* Specific icon animations */
+.btn-info:hover i {
+    animation: pulse-light 1.5s infinite;
+}
+
+.btn-primary:hover i {
+    animation: wiggle 1s ease;
+}
+
+.btn-danger:hover i {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes pulse-light {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes wiggle {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(-10deg) scale(1.1);
+    }
+    75% {
+        transform: rotate(10deg) scale(1.1);
+    }
+}
+
+@keyframes shake {
+    10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+    20%, 80% {
+        transform: translate3d(1px, 0, 0);
+    }
+    30%, 50%, 70% {
+        transform: translate3d(-1px, 0, 0) scale(1.05);
+    }
+    40%, 60% {
+        transform: translate3d(1px, 0, 0) scale(1.05);
+    }
+}
+
+/* Button groups with actions */
+.actions-container {
+    gap: 6px;
+}
+
+/* Custom button styles */
+.btn-outline-light {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-outline-light:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Low stock button styles - for header */
+.btn-outline-light i.fas.fa-exclamation-triangle {
+    color: var(--warning);
+}
+
+.btn-outline-light:hover i.fas.fa-exclamation-triangle {
+    color: var(--warning);
+}
+
+/*--------------------------------------------------------------
+Filter Button Styles - Used across components
+--------------------------------------------------------------*/
+
+/* Filter button styles */
+.filter-btn {
+    transition: var(--standard-transition);
+    padding: 0.375rem 0.875rem;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.filter-btn:hover {
+    transform: translateY(-1px);
+    background-color: var(--bg-hover);
+    border-color: var(--accent-primary);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.filter-btn.active {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #fff;
+    font-weight: 500;
+}
+
+/* Product-specific filter buttons */
+.product-filters .filter-btn[data-filter="all"] {
+    color: var(--text-primary);
+}
+
+.product-filters .filter-btn[data-filter="all"]:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.product-filters .filter-btn[data-filter="all"].active {
+    background-color: var(--accent-primary);
+    color: #fff;
+}
+
+.product-filters .filter-btn[data-filter="low"] {
+    color: var(--text-primary);
+}
+
+.product-filters .filter-btn[data-filter="low"]:hover {
+    background-color: rgba(245, 158, 11, 0.1);
+    border-color: var(--warning);
+}
+
+.product-filters .filter-btn[data-filter="low"].active {
+    background-color: var(--warning-bg);
+    border-color: var(--warning);
+    color: var(--warning-text);
+}
+
+.product-filters .filter-btn[data-filter="out"] {
+    color: var(--text-primary);
+}
+
+.product-filters .filter-btn[data-filter="out"]:hover {
+    background-color: rgba(220, 38, 38, 0.1);
+    border-color: var(--danger);
+}
+
+.product-filters .filter-btn[data-filter="out"].active {
+    background-color: var(--danger-bg);
+    border-color: var(--danger);
+    color: var(--danger-text);
+}
+
+/* Category-specific filter buttons */
+.category-filters .filter-btn[data-filter="all"] {
+    color: var(--text-primary);
+}
+
+.category-filters .filter-btn[data-filter="all"]:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.category-filters .filter-btn[data-filter="all"].active {
+    background-color: var(--accent-primary);
+    color: #fff;
+}
+
+.category-filters .filter-btn[data-filter="active"] {
+    color: var(--text-primary);
+}
+
+.category-filters .filter-btn[data-filter="active"]:hover {
+    background-color: rgba(34, 197, 94, 0.1);
+    border-color: var(--success);
+}
+
+.category-filters .filter-btn[data-filter="active"].active {
+    background-color: var(--success-bg);
+    border-color: var(--success);
+    color: var(--success-text);
+}
+
+.category-filters .filter-btn[data-filter="inactive"] {
+    color: var(--text-primary);
+}
+
+.category-filters .filter-btn[data-filter="inactive"]:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: var(--danger);
+}
+
+.category-filters .filter-btn[data-filter="inactive"].active {
+    background-color: var(--danger-bg);
+    border-color: var(--danger);
+    color: var(--danger-text);
+}
+
+/* Supplier-specific filter buttons */
+.supplier-filters .filter-btn[data-filter="all"] {
+    color: var(--text-primary);
+}
+
+.supplier-filters .filter-btn[data-filter="all"]:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.supplier-filters .filter-btn[data-filter="all"].active {
+    background-color: var(--accent-primary);
+    color: #fff;
+}
+
+.supplier-filters .filter-btn[data-filter="active"] {
+    color: var(--text-primary);
+}
+
+.supplier-filters .filter-btn[data-filter="active"]:hover {
+    background-color: rgba(34, 197, 94, 0.1);
+    border-color: var(--success);
+}
+
+.supplier-filters .filter-btn[data-filter="active"].active {
+    background-color: var(--success-bg);
+    border-color: var(--success);
+    color: var(--success-text);
+}
+
+.supplier-filters .filter-btn[data-filter="inactive"] {
+    color: var(--text-primary);
+}
+
+.supplier-filters .filter-btn[data-filter="inactive"]:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: var(--danger);
+}
+
+.supplier-filters .filter-btn[data-filter="inactive"].active {
+    background-color: var(--danger-bg);
+    border-color: var(--danger);
+    color: var(--danger-text);
+}
+
+/* Stock-specific filter buttons */
+.stock-filters .filter-btn[data-filter="all"] {
+    color: var(--text-primary);
+}
+
+.stock-filters .filter-btn[data-filter="all"]:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.stock-filters .filter-btn[data-filter="all"].active {
+    background-color: var(--accent-primary);
+    color: #fff;
+}
+
+.stock-filters .filter-btn[data-filter="1"],
+.stock-filters .filter-btn[data-filter="stock-in"] {
+    color: var(--text-primary);
+}
+
+.stock-filters .filter-btn[data-filter="1"]:hover,
+.stock-filters .filter-btn[data-filter="stock-in"]:hover {
+    background-color: rgba(34, 197, 94, 0.1);
+    border-color: var(--success);
+}
+
+.stock-filters .filter-btn[data-filter="1"].active,
+.stock-filters .filter-btn[data-filter="stock-in"].active {
+    background-color: var(--success-bg);
+    border-color: var(--success);
+    color: var(--success-text);
+}
+
+.stock-filters .filter-btn[data-filter="2"],
+.stock-filters .filter-btn[data-filter="stock-out"] {
+    color: var(--text-primary);
+}
+
+.stock-filters .filter-btn[data-filter="2"]:hover,
+.stock-filters .filter-btn[data-filter="stock-out"]:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: var(--danger);
+}
+
+.stock-filters .filter-btn[data-filter="2"].active,
+.stock-filters .filter-btn[data-filter="stock-out"].active {
+    background-color: var(--danger-bg);
+    border-color: var(--danger);
+    color: var(--danger-text);
+}
+
+.stock-filters .filter-btn[data-filter="3"],
+.stock-filters .filter-btn[data-filter="adjustment"] {
+    color: var(--text-primary);
+}
+
+.stock-filters .filter-btn[data-filter="3"]:hover,
+.stock-filters .filter-btn[data-filter="adjustment"]:hover {
+    background-color: rgba(234, 179, 8, 0.1);
+    border-color: var(--warning);
+}
+
+.stock-filters .filter-btn[data-filter="3"].active,
+.stock-filters .filter-btn[data-filter="adjustment"].active {
+    background-color: var(--warning-bg);
+    border-color: var(--warning);
+    color: var(--warning-text);
+}
+
+.stock-filters .filter-btn[data-filter="4"],
+.stock-filters .filter-btn[data-filter="initial"] {
+    color: var(--text-primary);
+}
+
+.stock-filters .filter-btn[data-filter="4"]:hover,
+.stock-filters .filter-btn[data-filter="initial"]:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: var(--accent-primary);
+}
+
+.stock-filters .filter-btn[data-filter="4"].active,
+.stock-filters .filter-btn[data-filter="initial"].active {
+    background-color: var(--info-bg);
+    border-color: var(--accent-primary);
+    color: var(--info-text);
+}
+
+/* Stock filter focus and active states - remove outline */
+.stock-filters .filter-btn:focus,
+.stock-filters .filter-btn:focus-visible,
+.stock-filters .filter-btn:active,
+.stock-filters .filter-btn.active {
+    outline: none !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+}
+
+/* Apply proper focus states for each filter type */
+.stock-filters .filter-btn[data-filter="all"]:focus,
+.stock-filters .filter-btn[data-filter="all"]:active,
+.stock-filters .filter-btn[data-filter="all"].active {
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important;
+}
+
+.stock-filters .filter-btn[data-filter="1"]:focus,
+.stock-filters .filter-btn[data-filter="1"]:active,
+.stock-filters .filter-btn[data-filter="1"].active,
+.stock-filters .filter-btn[data-filter="stock-in"]:focus,
+.stock-filters .filter-btn[data-filter="stock-in"]:active,
+.stock-filters .filter-btn[data-filter="stock-in"].active {
+    border-color: var(--success) !important;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25) !important;
+}
+
+.stock-filters .filter-btn[data-filter="2"]:focus,
+.stock-filters .filter-btn[data-filter="2"]:active,
+.stock-filters .filter-btn[data-filter="2"].active,
+.stock-filters .filter-btn[data-filter="stock-out"]:focus,
+.stock-filters .filter-btn[data-filter="stock-out"]:active,
+.stock-filters .filter-btn[data-filter="stock-out"].active {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25) !important;
+}
+
+.stock-filters .filter-btn[data-filter="3"]:focus,
+.stock-filters .filter-btn[data-filter="3"]:active,
+.stock-filters .filter-btn[data-filter="3"].active,
+.stock-filters .filter-btn[data-filter="adjustment"]:focus,
+.stock-filters .filter-btn[data-filter="adjustment"]:active,
+.stock-filters .filter-btn[data-filter="adjustment"].active {
+    border-color: var(--warning) !important;
+    box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.25) !important;
+}
+
+.stock-filters .filter-btn[data-filter="4"]:focus,
+.stock-filters .filter-btn[data-filter="4"]:active,
+.stock-filters .filter-btn[data-filter="4"].active,
+.stock-filters .filter-btn[data-filter="initial"]:focus,
+.stock-filters .filter-btn[data-filter="initial"]:active,
+.stock-filters .filter-btn[data-filter="initial"].active {
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.25) !important;
+}
+
+/* Focus states for all filter buttons */
+.filter-btn:focus,
+.filter-btn:active,
+.filter-btn:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+/* Product-specific focus states */
+.product-filters .filter-btn[data-filter="low"]:focus,
+.product-filters .filter-btn[data-filter="low"]:active,
+.product-filters .filter-btn[data-filter="low"].active {
+    border-color: var(--warning) !important;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25) !important;
+}
+
+.product-filters .filter-btn[data-filter="out"]:focus,
+.product-filters .filter-btn[data-filter="out"]:active,
+.product-filters .filter-btn[data-filter="out"].active {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.25) !important;
+}
+
+/* Category-specific focus states */
+.category-filters .filter-btn[data-filter="active"]:focus,
+.category-filters .filter-btn[data-filter="active"]:active,
+.category-filters .filter-btn[data-filter="active"].active {
+    border-color: var(--success) !important;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25) !important;
+}
+
+.category-filters .filter-btn[data-filter="inactive"]:focus,
+.category-filters .filter-btn[data-filter="inactive"]:active,
+.category-filters .filter-btn[data-filter="inactive"].active {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Supplier-specific focus states */
+.supplier-filters .filter-btn[data-filter="active"]:focus,
+.supplier-filters .filter-btn[data-filter="active"]:active,
+.supplier-filters .filter-btn[data-filter="active"].active {
+    border-color: var(--success) !important;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25) !important;
+}
+
+.supplier-filters .filter-btn[data-filter="inactive"]:focus,
+.supplier-filters .filter-btn[data-filter="inactive"]:active,
+.supplier-filters .filter-btn[data-filter="inactive"].active {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25) !important;
+}
+
+/* All Button Focus States */
+button:focus, 
+a:focus,
+.btn:focus,
+.btn.active,
+.btn:active:focus,
+.btn-primary:focus,
+.btn-outline-light:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important;
+}
+
+.btn-primary.active,
+.btn-primary:active:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4) !important;
+}
+
+.btn-danger:focus,
+.btn-danger.active,
+.btn-danger:active:focus {
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3) !important;
+}
+
+.btn-info:focus,
+.btn-info.active,
+.btn-info:active:focus {
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3) !important;
+}
+
+/* Advanced Filter Buttons */
+.filter-action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 0.5rem;
+}
+
+.filter-action-buttons .btn {
+    min-width: 90px;
+    border-radius: 6px;
+    padding: 0.375rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.filter-action-buttons .btn i {
+    font-size: 0.8rem;
+}
+
+.filter-action-buttons .btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.filter-action-buttons .btn-outline-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    color: var(--text-primary);
+}
+
+.filter-action-buttons .btn-primary {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+.filter-action-buttons .btn-primary:hover {
+    background-color: var(--accent-secondary);
+    border-color: var(--accent-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+} 

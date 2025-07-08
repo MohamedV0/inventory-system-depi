@@ -1,0 +1,81 @@
+/*--------------------------------------------------------------
+Modal & Confirmation Dialog Styles
+Copied verbatim from theme_original.css to preserve behaviour
+--------------------------------------------------------------*/
+
+/* Confirmation modal */
+.confirmation-modal .modal-body {
+    text-align: center;
+}
+
+.confirmation-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-bottom: 1.25rem;
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.confirmation-icon.warning i {
+    color: var(--warning);
+    font-size: 2rem;
+}
+
+.confirmation-icon.danger i {
+    color: var(--danger);
+    font-size: 2rem;
+}
+
+.confirmation-icon.success i {
+    color: var(--success);
+    font-size: 2rem;
+}
+
+.confirmation-message {
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.confirmation-target {
+    font-weight: 600;
+    color: var(--danger);
+    font-size: 1.1rem;
+    margin-bottom: 1.25rem;
+    padding: 0.25rem 0.5rem;
+    background-color: rgba(239, 68, 68, 0.05);
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.confirmation-warning {
+    background-color: rgba(234, 179, 8, 0.08);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.confirmation-warning i {
+    color: var(--warning);
+    margin-right: 0.5rem;
+}
+
+/* Modal animations */
+.modal-dialog {
+    transform: translate(0, -50px);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: translate(0, 0);
+}
+
+.modal-backdrop.show {
+    opacity: 0.6;
+} 

@@ -1,0 +1,40 @@
+/*--------------------------------------------------------------
+1. Variables & Root
+--------------------------------------------------------------*/
+:root {
+    /* Color Palette */
+    --bg-dark: #0a1120;
+    --bg-card: #0f172a;
+    --bg-hover: #1e293b;
+    --accent-primary: #3b82f6;
+    --accent-secondary: #2563eb;
+    
+    /* Text Colors */
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
+    
+    /* Border & Structural */
+    --border-color: #334155;
+    
+    /* Status Colors */
+    --success: #22c55e;
+    --warning: #eab308;
+    --danger: #ef4444;
+    
+    /* Derived Variables */
+    --success-bg: rgba(34, 197, 94, 0.2);
+    --success-text: #86efac;
+    --warning-bg: rgba(234, 179, 8, 0.2);
+    --warning-text: #fcd34d;
+    --danger-bg: rgba(239, 68, 68, 0.2);
+    --danger-text: #fca5a5;
+    --info-bg: rgba(14, 165, 233, 0.2);
+    --info-text: #7dd3fc;
+    
+    /* Spacing & Sizing */
+    --card-radius: 12px;
+    --button-radius: 8px;
+    --standard-transition: all 0.3s ease;
+    --tooltip-enabled: 1; /* Set to 0 to globally disable tooltips */
+} 

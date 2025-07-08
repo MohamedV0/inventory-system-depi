@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/animations.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/InventoryManagementSystem.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
@@ -20,111 +19,6 @@
     <link rel="stylesheet" href="~/css/sweetalert-custom.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     @await RenderSectionAsync("Styles", required: false)
-    <style>
-        :root {
-            --accent-primary: #3b82f6;
-            --accent-secondary: #2563eb;
-            --dark-blue: #0f172a;
-            --darker-blue: #0a1120;
-            --medium-blue: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --border-color: #334155;
-        }
-
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-        }
-
-        /* Enhanced Navbar Styles */
-        .navbar {
-            background-color: transparent !important;
-            box-shadow: none;
-            padding: 0.5rem 1rem;
-            border-bottom: none !important;
-        }
-
-        .navbar-brand {
-            font-weight: 600;
-            color: var(--text-primary) !important;
-            letter-spacing: 0.02em;
-        }
-
-        .navbar-brand i {
-            color: var(--accent-primary);
-        }
-
-        .nav-link {
-            color: var(--text-secondary) !important;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: var(--text-primary) !important;
-            background-color: rgba(59, 130, 246, 0.1);
-        }
-
-        .nav-link.active {
-            color: var(--accent-primary) !important;
-            background-color: rgba(59, 130, 246, 0.15);
-        }
-
-        .btn-outline-light {
-            border-color: var(--border-color);
-            color: var(--text-secondary);
-        }
-
-        .btn-outline-light:hover {
-            background-color: var(--medium-blue);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-
-        .btn-primary {
-            background-color: var(--accent-primary);
-            border-color: var(--accent-primary);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--accent-secondary);
-            border-color: var(--accent-secondary);
-        }
-
-        .container-fluid {
-            padding-left: 1.5rem;
-            padding-right: 1.5rem;
-        }
-
-        /* Navbar Button Animation */
-        @@keyframes pulse-light {
-            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3); }
-            70% { box-shadow: 0 0 0 5px rgba(59, 130, 246, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
-        }
-
-        .btn-pulse {
-            animation: pulse-light 2s infinite;
-        }
-
-        /* Media queries for responsive design */
-        @@media (max-width: 992px) {
-            .navbar-nav {
-                margin-top: 0.5rem;
-                padding-top: 0.5rem;
-                border-top: 1px solid var(--border-color);
-            }
-            
-            .navbar-nav .nav-item {
-                margin-bottom: 0.25rem;
-            }
-        }
-    </style>
 </head>
 <body class="dark-mode">
     <header>
@@ -208,9 +102,6 @@
                         }
                     </ul>
                     <div class="d-flex align-items-center mt-3 mt-lg-0">
-                        <a class="btn btn-sm btn-outline-light d-flex align-items-center me-2" asp-area="Identity" asp-page="/Account/Manage/Index">
-                            <i class="fas fa-user-circle me-1"></i> Account
-                        </a>
                         <a class="btn btn-sm btn-primary d-flex align-items-center btn-pulse" asp-area="Identity" asp-page="/Account/Manage/Index">
                             <i class="fas fa-cog me-1"></i> Settings
                         </a>

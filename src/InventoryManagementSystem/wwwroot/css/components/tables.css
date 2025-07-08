@@ -1,0 +1,216 @@
+/*--------------------------------------------------------------
+5.1 Tables
+--------------------------------------------------------------*/
+.table {
+    color: var(--text-primary);
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: rgba(59, 130, 246, 0.05);
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table tbody td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr:hover {
+    background-color: var(--bg-hover);
+}
+
+/* DataTables customization */
+.dataTables_wrapper {
+    color: var(--text-secondary);
+    padding: 1rem;
+}
+
+.dataTables_length select,
+.dataTables_filter input {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.375rem 0.75rem;
+}
+
+.dataTables_length select:focus,
+.dataTables_filter input:focus {
+    border-color: var(--accent-primary);
+    outline: none;
+}
+
+.dataTables_filter input {
+    min-width: 250px;
+}
+
+/* Enhanced data tables */
+.data-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.data-table thead th {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+}
+
+.data-table-row {
+    transition: var(--standard-transition);
+}
+
+.data-table-row:hover {
+    background-color: rgba(59, 130, 246, 0.05) !important;
+}
+
+/* Alternating row colors for better readability */
+.data-table tbody tr:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Styling for stock status rows */
+.data-table-row.low-stock:hover {
+    background-color: rgba(234, 179, 8, 0.1) !important;
+}
+
+.data-table-row.out-of-stock:hover {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Sortable column headers */
+.sortable {
+    cursor: pointer;
+    transition: var(--standard-transition);
+}
+
+.sortable:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.sortable .fa-sort {
+    font-size: 0.7rem;
+    opacity: 0.5;
+}
+
+.sortable:hover .fa-sort {
+    opacity: 1;
+}
+
+/* Stock progress bar enhancements */
+.stock-progress {
+    width: 100%;
+    max-width: 60px;
+    margin: 0 auto;
+}
+
+.stock-progress .progress-thin {
+    height: 4px;
+    margin-top: 3px;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.stock-progress:hover .progress-thin {
+    height: 6px;
+}
+
+/* Product links in tables */
+.data-table a.fw-medium {
+    color: var(--text-primary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: var(--standard-transition);
+    font-weight: 500;
+}
+
+.data-table a.fw-medium:hover {
+    color: var(--accent-primary);
+    border-bottom-color: var(--accent-primary);
+}
+
+/* Responsive date display */
+.date-display {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.date-display .date {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.date-display .time {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 767.98px) {
+    .date-display {
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .date-display .date {
+        font-size: 0.85rem;
+    }
+    
+    .date-display .time {
+        font-size: 0.75rem;
+        padding: 1px 4px;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+}
+
+/* Enhanced Stock History Table */
+@media (max-width: 767.98px) {
+    /* Adjust column display for small screens */
+    .stock-history-table th[data-sort="date"] {
+        width: auto !important;
+    }
+    
+    .stock-history-table th[data-sort="product"] {
+        width: auto !important;
+    }
+    
+    .stock-history-table th[data-sort="type"],
+    .stock-history-table th[data-sort="quantity"],
+    .stock-history-table th[data-sort="price"],
+    .stock-history-table th[data-sort="reference"] {
+        width: auto !important;
+    }
+    
+    /* Hide less important columns on mobile */
+    .stock-history-table .stock-history-reason {
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Smaller badges on mobile */
+    .stock-history-table .badge {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.7rem;
+    }
+    
+    /* Adjust spacing */
+    .stock-history-table td, 
+    .stock-history-table th {
+        padding: 0.5rem 0.5rem;
+    }
+} 

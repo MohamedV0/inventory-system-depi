@@ -1,81 +1,17 @@
-html {
-  font-size: 14px;
-}
+/* This file is kept for backward compatibility and contains only styles that haven't been migrated yet */
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin-bottom: 30px;
-}
-
-/* Navigation split button dropdown styling */
-.nav-link-container {
-  display: flex;
-  align-items: center;
-}
-
-.nav-link-container .nav-link {
-  padding-right: 0.5rem;
-  margin-right: 0;
-}
-
-.nav-link-container .dropdown-toggle-split {
-  padding-left: 0.25rem;
-  padding-right: 0.75rem;
-  margin-left: 0;
-}
-
-.dropdown-toggle-split::after {
-  margin-left: 0;
-}
-
-.nav-link-container .active {
-  color: #fff;
-}
-
-/* Ensure dropdown menu items have consistent styling */
-.dropdown-menu .dropdown-item {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-}
-
-.dropdown-menu .dropdown-item i {
-  width: 1.25rem;
-  text-align: center;
-}
-
-/* Required field marker with red asterisk */
-.form-label.required {
-  position: relative;
-  padding-right: 12px;
-}
-
-.form-label.required::after {
-  content: "*";
-  color: var(--danger);
-  font-weight: 600;
-  opacity: 0.9;
-  font-size: 1.2em;
-  transition: var(--standard-transition);
-  position: absolute;
-  top: -2px;
-  right: 0;
-}
-
-.form-label.required:hover::after {
-  opacity: 1;
-  transform: scale(1.2);
-}
+/* Import all component and base styles */
+@import url('base/variables.css');
+@import url('base/reset.css');
+@import url('base/utilities.css');
+@import url('components/navbar.css');
+@import url('components/buttons.css');
+@import url('components/forms.css');
+@import url('components/cards.css');
+@import url('components/tables.css');
+@import url('components/badges.css');
+@import url('components/modals.css');
+@import url('components/pagination.css');
+@import url('components/tooltips.css');
+@import url('components/lists.css');
+@import url('components/layout.css');

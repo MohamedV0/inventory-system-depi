@@ -1,0 +1,35 @@
+/* Layout Styles */
+
+/* Container styles */
+.container-fluid {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 992px) {
+    .navbar-nav {
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .navbar-nav .nav-item {
+        margin-bottom: 0.25rem;
+    }
+}
+
+/* Footer styles */
+.text-center.py-3.mt-5 {
+    margin-top: 2rem;
+}
+
+.text-center.py-3.mt-5 .text-muted.small {
+    font-size: 0.8rem;
+    opacity: 0.5;
+}
+
+.text-center.py-3.mt-5 i.text-primary {
+    opacity: 0.5;
+    margin-right: 0.25rem;
+} 

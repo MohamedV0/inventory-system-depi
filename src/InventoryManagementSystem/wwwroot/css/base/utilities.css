@@ -1,0 +1,102 @@
+/*--------------------------------------------------------------
+9. Utilities & Helpers
+--------------------------------------------------------------*/
+
+/* 9.1 Animations */
+.fa-beat {
+    animation: fa-beat 0.8s ease infinite;
+}
+
+@keyframes fa-beat {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Global transitions for interactive elements */
+.card, .list-item, .btn, .form-control, .badge, .icon-circle {
+    transition: var(--standard-transition);
+}
+
+/* Icon animations */
+.navbar-brand i, .nav-link i, .btn i {
+    transition: transform 0.2s ease;
+}
+
+.navbar-brand:hover i, .nav-link:hover i, .btn:hover i {
+    transform: scale(1.15);
+}
+
+/* 9.2 Icons & Visual Elements */
+.icon-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(59, 130, 246, 0.2);
+}
+
+/* Chart container styling */
+.chart-container {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 0.5rem;
+}
+
+/* Info section helpers */
+.info-section {
+    margin-bottom: 0.5rem;
+}
+
+/* Background colors for icon circles */
+.bg-danger-subtle {
+    background-color: var(--danger-bg);
+}
+
+.bg-success-subtle {
+    background-color: var(--success-bg);
+}
+
+.bg-info-subtle {
+    background-color: var(--info-bg);
+}
+
+/* Enhanced Text Styles */
+.text-gradient {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+    to {
+        text-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+    }
+}
+
+/* override bootstrap colors to fix the search input*/
+.bg-dark {
+    background-color: var(--bg-dark) !important;
+}
+
+.border-dark {
+    border-color: var(--border-color) !important;
+} 

@@ -1,0 +1,49 @@
+/*--------------------------------------------------------------
+Pagination Styles
+--------------------------------------------------------------*/
+
+/* Pagination controls */
+.pagination {
+    margin-bottom: 0;
+}
+
+.pagination .page-item .page-link {
+    background-color: var(--bg-card);
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+    transition: var(--standard-transition);
+    padding: 0.375rem 0.75rem;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+    font-weight: 500;
+    z-index: 3;
+}
+
+.pagination .page-item.disabled .page-link {
+    background-color: var(--bg-dark);
+    color: var(--text-muted);
+    border-color: var(--border-color);
+    opacity: 0.6;
+}
+
+.pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.pagination .page-item:first-child .page-link {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.pagination .page-item:last-child .page-link {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+} 
