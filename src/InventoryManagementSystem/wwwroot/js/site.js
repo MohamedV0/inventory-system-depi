@@ -20,6 +20,9 @@ $(document).ready(function() {
         icon.setAttribute('role', 'button');
         icon.setAttribute('aria-label', 'Help');
     });
+    
+    // Initialize password toggle functionality
+    initializePasswordToggles();
 });
 
 // Handle currency formatting in forms
@@ -69,6 +72,42 @@ $(document).ready(function() {
         }
     });
 });
+
+// Password toggle functionality
+function initializePasswordToggles() {
+    // Password visibility toggle functionality
+    $('.password-toggle').on('click', function(e) {
+        e.preventDefault();
+        
+        const $button = $(this);
+        const $input = $button.closest('.input-group').find('.password-input');
+        const $icon = $button.find('.toggle-icon');
+        
+        // Toggle password visibility
+        const isVisible = $input.attr('type') === 'text';
+        $input.attr('type', isVisible ? 'password' : 'text');
+        
+        // Toggle icon
+        $icon.toggleClass('fa-eye fa-eye-slash');
+        
+        // Update button title for accessibility
+        $button.attr('title', isVisible ? 'Show Password' : 'Hide Password');
+        
+        // Prevent the button from submitting the form
+        return false;
+    });
+
+    // Security measure: Reset password fields to type="password" when forms are submitted
+    $('form').on('submit', function() {
+        $('.password-input').attr('type', 'password');
+    });
+
+    // Security measure: Reset password visibility when user navigates away
+    $(window).on('beforeunload', function() {
+        $('.password-input').attr('type', 'password');
+        $('.toggle-icon').removeClass('fa-eye-slash').addClass('fa-eye');
+    });
+}
 
 // Create a stock level doughnut chart
 function createStockLevelChart(canvasId, stockLevel, reorderLevel) {

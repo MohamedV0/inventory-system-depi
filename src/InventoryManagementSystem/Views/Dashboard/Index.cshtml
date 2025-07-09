@@ -45,8 +45,8 @@
                     </div>");
                 
                 var lowStockCard = StatCardViewModel
-                    .Create("Low Stock Items", Model.LowStockCount.ToString(), "fas fa-exclamation-triangle text-warning")
-                    .WithIconClass("bg-warning-subtle")
+                    .Create("Low Stock Items", Model.LowStockCount.ToString(), "fas fa-exclamation-triangle")
+                    .WithIconClass("bg-warning")
                     .WithAdditionalContent(lowStockHtml);
             }
             <partial name="_StatCard" model="lowStockCard" />

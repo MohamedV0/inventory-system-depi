@@ -48,8 +48,14 @@
                                 <span class="input-group-text bg-dark border-dark text-secondary">
                                     <i class="fas fa-lock"></i>
                                 </span>
-                                <input asp-for="Input.Password" class="form-control bg-dark border-dark text-white" 
+                                <input asp-for="Input.Password" class="form-control bg-dark border-dark text-white password-input" 
                                        autocomplete="new-password" aria-required="true" placeholder="Enter your password" />
+                                <button class="btn btn-dark border-dark password-toggle" type="button" 
+                                        aria-label="Toggle password visibility" 
+                                        data-password-toggle="true" 
+                                        title="Show/Hide Password">
+                                    <i class="fas fa-eye toggle-icon"></i>
+                                </button>
                             </div>
                             <span asp-validation-for="Input.Password" class="text-danger small"></span>
                         </div>
@@ -60,8 +66,14 @@
                                 <span class="input-group-text bg-dark border-dark text-secondary">
                                     <i class="fas fa-lock"></i>
                                 </span>
-                                <input asp-for="Input.ConfirmPassword" class="form-control bg-dark border-dark text-white" 
+                                <input asp-for="Input.ConfirmPassword" class="form-control bg-dark border-dark text-white password-input" 
                                        autocomplete="new-password" aria-required="true" placeholder="Confirm your password" />
+                                <button class="btn btn-dark border-dark password-toggle" type="button" 
+                                        aria-label="Toggle password visibility" 
+                                        data-password-toggle="true" 
+                                        title="Show/Hide Password">
+                                    <i class="fas fa-eye toggle-icon"></i>
+                                </button>
                             </div>
                             <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
                         </div>

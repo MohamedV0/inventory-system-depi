@@ -123,6 +123,15 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account
                     var user = await _userManager.FindByEmailAsync(Input.Email);
                     if (user != null)
                     {
+                        // Check if the user is active
+                        if (!user.IsActive)
+                        {
+                            await _signInManager.SignOutAsync(); // Sign out the user if they were authenticated
+                            _logger.LogWarning("Inactive user {Email} attempted to log in", Input.Email);
+                            TempData["ErrorMessage"] = "Your account has been deactivated. Please contact an administrator.";
+                            return Page();
+                        }
+                        
                         user.LastLoginDate = DateTime.UtcNow;
                         await _userManager.UpdateAsync(user);
                     }

@@ -149,39 +149,6 @@
     <partial name="_ToastrNotifications" />
     <script>
         $(document).ready(function() {
-            // Password visibility toggle functionality
-            $('.password-toggle').on('click', function(e) {
-                e.preventDefault();
-                
-                const $button = $(this);
-                const $input = $button.closest('.input-group').find('.password-input');
-                const $icon = $button.find('.toggle-icon');
-                
-                // Toggle password visibility
-                const isVisible = $input.attr('type') === 'text';
-                $input.attr('type', isVisible ? 'password' : 'text');
-                
-                // Toggle icon
-                $icon.toggleClass('fa-eye fa-eye-slash');
-                
-                // Update button title for accessibility
-                $button.attr('title', isVisible ? 'Show Password' : 'Hide Password');
-                
-                // Prevent the button from submitting the form
-                return false;
-            });
-
-            // Security measure: Reset password field to type="password" when form is submitted
-            $('#account').on('submit', function() {
-                $('.password-input').attr('type', 'password');
-            });
-
-            // Security measure: Reset password visibility when user navigates away
-            $(window).on('beforeunload', function() {
-                $('.password-input').attr('type', 'password');
-                $('.toggle-icon').removeClass('fa-eye-slash').addClass('fa-eye');
-            });
-
             // Improved copy to clipboard functionality with fallback
             window.copyToClipboard = function(text) {
                 // Create a temporary textarea element
