@@ -43,7 +43,7 @@
                             </span>
                             <input type="text" name="searchTerm" id="productSearch" class="form-control bg-dark border-dark text-white border-start-0 border-end-0" 
                                    style="min-width: 200px;" 
-                                   placeholder="Search products..." value="@ViewBag.SearchTerm" />
+                                   placeholder="Search by name, SKU, or category..." value="@ViewBag.SearchTerm" />
                             @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
                             {
                                 <button type="button" id="clearSearch" class="btn bg-dark border-dark border-start-0 border-end-0">
@@ -235,7 +235,7 @@
                     <i class="fas fa-info-circle me-1"></i> Showing 1 to @Model.Count of @Model.TotalItemCount entries
                 </div>
                 <div>
-                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchTerm = ViewBag.SearchTerm, category = ViewBag.SelectedCategory, stockFilter = ViewBag.StockFilter }),
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchTerm = ViewBag.SearchTerm, stockFilter = ViewBag.StockFilter }),
                         PagedListAdapter.GetStandardOptions())
                 </div>
             </div>
@@ -255,8 +255,7 @@
                 serverSide: true,
                 filterParam: 'stockFilter',
                 urlParams: {
-                    searchTerm: '@ViewBag.SearchTerm',
-                    category: '@ViewBag.SelectedCategory'
+                    searchTerm: '@ViewBag.SearchTerm'
                 }
             });
 
@@ -265,21 +264,6 @@
 
             // Initialize search clear
             initializeSearchClear('#clearSearch');
-
-            // Handle category filter
-            $('#categoryFilter').change(function() {
-                var category = $(this).val();
-                var currentUrl = new URL(window.location);
-                
-                if (category) {
-                    currentUrl.searchParams.set('category', category);
-                } else {
-                    currentUrl.searchParams.delete('category');
-                }
-                
-                currentUrl.searchParams.set('page', 1);
-                window.location = currentUrl;
-            });
         });
     </script>
 } 

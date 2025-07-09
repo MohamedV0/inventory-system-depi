@@ -95,12 +95,7 @@
             <table class="table m-0 data-table">
                 <thead>
                     <tr>
-                        <th width="5%" class="sortable" data-sort="id">
-                            <div class="d-flex align-items-center">
-                                ID <i class="fas fa-sort ms-1 text-muted"></i>
-                            </div>
-                        </th>
-                        <th width="20%" class="sortable" data-sort="name">
+                        <th width="25%" class="sortable" data-sort="name">
                             <div class="d-flex align-items-center">
                                 NAME <i class="fas fa-sort ms-1 text-muted"></i>
                             </div>
@@ -137,7 +132,6 @@
                         var statusIcon = supplier.IsActive ? "fas fa-check-circle" : "fas fa-times-circle";
                         
                         <tr class="data-table-row @(supplier.IsActive ? "active" : "inactive")">
-                            <td>@supplier.Id</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-building text-primary me-2"></i>

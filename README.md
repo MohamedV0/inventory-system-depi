@@ -11,7 +11,7 @@
 The Inventory Management System (IMS) is a comprehensive web-based solution developed as a graduation project for the [Digital Egypt Pioneers Initiative (DEPI)](https://www.linkedin.com/company/digital-egypt-pioneers-initiative-depi/), a government initiative under the Ministry of Communications and Information Technology. This system streamlines inventory management through real-time tracking, intelligent notifications, and detailed analytics.
 
 <div align="center">
-  <a href="http://inventorysystem.runasp.net/">
+  <a href="https://inventorysystem.runasp.net">
     <img src="https://img.shields.io/badge/View_Live_Demo-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Preview" />
   </a>
 </div>

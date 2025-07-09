@@ -467,28 +467,11 @@ namespace InventoryManagementSystem.Services
                     searchTerm = searchTerm.Trim().ToLower();
                     predicate = p => p.Name.ToLower().Contains(searchTerm) ||
                                     p.SKU.ToLower().Contains(searchTerm) ||
-                                    (p.Description != null && p.Description.ToLower().Contains(searchTerm));
+                                    (p.Description != null && p.Description.ToLower().Contains(searchTerm)) ||
+                                    (p.Category != null && p.Category.Name.ToLower().Contains(searchTerm));
                 }
                 
-                // Category name filter
-                if (!string.IsNullOrWhiteSpace(categoryName))
-                {
-                    var categoryNameTrimmed = categoryName.Trim();
-                    
-                    // If we already have a search term predicate, combine it with the category filter
-                    if (predicate != null)
-                    {
-                        var searchPredicate = predicate; // Store the existing predicate
-                        predicate = p => searchPredicate.Compile()(p) && 
-                                      p.Category != null && 
-                                      p.Category.Name == categoryNameTrimmed;
-                    }
-                    else
-                    {
-                        // Just filter by category name
-                        predicate = p => p.Category != null && p.Category.Name == categoryNameTrimmed;
-                    }
-                }
+                // Category name filter (now removed as it's included in the search term)
                 
                 // Low Stock filter
                 if (lowStock == true)
