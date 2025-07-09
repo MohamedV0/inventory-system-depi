@@ -1,8 +1,8 @@
 @using Microsoft.AspNetCore.Identity
 @using InventoryManagementSystem.Models.Identity
 
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 @if (SignInManager.IsSignedIn(User))
 {
@@ -13,14 +13,14 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary">
             <li>
-                <a class="dropdown-item text-white-50" asp-area="Identity" asp-page="/Account/Manage/Index">
+                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
                     <i class="fas fa-user-cog me-1"></i> Profile
                 </a>
             </li>
             <li><hr class="dropdown-divider border-secondary"></li>
             <li>
                 <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                    <button type="submit" class="dropdown-item text-white-50">
+                    <button type="submit" class="dropdown-item text-danger">
                         <i class="fas fa-sign-out-alt me-1"></i> Logout
                     </button>
                 </form>

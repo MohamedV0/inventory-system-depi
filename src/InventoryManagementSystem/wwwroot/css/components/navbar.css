@@ -417,3 +417,76 @@
     background-color: rgba(59, 130, 246, 0.1);
     color: var(--accent-secondary);
 } 
+
+/* Custom styles for the logout button and dropdown */
+.dropdown-menu {
+    background-color: var(--bg-dark) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-menu .dropdown-item {
+    color: var(--text-primary) !important;
+    transition: all 0.2s ease;
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Specific styling for the logout button */
+.dropdown-menu .dropdown-item.text-danger {
+    color: #ff4444 !important;
+}
+
+.dropdown-menu .dropdown-item.text-danger:hover,
+.dropdown-menu .dropdown-item.text-danger:focus {
+    background-color: rgba(255, 68, 68, 0.15) !important;
+    color: #ff6666 !important;
+}
+
+.dropdown-menu .dropdown-item.text-danger i {
+    color: #ff4444;
+}
+
+/* Add animation for logout button */
+.dropdown-menu .dropdown-item.text-danger:hover i {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+    20%, 80% {
+        transform: translate3d(1px, 0, 0);
+    }
+    30%, 50%, 70% {
+        transform: translate3d(-2px, 0, 0);
+    }
+    40%, 60% {
+        transform: translate3d(2px, 0, 0);
+    }
+}
+
+/* Ensure dropdown has proper styling in dark theme */
+.dropdown-menu.bg-dark {
+    background-color: var(--bg-dark) !important;
+    border-color: var(--border-color) !important;
+}
+
+.dropdown-menu.bg-dark .dropdown-item {
+    color: var(--text-primary) !important;
+}
+
+.dropdown-menu.bg-dark .dropdown-item:hover {
+    background-color: var(--bg-hover) !important;
+}
+
+/* Divider styling */
+.dropdown-menu .dropdown-divider {
+    border-color: var(--border-color) !important;
+    opacity: 0.5;
+}

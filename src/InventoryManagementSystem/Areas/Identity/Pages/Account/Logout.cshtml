@@ -4,18 +4,75 @@
     ViewData["Title"] = "Log out";
 }
 
-<header>
-    <h1>@ViewData["Title"]</h1>
+<div class="container-fluid px-3 py-2">
+    <!-- Page Header -->
     @{
-        if (User.Identity?.IsAuthenticated ?? false)
-        {
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                <button type="submit" class="nav-link btn btn-link text-dark">Click here to Logout</button>
-            </form>
-        }
-        else
-        {
-            <p>You have successfully logged out of the application.</p>
-        }
+        var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
+            .Create("Log Out", "fas fa-sign-out-alt")
+            .WithPrimaryButton("Return to Dashboard", Url.Action("Index", "Home"), "fas fa-home");
     }
-</header>
+    <partial name="_PageHeader" model="headerModel" />
+
+    <div class="row g-3">
+        <div class="col-lg-6 mx-auto">
+            <div class="card content-card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <span class="icon-circle bg-primary-subtle me-2">
+                            <i class="fas fa-sign-out-alt text-primary"></i>
+                        </span>
+                        @ViewData["Title"]
+                    </h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    @{
+                        if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <div class="mb-4">
+                                <div class="icon-circle icon-circle-xl bg-primary-subtle mx-auto">
+                                    <i class="fas fa-sign-out-alt text-primary" style="font-size: 3rem;"></i>
+                                </div>
+                            </div>
+                            <h4 class="mb-3">Are you sure you want to log out?</h4>
+                            <p class="mb-4 text-secondary">You will need to log in again to access your account.</p>
+                            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Log Out
+                                </button>
+                                <a href="javascript:history.back()" class="btn btn-outline-light ms-2">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="mb-4">
+                                <div class="icon-circle icon-circle-xl bg-success-subtle mx-auto">
+                                    <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+                                </div>
+                            </div>
+                            <h4 class="mb-3">You have successfully logged out</h4>
+                            <p class="mb-4 text-secondary">Thank you for using our application.</p>
+                            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                                <i class="fas fa-home me-2"></i>Return to Home
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .icon-circle-xl {
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+    </style>
+}

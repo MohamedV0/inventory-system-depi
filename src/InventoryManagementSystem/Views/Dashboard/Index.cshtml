@@ -8,9 +8,10 @@
 <div class="container-fluid px-3 py-2">
     <!-- Use the PageHeader partial with fluent API similar to Details.cshtml -->
     @{
+        var exportUrl = Url.Action("Index", "Reports");
         var headerModel = InventoryManagementSystem.Models.ViewComponents.PageHeaderViewModel
             .Create("Analytics Dashboard", "fas fa-chart-line")
-            .WithSecondaryButton("Export Report", "#", "fas fa-file-export");
+            .WithSecondaryButton("Export Report", exportUrl, "fas fa-file-export");
     }
     <partial name="_PageHeader" model="headerModel" />
 
@@ -516,111 +517,7 @@
 </div>
 
 @section Styles {
-    <style>
-        .health-score-circle {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto;
-            position: relative;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.2);
-            border: 4px solid;
-            border-color: var(--bs-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .health-score-circle .score {
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
-
-        .score.excellent { color: #10B981; }
-        .score.good { color: #3B82F6; }
-        .score.fair { color: #F59E0B; }
-        .score.poor { color: #EF4444; }
-
-        .stock-metric-item {
-            padding: 0.25rem 0;
-        }
-
-        .progress-thin {
-            height: 5px !important;
-            background-color: rgba(0, 0, 0, 0.15);
-        }
-        
-        .progress {
-            background-color: rgba(0, 0, 0, 0.15);
-        }
-
-        .alert-list .alert-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .alert-list .alert-item:last-child {
-            border-bottom: none;
-        }
-
-        .alert-item .alert-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-        }
-
-        .alert-item .alert-content {
-            flex: 1;
-        }
-
-        .alert-item .alert-title {
-            font-weight: 500;
-        }
-
-        .action-list .action-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .action-list .action-item:last-child {
-            border-bottom: none;
-        }
-
-        .action-item .action-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-        }
-
-        .action-item .action-content {
-            flex: 1;
-        }
-
-        .action-item .action-title {
-            font-weight: 500;
-        }
-
-        .supplier-rating {
-            line-height: 1;
-        }
-
-        .supplier-rating i {
-            font-size: 0.8rem;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/components/dashboard.css" />
 }
 
 @section Scripts {
