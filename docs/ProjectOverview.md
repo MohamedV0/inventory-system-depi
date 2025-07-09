@@ -66,8 +66,7 @@ The Inventory Management System (IMS) is a comprehensive web-based solution buil
 | **Object Mapping** | AutoMapper | Entity to DTO/ViewModel mapping |
 | **Reporting** | QuestPDF, CsvHelper, ClosedXML | Export and reporting capabilities |
 | **API Documentation** | Swashbuckle/Swagger | API documentation |
-| **Logging** | Serilog | Application logging |
-| **Dependency Injection** | Scrutor | Advanced dependency registration |
+| **Dependency Injection** | ASP.NET Core DI | Built-in dependency injection |
 
 ## 📦 Feature Visualizations
 
