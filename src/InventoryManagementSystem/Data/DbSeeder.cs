@@ -82,6 +82,9 @@ namespace InventoryManagementSystem.Data
                 // Finally seed other data
                 await SeedDataAsync(context);
                 
+                // Seed notifications after all other data is seeded
+                await SeedNotificationsAsync(context);
+                
                 logger.LogInformation("Database seeding completed successfully.");
             }
             catch (Exception ex)
@@ -716,6 +719,87 @@ namespace InventoryManagementSystem.Data
             }
             
             Console.WriteLine("Finished seeding users.");
+        }
+
+        private static async Task SeedNotificationsAsync(ApplicationDbContext context)
+        {
+            // Check if notifications already exist
+            if (await context.Set<Notification>().AnyAsync())
+            {
+                return;
+            }
+
+            Console.WriteLine("Seeding notifications...");
+
+            // Get products with low stock or out of stock
+            var lowStockProducts = await context.Products
+                .Where(p => p.CurrentStock > 0 && p.CurrentStock <= p.ReorderLevel)
+                .OrderBy(p => p.CurrentStock)
+                .Take(5)
+                .ToListAsync();
+
+            var outOfStockProducts = await context.Products
+                .Where(p => p.CurrentStock == 0)
+                .Take(5)
+                .ToListAsync();
+
+            var notifications = new List<Notification>();
+            var now = DateTime.UtcNow;
+
+            // Create low stock notifications with Egyptian city references
+            foreach (var product in lowStockProducts)
+            {
+                // Get a random Egyptian city for this notification
+                string city = GetRandomItem(_egyptianCities);
+                
+                // Create a city-specific message
+                string citySpecificMessage = $"Inventory alert from {city} warehouse: {product.Name} (SKU: {product.SKU}) is running low on stock. Current stock: {product.CurrentStock}, Reorder Level: {product.ReorderLevel}. Please arrange for restocking soon.";
+                
+                notifications.Add(new Notification
+                {
+                    Title = $"Low Stock in {city}: {product.Name}",
+                    Message = citySpecificMessage,
+                    Type = NotificationType.LowStock,
+                    Priority = product.CurrentStock <= product.MinimumStockLevel ? NotificationPriority.High : NotificationPriority.Medium,
+                    IsRead = false,
+                    CreatedAt = now.AddHours(-_random.Next(1, 72)), // Random time in the last 3 days
+                    CreatedBy = "System",
+                    ProductId = product.Id,
+                    IsActive = true, // Explicitly set IsActive to true
+                    ModifiedBy = "System", // Set ModifiedBy to avoid NULL constraint error
+                    ModifiedAt = now // Set ModifiedAt to current time
+                });
+            }
+
+            // Create out of stock notifications with Egyptian city references
+            foreach (var product in outOfStockProducts)
+            {
+                // Get a random Egyptian city for this notification
+                string city = GetRandomItem(_egyptianCities);
+                
+                // Create a city-specific message with more urgency
+                string citySpecificMessage = $"URGENT: {city} branch has completely run out of {product.Name} (SKU: {product.SKU}). Last unit was sold today. This item is in high demand at this location. Please prioritize restocking immediately.";
+                
+                notifications.Add(new Notification
+                {
+                    Title = $"{city} Out of Stock: {product.Name}",
+                    Message = citySpecificMessage,
+                    Type = NotificationType.OutOfStock,
+                    Priority = NotificationPriority.Critical,
+                    IsRead = false,
+                    CreatedAt = now.AddHours(-_random.Next(1, 48)), // Random time in the last 2 days
+                    CreatedBy = "System",
+                    ProductId = product.Id,
+                    IsActive = true, // Explicitly set IsActive to true
+                    ModifiedBy = "System", // Set ModifiedBy to avoid NULL constraint error
+                    ModifiedAt = now // Set ModifiedAt to current time
+                });
+            }
+
+            await context.AddRangeAsync(notifications);
+            await context.SaveChangesAsync();
+
+            Console.WriteLine($"Successfully seeded {notifications.Count} notifications.");
         }
 
         public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)

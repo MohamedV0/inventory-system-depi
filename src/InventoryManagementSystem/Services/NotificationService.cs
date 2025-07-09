@@ -41,12 +41,32 @@ namespace InventoryManagementSystem.Services
 
         public async Task<NotificationBellViewModel> GetNotificationBellDataAsync(CancellationToken cancellationToken = default)
         {
-            var unreadNotifications = await GetUnreadNotificationsAsync(cancellationToken);
-            return new NotificationBellViewModel
+            try
             {
-                UnreadNotifications = unreadNotifications,
-                UnreadCount = unreadNotifications.Count
-            };
+                // Get total count of unread notifications
+                var totalUnreadCount = await _context.Notifications
+                    .Where(n => !n.IsRead)
+                    .CountAsync(cancellationToken);
+
+                // Get only top 3 most recent unread notifications
+                var recentNotifications = await _context.Notifications
+                    .Include(n => n.Product)
+                    .Where(n => !n.IsRead)
+                    .OrderByDescending(n => n.CreatedAt)
+                    .Take(3)
+                    .ToListAsync(cancellationToken);
+
+                return new NotificationBellViewModel
+                {
+                    UnreadNotifications = _mapper.Map<List<NotificationViewModel>>(recentNotifications),
+                    UnreadCount = totalUnreadCount
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving notification bell data");
+                throw;
+            }
         }
 
         public async Task<List<NotificationViewModel>> GetAllNotificationsAsync(CancellationToken cancellationToken = default)

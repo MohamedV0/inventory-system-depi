@@ -46,7 +46,14 @@
         }
         <div class="dropdown-divider my-0"></div>
         <a class="dropdown-item text-center py-2" asp-controller="Notification" asp-action="Index">
-            <small>View All Notifications</small>
+            @if (Model.UnreadCount > 3)
+            {
+                <small>View All (@(Model.UnreadCount - 3) more notifications)</small>
+            }
+            else
+            {
+                <small>View All Notifications</small>
+            }
         </a>
     </div>
 </li>

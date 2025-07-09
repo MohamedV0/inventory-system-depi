@@ -2,152 +2,139 @@
 @using InventoryManagementSystem.Models.Common
 
 <div class="container-fluid px-3 py-2">
-    <div class="card content-card shadow-sm">
-        <div class="card-header bg-dark border-bottom border-secondary d-flex justify-content-between align-items-center py-3">
-            <h5 class="mb-0 d-flex align-items-center">
-                <span class="icon-circle bg-primary-subtle me-2">
-                    <i class="fas fa-bell text-primary"></i>
-                </span>
-                Notifications
-            </h5>
-            @if (Model.Any(n => !n.IsRead))
-            {
-                <button id="markAllBtn" class="btn btn-outline-primary btn-sm" onclick="markAllAsRead()">
-                    <i class="fas fa-check-double me-1"></i>
-                    <span>Mark All as Read</span>
-                    <span class="spinner-border spinner-border-sm ms-1 d-none" role="status"></span>
-                </button>
-            }
-        </div>
-        <div class="card-body p-0 bg-dark">
-            <div id="loadingOverlay" class="position-absolute w-100 h-100 bg-dark bg-opacity-75 d-none" style="top: 0; left: 0; z-index: 1000;">
-                <div class="d-flex justify-content-center align-items-center h-100">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div>
-            @if (!Model.Any())
-            {
-                <div class="empty-state d-flex flex-column align-items-center justify-content-center py-5">
-                    <div class="text-center">
-                        <i class="fas fa-bell-slash fa-4x text-muted mb-3 d-block"></i>
-                        <h6 class="text-muted mb-0">No notifications to display</h6>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="notification-list">
-                    @foreach (var notification in Model.OrderByDescending(n => n.CreatedAt))
-                    {
-                        string navigationUrl = notification.Type switch
-                        {
-                            NotificationType.LowStock => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
-                            NotificationType.OutOfStock => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
-                            NotificationType.StockOut => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
-                            NotificationType.ExpiryWarning => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
-                            _ => "#"
-                        };
-
-                        <div class="notification-item @(!notification.IsRead ? "unread" : "")" 
-                             data-notification-id="@notification.Id"
-                             onclick="handleNotificationClick('@notification.Id', '@navigationUrl')">
-                            <div class="notification-icon">
-                                @{
-                                    var iconClass = notification.Type switch
-                                    {
-                                        NotificationType.LowStock => "fas fa-exclamation-triangle text-warning",
-                                        NotificationType.OutOfStock => "fas fa-times-circle text-danger",
-                                        NotificationType.StockOut => "fas fa-times-circle text-danger",
-                                        NotificationType.ExpiryWarning => "fas fa-clock text-warning",
-                                        NotificationType.SystemAlert => "fas fa-info-circle text-info",
-                                        NotificationType.Error => "fas fa-exclamation-circle text-danger",
-                                        NotificationType.Warning => "fas fa-exclamation-triangle text-warning",
-                                        _ => "fas fa-bell text-primary"
-                                    };
-                                }
-                                <span class="icon-circle bg-dark">
-                                    <i class="@iconClass"></i>
-                                </span>
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <div class="card shadow-sm border border-dark">
+                <div class="card-header bg-dark border-bottom border-dark py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle bg-primary bg-opacity-10 me-3">
+                                <i class="fas fa-bell text-primary fs-4"></i>
                             </div>
-                            <div class="notification-content">
-                                <div class="notification-header">
-                                    <h6 class="notification-title text-light mb-1">@notification.Title</h6>
-                                    <div class="notification-time text-muted small">
-                                        <i class="fas fa-clock me-1"></i>
-                                        @notification.CreatedAt.ToLocalTime().ToString("MMM dd, HH:mm")
-                                    </div>
+                            <h4 class="mb-0 text-light">Notifications Center</h4>
+                        </div>
+                        @if (Model.Any(n => !n.IsRead))
+                        {
+                            <button id="markAllBtn" class="btn btn-outline-primary" onclick="markAllAsRead()">
+                                <i class="fas fa-check-double me-2"></i>
+                                <span>Mark All as Read</span>
+                                <span class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-body p-0 bg-dark position-relative">
+                    <div id="loadingOverlay" class="position-absolute w-100 h-100 bg-dark bg-opacity-75 d-none" 
+                         style="top: 0; left: 0; z-index: 1000;">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!Model.Any())
+                    {
+                        <div class="empty-state d-flex flex-column align-items-center justify-content-center py-5 min-vh-50">
+                            <div class="text-center">
+                                <div class="icon-circle bg-dark mb-4 mx-auto d-flex align-items-center justify-content-center" style="width: 100px; height: 100px">
+                                    <i class="fas fa-bell-slash text-muted" style="font-size: 3rem"></i>
                                 </div>
-                                <p class="notification-message text-secondary mb-2">@notification.Message</p>
-                                <div class="notification-badges">
-                                    <span class="badge bg-@(notification.Type.ToString().ToLowerInvariant()) rounded-pill">
-                                        <i class="fas fa-tag me-1"></i>
-                                        @notification.Type
-                                    </span>
-                                    <span class="badge bg-@(notification.Priority.ToString().ToLowerInvariant()) rounded-pill">
-                                        <i class="fas fa-flag me-1"></i>
-                                        @notification.Priority
-                                    </span>
-                                    @if (!notification.IsRead)
-                                    {
-                                        <span class="badge bg-primary rounded-pill">
-                                            <i class="fas fa-circle me-1"></i>
-                                            New
-                                        </span>
-                                    }
-                                </div>
+                                <h5 class="text-muted mb-2">No Notifications</h5>
+                                <p class="text-secondary mb-0">You're all caught up! Check back later for updates.</p>
                             </div>
                         </div>
                     }
+                    else
+                    {
+                        <div class="notification-list">
+                            @foreach (var notification in Model.OrderByDescending(n => n.CreatedAt))
+                            {
+                                string navigationUrl = notification.Type switch
+                                {
+                                    NotificationType.LowStock => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
+                                    NotificationType.OutOfStock => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
+                                    NotificationType.StockOut => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
+                                    NotificationType.ExpiryWarning => notification.ProductId.HasValue ? $"/Products/Details/{notification.ProductId}" : "#",
+                                    _ => "#"
+                                };
+
+                                var (badgeClass, badgeIcon, badgeText) = notification.Type switch
+                                {
+                                    NotificationType.LowStock => ("bg-warning bg-opacity-25 text-warning", "fas fa-exclamation-triangle", "Low Stock"),
+                                    NotificationType.OutOfStock => ("bg-danger bg-opacity-25 text-danger", "fas fa-times-circle", "Out of Stock"),
+                                    NotificationType.StockOut => ("bg-danger bg-opacity-25 text-danger", "fas fa-times-circle", "Stock Out"),
+                                    NotificationType.ExpiryWarning => ("bg-warning bg-opacity-25 text-warning", "fas fa-clock", "Expiry Warning"),
+                                    NotificationType.SystemAlert => ("bg-info bg-opacity-25 text-info", "fas fa-info-circle", "System Alert"),
+                                    NotificationType.Error => ("bg-danger bg-opacity-25 text-danger", "fas fa-exclamation-circle", "Error"),
+                                    NotificationType.Warning => ("bg-warning bg-opacity-25 text-warning", "fas fa-exclamation-triangle", "Warning"),
+                                    _ => ("bg-primary bg-opacity-25 text-primary", "fas fa-bell", "Info")
+                                };
+
+                                var priorityBadgeClass = notification.Priority switch
+                                {
+                                    NotificationPriority.High => "bg-danger bg-opacity-25 text-danger",
+                                    NotificationPriority.Medium => "bg-warning bg-opacity-25 text-warning",
+                                    _ => "bg-info bg-opacity-25 text-info"
+                                };
+
+                                <div class="notification-item p-4 border-bottom border-dark @(!notification.IsRead ? "unread bg-dark bg-opacity-75" : "")" 
+                                     data-notification-id="@notification.Id"
+                                     onclick="handleNotificationClick('@notification.Id', '@navigationUrl')">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <div class="icon-circle @badgeClass" style="width: 48px; height: 48px">
+                                                <i class="@badgeIcon fs-4"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h5 class="text-light mb-0">@notification.Title</h5>
+                                                <div class="text-muted small d-flex align-items-center">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    @notification.CreatedAt.ToLocalTime().ToString("MMM dd, HH:mm")
+                                                </div>
+                                            </div>
+                                            <p class="text-secondary mb-3">@notification.Message</p>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge rounded-pill py-2 px-3 @badgeClass">
+                                                    <i class="@badgeIcon me-1"></i> @badgeText
+                                                </span>
+                                                <span class="badge rounded-pill py-2 px-3 @priorityBadgeClass">
+                                                    <i class="fas fa-flag me-1"></i> @notification.Priority
+                                                </span>
+                                                @if (!notification.IsRead)
+                                                {
+                                                    <span class="badge rounded-pill py-2 px-3 bg-primary bg-opacity-25 text-primary">
+                                                        <i class="fas fa-circle me-1"></i> New
+                                                    </span>
+                                                }
+                                                @if (notification.ProductId.HasValue)
+                                                {
+                                                    <a href="@navigationUrl" class="ms-auto btn btn-link btn-sm text-primary text-decoration-none">
+                                                        View Details <i class="fas fa-chevron-right ms-1"></i>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
                 </div>
-            }
+            </div>
         </div>
     </div>
 </div>
 
-@* Add anti-forgery token *@
 @Html.AntiForgeryToken()
 
 @section Scripts {
     <script>
         // Get the anti-forgery token
         const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-        // Toast notification function
-        function showToast(message, type = 'success') {
-            const toastContainer = document.getElementById('toast-container') || createToastContainer();
-            const toast = document.createElement('div');
-            toast.className = `toast align-items-center text-white bg-${type} border-0`;
-            toast.setAttribute('role', 'alert');
-            toast.setAttribute('aria-live', 'assertive');
-            toast.setAttribute('aria-atomic', 'true');
-            
-            toast.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            `;
-            
-            toastContainer.appendChild(toast);
-            const bsToast = new bootstrap.Toast(toast);
-            bsToast.show();
-            
-            toast.addEventListener('hidden.bs.toast', () => {
-                toast.remove();
-            });
-        }
-
-        function createToastContainer() {
-            const container = document.createElement('div');
-            container.id = 'toast-container';
-            container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-            document.body.appendChild(container);
-            return container;
-        }
 
         function setLoading(isLoading) {
             const overlay = document.getElementById('loadingOverlay');
@@ -180,7 +167,7 @@
                             if (newBadge) {
                                 newBadge.remove();
                             }
-                            showToast('Notification marked as read');
+                            toastr.success('Notification marked as read');
                         }
 
                         // Then navigate if there's a valid URL
@@ -188,7 +175,7 @@
                             window.location.href = navigationUrl;
                         }
                     } else {
-                        showToast(data.message || 'Failed to mark notification as read', 'danger');
+                        toastr.error(data.message || 'Failed to mark notification as read');
                         // Still navigate even if marking as read fails
                         if (navigationUrl && navigationUrl !== '#') {
                             window.location.href = navigationUrl;
@@ -197,7 +184,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showToast('An error occurred while marking notification as read', 'danger');
+                    toastr.error('An error occurred while marking notification as read');
                     // Still navigate even if marking as read fails
                     if (navigationUrl && navigationUrl !== '#') {
                         window.location.href = navigationUrl;
@@ -257,14 +244,14 @@
                     if (markAllBtn) {
                         markAllBtn.remove();
                     }
-                    showToast('All notifications marked as read');
+                    toastr.success('All notifications marked as read');
                 } else {
-                    showToast(data.message || 'Failed to mark all notifications as read', 'danger');
+                    toastr.error(data.message || 'Failed to mark all notifications as read');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showToast('An error occurred while marking all notifications as read', 'danger');
+                toastr.error('An error occurred while marking all notifications as read');
                 if (markAllBtn) {
                     const spinner = markAllBtn.querySelector('.spinner-border');
                     const textSpan = markAllBtn.querySelector('span:not(.spinner-border)');
