@@ -15,6 +15,7 @@
     background-color: var(--bg-card);
     color: var(--text-primary);
     box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+    outline: none; /* Remove default outline */
 }
 
 .form-control::placeholder {
@@ -351,3 +352,13 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
   transform: scale(1.2);
 } 
+
+input:focus, 
+select:focus, 
+textarea:focus, 
+button:focus,
+.form-control:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+    border-color: var(--accent-primary) !important;
+}

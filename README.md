@@ -8,16 +8,21 @@
 
 ## 📌 Overview
 
-The Inventory Management System (IMS) is a comprehensive web-based solution developed as a graduation project for the Digital Egypt Pioneers Initiative (DEPI). This system streamlines inventory management through real-time tracking, intelligent notifications, and detailed analytics.
+The Inventory Management System (IMS) is a comprehensive web-based solution developed as a graduation project for the [Digital Egypt Pioneers Initiative (DEPI)](https://www.linkedin.com/company/digital-egypt-pioneers-initiative-depi/), a government initiative under the Ministry of Communications and Information Technology. This system streamlines inventory management through real-time tracking, intelligent notifications, and detailed analytics.
+
+<div align="center">
+  <a href="http://inventorysystem.runasp.net/">
+    <img src="https://img.shields.io/badge/View_Live_Demo-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Preview" />
+  </a>
+</div>
 
 ## 💫 Interface Preview
 
 <div align="center">
-
-![Hero Image](docs/ui-screenshots/Hero.png)
-
-**[🎯 View all system screenshots](docs/ui-screenshots)**
-
+  <img src="docs/ui-screenshots/Hero.png" alt="Inventory Management System">
+  <a href="docs/ui-screenshots">
+    <img src="https://img.shields.io/badge/View_All_Screenshots-4285F4?style=for-the-badge&logo=instagram&logoColor=white" alt="View All Screenshots" />
+  </a>
 </div>
 
 <div align="center">
@@ -97,7 +102,7 @@ The Inventory Management System (IMS) is a comprehensive web-based solution deve
 
 For detailed information about the application structure, please refer to the [Project Structure](docs/ProjectStructure.md) documentation.
 
-**Initiative**: Digital Egypt Pioneers Initiative (DEPI)<br>
+**Initiative**: [Digital Egypt Pioneers Initiative (DEPI)](https://www.linkedin.com/company/digital-egypt-pioneers-initiative-depi/) - A government program by the Ministry of Communications and Information Technology<br>
 **Track**: Full Stack .NET Developer | **Cohort**: 2024-2025<br>
 
 ## 🚀 Getting Started
@@ -136,3 +141,13 @@ For detailed information about the application structure, please refer to the [P
    ```bash
    dotnet run
    ```
+
+<div align="center">
+  <p>Developed by <a href="https://github.com/MohamedV0">Mohamed Ashraf</a> as part of the <a href="https://www.linkedin.com/company/digital-egypt-pioneers-initiative-depi/">Digital Egypt Pioneers Initiative (DEPI)</a></p>
+  <p>
+    <a href="https://github.com/MohamedV0"><img src="https://img.shields.io/badge/GitHub-MohamedV0-181717?style=flat&logo=github&logoColor=white" alt="GitHub"></a>
+    <a href="mailto:mohamed.ashraf.v0@gmail.com"><img src="https://img.shields.io/badge/Contact-Email-EA4335?style=flat&logo=gmail&logoColor=white" alt="Email"></a>
+    <a href="https://www.linkedin.com/in/mohamed-ashraf-v0/"><img src="https://img.shields.io/badge/LinkedIn-Profile-0A66C2?style=flat&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+    <a href="https://mohamedv0.netlify.app/"><img src="https://img.shields.io/badge/Portfolio-Website-00C7B7?style=flat&logo=netlify&logoColor=white" alt="Portfolio"></a>
+  </p>
+</div>

@@ -237,17 +237,20 @@ app.MapControllerRoute(
 // Add this line to map Razor Pages (required for Identity UI)
 app.MapRazorPages();
 
-// Apply migrations in development only
-if (app.Environment.IsDevelopment() && databaseConfig?.EnableAutoMigration == true)
+// Apply migrations and seed data for both development and production
+// Modified to support portfolio project deployment
+try
 {
-    try
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    // Apply migrations
+    dbContext.Database.Migrate();
+    
+    // Check if database needs seeding (no products exist)
+    var productCount = dbContext.Products.Count();
+    if (productCount == 0)
     {
-        using var scope = app.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        
-        // Apply migrations
-        dbContext.Database.Migrate();
-        
         // Seed the database with test data
         await DbSeeder.SeedDatabaseAsync(app.Services);
         
@@ -257,15 +260,15 @@ if (app.Environment.IsDevelopment() && databaseConfig?.EnableAutoMigration == tr
         
         // Fix admin permissions
         await userManagementService.FixAdminPermissionsAsync();
-        
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("Database migration and seeding completed successfully.");
     }
-    catch (Exception ex)
-    {
-        var logger = app.Services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
-    }
+    
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    logger.LogInformation("Database migration and seeding completed successfully.");
+}
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred while migrating or seeding the database.");
 }
 
 // Enable Swagger middleware in development only

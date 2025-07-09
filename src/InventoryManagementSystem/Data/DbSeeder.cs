@@ -280,9 +280,9 @@ namespace InventoryManagementSystem.Data
             }
 
             // Constants for data generation
-            const int CATEGORY_COUNT = 100;
-            const int SUPPLIER_COUNT = 50;
-            const int PRODUCT_COUNT = 700;
+            const int CATEGORY_COUNT = 50;
+            const int SUPPLIER_COUNT = 20;
+            const int PRODUCT_COUNT = 300;
             const int MIN_SUPPLIERS_PER_PRODUCT = 0;  // Some products may have no suppliers
             const int MAX_SUPPLIERS_PER_PRODUCT = 4;
             const int MIN_STOCK_HISTORY_PER_PRODUCT = 50;  // Increased for more data points
@@ -365,8 +365,8 @@ namespace InventoryManagementSystem.Data
                     var categoryId = categoryIds[_random.Next(categoryIds.Count)];
                     var category = await context.Categories.FindAsync(categoryId);
                     
-                    decimal cost = GetRandomPrice(50, 30000);
-                    decimal price = cost * (decimal)(1 + (_random.NextDouble() * 0.5)); // 0-50% markup
+                    decimal price = GetRandomPrice(1, 20);
+                    decimal cost = price * 0.7m; // 30% margin
                     
                     int reorderLevel = GetRandomNumber(3, 30);
                     int minStockLevel = GetRandomNumber(1, reorderLevel - 1);
