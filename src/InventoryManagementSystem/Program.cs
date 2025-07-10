@@ -89,41 +89,41 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireStaffRole", policy => policy.RequireRole("Staff"));
     
     // Product policies
-    options.AddPolicy("CanViewProducts", policy => policy.RequireRole("Admin", "Staff"));
-    options.AddPolicy("CanCreateProducts", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("CanEditProducts", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("CanDeleteProducts", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CanViewProducts", policy => policy.AddRequirements(new PermissionRequirement("CanViewProducts")));
+    options.AddPolicy("CanCreateProducts", policy => policy.AddRequirements(new PermissionRequirement("CanCreateProducts")));
+    options.AddPolicy("CanEditProducts", policy => policy.AddRequirements(new PermissionRequirement("CanEditProducts")));
+    options.AddPolicy("CanDeleteProducts", policy => policy.AddRequirements(new PermissionRequirement("CanDeleteProducts")));
     
     // Stock policies
-    options.AddPolicy("CanViewStock", policy => policy.RequireRole("Admin", "Staff"));
-    options.AddPolicy("CanAddStock", policy => policy.RequireRole("Admin", "Staff"));
-    options.AddPolicy("CanRemoveStock", policy => policy.RequireRole("Admin", "Staff"));
-    options.AddPolicy("CanAdjustStock", policy => policy.RequireRole("Admin", "Staff"));
+    options.AddPolicy("CanViewStock", policy => policy.AddRequirements(new PermissionRequirement("CanViewStock")));
+    options.AddPolicy("CanAddStock", policy => policy.AddRequirements(new PermissionRequirement("CanAddStock")));
+    options.AddPolicy("CanRemoveStock", policy => policy.AddRequirements(new PermissionRequirement("CanRemoveStock")));
+    options.AddPolicy("CanAdjustStock", policy => policy.AddRequirements(new PermissionRequirement("CanAdjustStock")));
     
     // Category policies
-    options.AddPolicy("CanViewCategories", policy => policy.RequireRole("Admin", "Staff"));
-    options.AddPolicy("CanManageCategories", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CanViewCategories", policy => policy.AddRequirements(new PermissionRequirement("CanViewCategories")));
+    options.AddPolicy("CanManageCategories", policy => policy.AddRequirements(new PermissionRequirement("CanManageCategories")));
     
     // Supplier policies
-    options.AddPolicy("CanViewSuppliers", policy => policy.RequireRole("Admin", "Staff"));
-    options.AddPolicy("CanManageSuppliers", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CanViewSuppliers", policy => policy.AddRequirements(new PermissionRequirement("CanViewSuppliers")));
+    options.AddPolicy("CanManageSuppliers", policy => policy.AddRequirements(new PermissionRequirement("CanManageSuppliers")));
     
     // Report policies
-    options.AddPolicy("CanViewReports", policy => policy.RequireRole("Admin", "Staff"));
-    options.AddPolicy("CanExportReports", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CanViewReports", policy => policy.AddRequirements(new PermissionRequirement("CanViewReports")));
+    options.AddPolicy("CanExportReports", policy => policy.AddRequirements(new PermissionRequirement("CanExportReports")));
     
     // Notification policies
-    options.AddPolicy("CanViewNotifications", policy => policy.RequireRole("Admin", "Staff"));
+    options.AddPolicy("CanViewNotifications", policy => policy.AddRequirements(new PermissionRequirement("CanViewNotifications")));
     
     // Dashboard policy
-    options.AddPolicy("CanAccessDashboard", policy => policy.RequireRole("Admin", "Staff"));
+    options.AddPolicy("CanAccessDashboard", policy => policy.AddRequirements(new PermissionRequirement("CanAccessDashboard")));
     
     // User Management policies
-    options.AddPolicy("CanViewUsers", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("CanCreateUsers", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("CanEditUsers", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("CanDeleteUsers", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("CanManagePermissions", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CanViewUsers", policy => policy.AddRequirements(new PermissionRequirement("CanViewUsers")));
+    options.AddPolicy("CanCreateUsers", policy => policy.AddRequirements(new PermissionRequirement("CanCreateUsers")));
+    options.AddPolicy("CanEditUsers", policy => policy.AddRequirements(new PermissionRequirement("CanEditUsers")));
+    options.AddPolicy("CanDeleteUsers", policy => policy.AddRequirements(new PermissionRequirement("CanDeleteUsers")));
+    options.AddPolicy("CanManagePermissions", policy => policy.AddRequirements(new PermissionRequirement("CanManagePermissions")));
 });
 
 // Add custom authorization handler for dynamic permissions
