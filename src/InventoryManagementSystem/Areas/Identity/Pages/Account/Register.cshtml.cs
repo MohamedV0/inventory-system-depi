@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using InventoryManagementSystem.Services.Interfaces;
 
 namespace InventoryManagementSystem.Areas.Identity.Pages.Account
 {
@@ -30,13 +31,15 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IUserManagementService _userManagementService;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IUserManagementService userManagementService)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +47,7 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _userManagementService = userManagementService;
         }
 
         /// <summary>
@@ -132,6 +136,16 @@ namespace InventoryManagementSystem.Areas.Identity.Pages.Account
 
                     // Assign Staff role to the new user
                     await _userManager.AddToRoleAsync(user, "Staff");
+                    
+                    // Assign default permissions based on the Staff role
+                    // This ensures permissions are assigned just like when creating a user from the admin panel
+                    await _userManagementService.UpdateUserPermissionsAsync(user.Id, 
+                        (await _userManagementService.GetPermissionsAsync())
+                        .Where(p => 
+                            p.Category != "User Management" && 
+                            !p.Name.Contains("Delete") &&
+                            p.Name != "RequireAdminRole")
+                        .Select(p => p.Id));
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

@@ -11,7 +11,7 @@
     @{
         var headerModel = PageHeaderViewModel
             .Create("Create Category", "fas fa-plus-circle")
-            .WithPrimaryButton("Back to Categories", Url.Action("Index", "Category"), "fas fa-arrow-left");
+            .WithPrimaryButton("Back to Categories", Url.Action("Index", "Categories"), "fas fa-arrow-left");
     }
     <partial name="_PageHeader" model="headerModel" />
 
